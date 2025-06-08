@@ -92,7 +92,7 @@ function ProjectList() {
   };
 
   const handleProjectClick = (project) => {
-    navigate(`/demo/${project.id}`);
+    navigate(`/payment/${project.id}`);
   };
 
   const handleDemoClick = (project) => {
