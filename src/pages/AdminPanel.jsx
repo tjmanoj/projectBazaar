@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { fetchProjects, updateProject, createProject, deleteProject, updateProjectStatus } from '../services/projectService';
+import { fetchProjects, fetchAllProjects, updateProject, createProject, deleteProject, updateProjectStatus } from '../services/projectService';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import {
@@ -82,8 +82,8 @@ function AdminPanel() {
     try {
       setLoading(true);
       setError('');
-      // Get all projects without category filter for admin
-      const projectsList = await fetchProjects();
+      // Get all projects including drafts and published for admin
+      const projectsList = await fetchAllProjects();
       if (!projectsList) {
         setError('No projects found');
         setProjects([]);

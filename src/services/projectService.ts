@@ -64,14 +64,18 @@ export async function fetchProjects(category?: string) {
     let q;
     
     if (category && category !== 'all') {
-      // Query with category filter
+      // Query with category and status filter
       q = query(
         projectsRef,
-        where('category', '==', category)
+        where('category', '==', category),
+        where('status', '==', 'published')
       );
     } else {
-      // Query for all projects
-      q = query(projectsRef);
+      // Query for all published projects
+      q = query(
+        projectsRef,
+        where('status', '==', 'published')
+      );
     }
 
     const querySnapshot = await getDocs(q);
@@ -220,6 +224,20 @@ export async function updateSourceCodeUrl(projectId: string, sourceCodeUrl: stri
     });
   } catch (error) {
     console.error('Error updating source code URL:', error);
+    throw error;
+  }
+}
+
+export async function fetchAllProjects() {
+  try {
+    const projectsRef = collection(db, projectsCollection).withConverter(projectConverter);
+    const q = query(projectsRef);
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs
+      .map(doc => doc.data())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  } catch (error) {
+    console.error('Error fetching all projects:', error);
     throw error;
   }
 }
