@@ -5,9 +5,10 @@ const sampleProjects = [
   {
     title: "E-commerce Website",
     description: "A full-stack e-commerce website with shopping cart, user authentication, and payment integration.",
-    previewURL: "https://example.com/ecommerce-demo",
+    demoLink: "https://example.com/ecommerce-demo",
     price: 1499,
-    sourceFilePath: "projects/ecommerce/source.zip",
+    sourceCodeUrl: "",
+    downloadUrl: "",
     category: "final-year",
     technologies: ["React", "Node.js", "MongoDB", "Express"],
     features: [
@@ -17,17 +18,23 @@ const sampleProjects = [
       "Admin dashboard",
       "Order tracking"
     ],
-    thumbnailURL: "https://source.unsplash.com/featured/?ecommerce",
-    difficulty: "advanced",
+    thumbnail: "https://source.unsplash.com/featured/?ecommerce",
+    status: 'published',
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    razorpayOrderId: "",
+    razorpayPaymentId: "",
+    paymentStatus: "pending",
+    purchasedBy: [],
+    lastPurchasedAt: null
   },
   {
     title: "Todo App",
     description: "A simple todo application with basic CRUD operations and user authentication.",
-    previewURL: "https://example.com/todo-demo",
+    demoLink: "https://example.com/todo-demo",
     price: 499,
-    sourceFilePath: "projects/todo/source.zip",
+    sourceCodeUrl: "",
+    downloadUrl: "",
     category: "mini-project",
     technologies: ["React", "Firebase", "Material-UI"],
     features: [
@@ -36,17 +43,23 @@ const sampleProjects = [
       "Priority levels",
       "Categories"
     ],
-    thumbnailURL: "https://source.unsplash.com/featured/?todo",
-    difficulty: "beginner",
+    thumbnail: "https://source.unsplash.com/featured/?todo",
+    status: 'published',
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    razorpayOrderId: "",
+    razorpayPaymentId: "",
+    paymentStatus: "pending",
+    purchasedBy: [],
+    lastPurchasedAt: null
   },
   {
     title: "Machine Learning Project",
     description: "Image classification using deep learning with TensorFlow and Python.",
-    previewURL: "https://example.com/ml-demo",
+    demoLink: "https://example.com/ml-demo",
     price: 2499,
-    sourceFilePath: "projects/ml/source.zip",
+    sourceCodeUrl: "",
+    downloadUrl: "",
     category: "mentorship",
     technologies: ["Python", "TensorFlow", "OpenCV", "NumPy"],
     features: [
@@ -55,10 +68,15 @@ const sampleProjects = [
       "Dataset preparation",
       "Performance optimization"
     ],
-    thumbnailURL: "https://source.unsplash.com/featured/?ai",
-    difficulty: "advanced",
+    thumbnail: "https://source.unsplash.com/featured/?ai",
+    status: 'published',
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    razorpayOrderId: "",
+    razorpayPaymentId: "",
+    paymentStatus: "pending",
+    purchasedBy: [],
+    lastPurchasedAt: null
   }
 ];
 
