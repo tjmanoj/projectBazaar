@@ -184,8 +184,8 @@ export async function updatePaymentStatus(
     const now = new Date();
     
     await updateDoc(docRef, {
-      razorpayOrderId,
-      razorpayPaymentId,
+      razorpayOrderId: razorpayOrderId || '',
+      razorpayPaymentId: razorpayPaymentId || '',
       paymentStatus: status,
       lastPurchasedAt: now,
       purchasedBy: status === 'completed' ? 

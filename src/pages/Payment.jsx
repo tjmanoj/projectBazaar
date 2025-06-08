@@ -60,10 +60,14 @@ function Payment() {
         handler: async (response) => {
           try {
             // Handle successful payment
+            // Use empty string as fallback for undefined values
+            const orderId = response.razorpay_order_id || '';
+            const paymentId = response.razorpay_payment_id || '';
+            
             await updatePaymentStatus(
               projectId,
-              response.razorpay_order_id,
-              response.razorpay_payment_id,
+              orderId,
+              paymentId,
               currentUser.uid,
               'completed'
             );
@@ -89,11 +93,11 @@ function Payment() {
       const razorpayInstance = new window.Razorpay(options);
       razorpayInstance.on('payment.failed', function (response) {
         setError('Payment failed: ' + response.error.description);
-        // Update payment status in Firebase
+        // Update payment status in Firebase with fallback for undefined values
         updatePaymentStatus(
           projectId,
-          response.error.metadata.order_id,
-          response.error.metadata.payment_id,
+          response.error.metadata?.order_id || '',
+          response.error.metadata?.payment_id || '',
           currentUser.uid,
           'failed'
         );
