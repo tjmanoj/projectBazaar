@@ -49,10 +49,26 @@ function Landing() {
       <AppBar position="sticky" color="default" elevation={1}>
         <Container maxWidth="lg">
           <Toolbar sx={{ justifyContent: 'space-between' }}>
-            <Typography variant="h5" component="h1" color="primary" fontWeight="bold" 
-              sx={{ flexGrow: { xs: 1, md: 0 } }}>
-              Project Bazaar
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <img 
+                src="/logo.png" 
+                alt="Project Bazaar Logo" 
+                style={{ 
+                  height: '32px',
+                  width: 'auto',
+                  objectFit: 'contain'
+                }} 
+              />
+              <Typography 
+                variant="h5" 
+                component="h1" 
+                color="primary" 
+                fontWeight="bold" 
+                sx={{ flexGrow: { xs: 1, md: 0 } }}
+              >
+                Project Bazaar
+              </Typography>
+            </Box>
             
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
               <Button color="inherit" href="#services">Services</Button>
