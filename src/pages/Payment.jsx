@@ -56,7 +56,7 @@ function Payment() {
         currency: "INR",
         name: "Project Bazaar",
         description: `Payment for ${project.title}`,
-        image: "../assets/logo.png", // Add your logo URL
+        image: '/src/assets/logo.png', // Local path for Razorpay logo
         handler: async (response) => {
           try {
             // Handle successful payment

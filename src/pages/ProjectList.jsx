@@ -147,18 +147,28 @@ function ProjectList() {
               flex: 1,
               justifyContent: { xs: 'center', md: 'flex-start' }
             }}>
-              <Typography 
-                variant="h6" 
-                component="h1" 
-                color="primary" 
-                fontWeight="bold"
-                sx={{ 
-                  fontSize: { xs: '1.1rem', sm: '1.25rem' },
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                Project Bazaar
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <img 
+                  src="/src/assets/logo.png"
+                  alt="Project Bazaar Logo"
+                  style={{ 
+                    height: '32px',
+                    width: 'auto'
+                  }}
+                />
+                <Typography 
+                  variant="h6" 
+                  component="h1" 
+                  color="primary" 
+                  fontWeight="bold"
+                  sx={{ 
+                    fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  Project Bazaar
+                </Typography>
+              </Box>
             </Box>
 
             {/* Navigation Tabs - Hidden on mobile */}
