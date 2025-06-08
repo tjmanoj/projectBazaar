@@ -95,6 +95,13 @@ function ProjectList() {
     navigate(`/demo/${project.id}`);
   };
 
+  const handleDemoClick = (project) => {
+    // If project has a demo URL, open it in a new tab
+    if (project.demoLink) {
+      window.open(project.demoLink, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <Box sx={{ 
       bgcolor: 'background.default', 
@@ -318,6 +325,7 @@ function ProjectList() {
                 <ProjectCard
                   project={project}
                   onClick={handleProjectClick}
+                  onDemoClick={handleDemoClick}
                 />
               </Grid>
             ))}

@@ -19,13 +19,21 @@ import { Project } from '../types/Project';
 interface ProjectCardProps {
   project: Project;
   onClick?: (project: Project) => void;
+  onDemoClick?: (project: Project) => void;
 }
 
-export function ProjectCard({ project, onClick }: ProjectCardProps) {
+export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps) {
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR'
   }).format(project.price);
+
+  const handleDemoClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the card click
+    if (onDemoClick) {
+      onDemoClick(project);
+    }
+  };
 
   return (
     <Card 
@@ -115,14 +123,16 @@ export function ProjectCard({ project, onClick }: ProjectCardProps) {
       </CardContent>
 
       <CardActions sx={{ p: 2, pt: 0 }}>
-        <Button
-          size="small"
-          startIcon={<PlayIcon />}
-          onClick={() => onClick?.(project)}
-          sx={{ mr: 1 }}
-        >
-          Demo
-        </Button>
+        {project.demoLink && (
+          <Button
+            size="small"
+            startIcon={<PlayIcon />}
+            onClick={handleDemoClick}
+            sx={{ mr: 1 }}
+          >
+            Demo
+          </Button>
+        )}
         <Button 
           size="small" 
           color="primary"

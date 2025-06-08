@@ -22,7 +22,7 @@ import { Project, ProjectCreate, ProjectUpdate } from '../types/Project';
 const projectConverter: FirestoreDataConverter<Project> = {
   toFirestore: (project: Project) => {
     const { id, ...projectData } = project;
-    const data = {
+    const data: { [key: string]: any } = {
       ...projectData,
       createdAt: Timestamp.fromDate(project.createdAt),
       updatedAt: Timestamp.fromDate(project.updatedAt),
