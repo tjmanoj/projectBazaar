@@ -149,7 +149,7 @@ function ProjectList() {
             }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <img 
-                  src="/src/assets/logo.png"
+                  src="https://res.cloudinary.com/dejvgjqgh/image/upload/v1749394373/logo_dkpogl.png"
                   alt="Project Bazaar Logo"
                   style={{ 
                     height: '32px',
