@@ -9,6 +9,7 @@ import ProjectList from "./pages/ProjectList";
 import Demo from "./pages/Demo";
 import Payment from "./pages/Payment";
 import Download from "./pages/Download";
+import AdminPanel from "./pages/AdminPanel";
 
 // ProtectedRoute component
 function ProtectedRoute({ children }) {
@@ -75,6 +76,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Download />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminPanel />
                 </ProtectedRoute>
               }
             />

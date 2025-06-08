@@ -1,47 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { fetchProjects, updateProject, createProject, deleteProject, updateProjectStatus } from '../services/projectService';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 import {
   Container,
+  Box,
   Typography,
   Button,
+  Grid,
+  Card,
+  CardContent,
+  CardActions,
+  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
   MenuItem,
-  Grid,
-  CircularProgress,
   Alert,
-  Paper,
-  Box,
-  IconButton,
-  Card,
-  CardContent,
-  CardActions,
-  Chip
+  Chip,
+  CircularProgress
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Save as SaveIcon,
-  Close as CloseIcon,
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon
 } from '@mui/icons-material';
-import { collection, getDocs, doc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
-import { 
-  createProject, 
-  updateProject, 
-  deleteProject, 
-  fetchProjects,
-  updateProjectStatus
-} from '../services/projectService';
 
 function AdminPanel() {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -59,6 +53,25 @@ function AdminPanel() {
     status: 'draft'
   });
 
+  // Check admin status
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        const isUserAdmin = userDoc.exists() && userDoc.data().isAdmin === true;
+        setIsAdmin(isUserAdmin);
+        if (!isUserAdmin) {
+          // Redirect non-admin users
+          navigate('/dashboard');
+        }
+      } catch (err) {
+        console.error('Error checking admin status:', err);
+        navigate('/dashboard');
+      }
+    };
+    checkAdminStatus();
+  }, [currentUser, navigate]);
+
   useEffect(() => {
     loadProjects();
   }, []);
@@ -67,16 +80,18 @@ function AdminPanel() {
     try {
       setLoading(true);
       setError('');
-      const projectsRef = collection(db, 'projects');
-      const querySnapshot = await getDocs(projectsRef);
-      const projectsList = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setProjects(projectsList);
+      // Get all projects without category filter for admin
+      const projectsList = await fetchProjects();
+      if (!projectsList) {
+        setError('No projects found');
+        setProjects([]);
+      } else {
+        setProjects(projectsList);
+      }
     } catch (err) {
       setError('Failed to load projects: ' + err.message);
       console.error('Error loading projects:', err);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -89,9 +104,9 @@ function AdminPanel() {
         title: project.title || '',
         description: project.description || '',
         category: project.category || '',
-        price: project.price || '',
-        technologies: project.technologies?.join(', ') || '',
-        features: project.features?.join(', ') || '',
+        price: project.price?.toString() || '',
+        technologies: Array.isArray(project.technologies) ? project.technologies.join(', ') : '',
+        features: Array.isArray(project.features) ? project.features.join(', ') : '',
         thumbnail: project.thumbnail || '',
         demoLink: project.demoLink || '',
         status: project.status || 'draft'
@@ -132,6 +147,7 @@ function AdminPanel() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setError('');
       const projectData = {
         ...formData,
         price: Number(formData.price),
@@ -142,14 +158,15 @@ function AdminPanel() {
       if (editingProject) {
         await updateProject({
           id: editingProject.id,
-          ...projectData
+          ...projectData,
+          status: projectData.status || editingProject.status
         });
       } else {
         await createProject(projectData);
       }
 
       handleCloseDialog();
-      loadProjects();
+      await loadProjects();
     } catch (err) {
       setError('Failed to save project: ' + err.message);
     }
@@ -233,31 +250,38 @@ function AdminPanel() {
                   />
                 </Box>
               </CardContent>
-              <CardActions>
-                <IconButton
-                  size="small"
-                  onClick={() => handleToggleStatus(project)}
-                  title={project.status === 'published' ? 'Unpublish' : 'Publish'}
-                >
-                  {project.status === 'published' ? 
-                    <VisibilityIcon /> : 
-                    <VisibilityOffIcon />
-                  }
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => handleOpenDialog(project)}
-                  color="primary"
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => handleDelete(project.id)}
-                  color="error"
-                >
-                  <DeleteIcon />
-                </IconButton>
+              <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                <Box>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleToggleStatus(project)}
+                    title={project.status === 'published' ? 'Unpublish' : 'Publish'}
+                  >
+                    {project.status === 'published' ? 
+                      <VisibilityIcon /> : 
+                      <VisibilityOffIcon />
+                    }
+                  </IconButton>
+                </Box>
+                <Box>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleOpenDialog(project)}
+                    color="primary"
+                    title="Edit project"
+                    sx={{ mr: 1 }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={() => handleDelete(project.id)}
+                    color="error"
+                    title="Delete project"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
               </CardActions>
             </Card>
           </Grid>
