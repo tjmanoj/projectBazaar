@@ -1,0 +1,29 @@
+{
+  "name": "project-bazaar",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "setup-db": "vite-node scripts/setupDb.js",
+    "setup-admin": "vite-node scripts/setupAdmin.js"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/poppins": "^5.2.6",
+    "@mui/icons-material": "^7.1.1",
+    "@mui/material": "^7.1.1",
+    "firebase": "^11.9.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^7.6.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "esm": "^3.2.25",
+    "vite": "^4.0.0",
+    "vite-node": "^3.2.2"
+  }
+}

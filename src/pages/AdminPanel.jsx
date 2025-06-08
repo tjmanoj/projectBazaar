@@ -1,0 +1,368 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  MenuItem,
+  Grid,
+  CircularProgress,
+  Alert,
+  Paper,
+  Box,
+  IconButton,
+  Card,
+  CardContent,
+  CardActions,
+  Chip
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Save as SaveIcon,
+  Close as CloseIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon
+} from '@mui/icons-material';
+import { collection, getDocs, doc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
+import { 
+  createProject, 
+  updateProject, 
+  deleteProject, 
+  fetchProjects,
+  updateProjectStatus
+} from '../services/projectService';
+
+function AdminPanel() {
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: '',
+    price: '',
+    technologies: '',
+    features: '',
+    thumbnail: '',
+    demoLink: '',
+    status: 'draft'
+  });
+
+  useEffect(() => {
+    loadProjects();
+  }, []);
+
+  const loadProjects = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const projectsRef = collection(db, 'projects');
+      const querySnapshot = await getDocs(projectsRef);
+      const projectsList = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setProjects(projectsList);
+    } catch (err) {
+      setError('Failed to load projects: ' + err.message);
+      console.error('Error loading projects:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenDialog = (project = null) => {
+    if (project) {
+      setEditingProject(project);
+      setFormData({
+        title: project.title || '',
+        description: project.description || '',
+        category: project.category || '',
+        price: project.price || '',
+        technologies: project.technologies?.join(', ') || '',
+        features: project.features?.join(', ') || '',
+        thumbnail: project.thumbnail || '',
+        demoLink: project.demoLink || '',
+        status: project.status || 'draft'
+      });
+    } else {
+      setEditingProject(null);
+      setFormData({
+        title: '',
+        description: '',
+        category: '',
+        price: '',
+        technologies: '',
+        features: '',
+        thumbnail: '',
+        demoLink: '',
+        status: 'draft'
+      });
+    }
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setEditingProject(null);
+    setFormData({
+      title: '',
+      description: '',
+      category: '',
+      price: '',
+      technologies: '',
+      features: '',
+      thumbnail: '',
+      demoLink: '',
+      status: 'draft'
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const projectData = {
+        ...formData,
+        price: Number(formData.price),
+        technologies: formData.technologies.split(',').map(t => t.trim()).filter(Boolean),
+        features: formData.features.split(',').map(f => f.trim()).filter(Boolean),
+      };
+
+      if (editingProject) {
+        await updateProject({
+          id: editingProject.id,
+          ...projectData
+        });
+      } else {
+        await createProject(projectData);
+      }
+
+      handleCloseDialog();
+      loadProjects();
+    } catch (err) {
+      setError('Failed to save project: ' + err.message);
+    }
+  };
+
+  const handleDelete = async (projectId) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        await deleteProject(projectId);
+        loadProjects();
+      } catch (err) {
+        setError('Failed to delete project: ' + err.message);
+      }
+    }
+  };
+
+  const handleToggleStatus = async (project) => {
+    try {
+      const newStatus = project.status === 'published' ? 'draft' : 'published';
+      await updateProjectStatus(project.id, newStatus);
+      loadProjects();
+    } catch (err) {
+      setError('Failed to update project status: ' + err.message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Typography variant="h4" component="h1">
+          Project Management
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenDialog()}
+        >
+          Add Project
+        </Button>
+      </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 4 }}>
+          {error}
+        </Alert>
+      )}
+
+      <Grid container spacing={3}>
+        {projects.map((project) => (
+          <Grid item xs={12} sm={6} md={4} key={project.id}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" component="h2" noWrap>
+                  {project.title}
+                </Typography>
+                <Typography color="textSecondary" gutterBottom>
+                  {project.category}
+                </Typography>
+                <Typography variant="body2" color="textSecondary" paragraph>
+                  {project.description?.substring(0, 100)}...
+                </Typography>
+                <Box display="flex" gap={1} flexWrap="wrap">
+                  <Chip
+                    label={project.status}
+                    color={project.status === 'published' ? 'success' : 'default'}
+                    size="small"
+                  />
+                  <Chip
+                    label={`₹${project.price}`}
+                    color="primary"
+                    size="small"
+                  />
+                </Box>
+              </CardContent>
+              <CardActions>
+                <IconButton
+                  size="small"
+                  onClick={() => handleToggleStatus(project)}
+                  title={project.status === 'published' ? 'Unpublish' : 'Publish'}
+                >
+                  {project.status === 'published' ? 
+                    <VisibilityIcon /> : 
+                    <VisibilityOffIcon />
+                  }
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => handleOpenDialog(project)}
+                  color="primary"
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  onClick={() => handleDelete(project.id)}
+                  color="error"
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </CardActions>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <form onSubmit={handleSubmit}>
+          <DialogTitle>
+            {editingProject ? 'Edit Project' : 'Add New Project'}
+          </DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={12}>
+                <TextField
+                  label="Title"
+                  fullWidth
+                  required
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Description"
+                  fullWidth
+                  multiline
+                  rows={4}
+                  required
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  select
+                  label="Category"
+                  fullWidth
+                  required
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                >
+                  <MenuItem value="mini-project">Mini Project</MenuItem>
+                  <MenuItem value="final-year">Final Year</MenuItem>
+                  <MenuItem value="mentorship">Mentorship</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  label="Price"
+                  type="number"
+                  fullWidth
+                  required
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Technologies (comma-separated)"
+                  fullWidth
+                  required
+                  value={formData.technologies}
+                  onChange={(e) => setFormData({ ...formData, technologies: e.target.value })}
+                  helperText="Example: React, Firebase, Material-UI"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Features (comma-separated)"
+                  fullWidth
+                  required
+                  value={formData.features}
+                  onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                  helperText="Example: Authentication, CRUD operations, Real-time updates"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Thumbnail URL"
+                  fullWidth
+                  value={formData.thumbnail}
+                  onChange={(e) => setFormData({ ...formData, thumbnail: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Demo Link"
+                  fullWidth
+                  value={formData.demoLink}
+                  onChange={(e) => setFormData({ ...formData, demoLink: e.target.value })}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog}>Cancel</Button>
+            <Button type="submit" variant="contained" color="primary">
+              {editingProject ? 'Update' : 'Create'}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </Container>
+  );
+}
+
+export default AdminPanel;
