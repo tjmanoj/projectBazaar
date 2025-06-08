@@ -389,7 +389,7 @@ function Landing() {
 
       <Box component="footer" sx={{ bgcolor: 'background.paper', py: 3, textAlign: 'center' }}>
         <Typography color="text.secondary">
-          &copy; {currentYear} Student Project Studio. All rights reserved.
+          &copy; {currentYear} Project Bazaar. All rights reserved.
         </Typography>
       </Box>
     </Box>
