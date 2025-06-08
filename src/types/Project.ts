@@ -12,6 +12,13 @@ export interface Project {
   createdAt: Date;
   updatedAt: Date;
   status: 'draft' | 'published' | 'archived';
+  // Payment related fields
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  paymentStatus?: 'pending' | 'completed' | 'failed';
+  purchasedBy?: string[];  // Array of user IDs who purchased
+  sourceCodeUrl?: string;  // URL to download source code after payment
+  lastPurchasedAt?: Date;  // Timestamp of last purchase
 }
 
 export interface ProjectCreate extends Omit<Project, 'id' | 'createdAt' | 'updatedAt'> {

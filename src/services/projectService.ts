@@ -11,7 +11,9 @@ import {
   Timestamp, 
   orderBy,
   FirestoreDataConverter,
-  QueryDocumentSnapshot
+  QueryDocumentSnapshot,
+  arrayUnion,
+  arrayRemove
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../firebaseConfig';
@@ -20,12 +22,19 @@ import { Project, ProjectCreate, ProjectUpdate } from '../types/Project';
 const projectConverter: FirestoreDataConverter<Project> = {
   toFirestore: (project: Project) => {
     const { id, ...projectData } = project;
-    return {
+    const data = {
       ...projectData,
       createdAt: Timestamp.fromDate(project.createdAt),
       updatedAt: Timestamp.fromDate(project.updatedAt),
       status: project.status || 'published',
     };
+    
+    // Convert Date objects to Timestamps for payment-related fields
+    if (project.lastPurchasedAt) {
+      data.lastPurchasedAt = Timestamp.fromDate(project.lastPurchasedAt);
+    }
+    
+    return data;
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot) => {
     const data = snapshot.data();
@@ -35,6 +44,14 @@ const projectConverter: FirestoreDataConverter<Project> = {
       createdAt: data.createdAt?.toDate() || new Date(),
       updatedAt: data.updatedAt?.toDate() || new Date(),
       status: data.status || 'published',
+      // Convert Timestamps back to Dates for payment-related fields
+      lastPurchasedAt: data.lastPurchasedAt?.toDate() || null,
+      // Initialize payment related fields if they don't exist
+      paymentStatus: data.paymentStatus || null,
+      purchasedBy: data.purchasedBy || [],
+      razorpayOrderId: data.razorpayOrderId || null,
+      razorpayPaymentId: data.razorpayPaymentId || null,
+      sourceCodeUrl: data.sourceCodeUrl || null,
     } as Project;
   },
 };
@@ -151,6 +168,58 @@ export async function updateProjectStatus(id: string, status: Project['status'])
     });
   } catch (error) {
     console.error('Error updating project status:', error);
+    throw error;
+  }
+}
+
+export async function updatePaymentStatus(
+  projectId: string, 
+  razorpayOrderId: string, 
+  razorpayPaymentId: string,
+  userId: string,
+  status: 'completed' | 'failed' = 'completed'
+) {
+  try {
+    const docRef = doc(db, projectsCollection, projectId).withConverter(projectConverter);
+    const now = new Date();
+    
+    await updateDoc(docRef, {
+      razorpayOrderId,
+      razorpayPaymentId,
+      paymentStatus: status,
+      lastPurchasedAt: now,
+      purchasedBy: status === 'completed' ? 
+        arrayUnion(userId) : // Add user to purchasedBy array only if payment completed
+        arrayRemove(userId), // Remove user if payment failed
+      updatedAt: now
+    });
+  } catch (error) {
+    console.error('Error updating payment status:', error);
+    throw error;
+  }
+}
+
+export async function checkPurchaseStatus(projectId: string, userId: string): Promise<boolean> {
+  try {
+    const project = await fetchProjectById(projectId);
+    if (!project) return false;
+    
+    return project.purchasedBy?.includes(userId) || false;
+  } catch (error) {
+    console.error('Error checking purchase status:', error);
+    return false;
+  }
+}
+
+export async function updateSourceCodeUrl(projectId: string, sourceCodeUrl: string) {
+  try {
+    const docRef = doc(db, projectsCollection, projectId).withConverter(projectConverter);
+    await updateDoc(docRef, {
+      sourceCodeUrl,
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error('Error updating source code URL:', error);
     throw error;
   }
 }

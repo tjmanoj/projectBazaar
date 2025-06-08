@@ -50,6 +50,8 @@ function AdminPanel() {
     features: '',
     thumbnail: '',
     demoLink: '',
+    sourceCodeUrl: '',
+    downloadUrl: '',
     status: 'draft'
   });
 
@@ -109,6 +111,8 @@ function AdminPanel() {
         features: Array.isArray(project.features) ? project.features.join(', ') : '',
         thumbnail: project.thumbnail || '',
         demoLink: project.demoLink || '',
+        sourceCodeUrl: project.sourceCodeUrl || '',
+        downloadUrl: project.downloadUrl || '',
         status: project.status || 'draft'
       });
     } else {
@@ -122,6 +126,8 @@ function AdminPanel() {
         features: '',
         thumbnail: '',
         demoLink: '',
+        sourceCodeUrl: '',
+        downloadUrl: '',
         status: 'draft'
       });
     }
@@ -373,6 +379,24 @@ function AdminPanel() {
                   fullWidth
                   value={formData.demoLink}
                   onChange={(e) => setFormData({ ...formData, demoLink: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Source Code URL"
+                  fullWidth
+                  value={formData.sourceCodeUrl}
+                  onChange={(e) => setFormData({ ...formData, sourceCodeUrl: e.target.value })}
+                  helperText="URL where the source code zip file is stored"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Download URL"
+                  fullWidth
+                  value={formData.downloadUrl}
+                  onChange={(e) => setFormData({ ...formData, downloadUrl: e.target.value })}
+                  helperText="URL for downloading the project files"
                 />
               </Grid>
             </Grid>
