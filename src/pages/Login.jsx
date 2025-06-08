@@ -10,6 +10,11 @@ import {
   Box,
   Alert,
   Link as MuiLink,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
@@ -17,8 +22,11 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [openResetDialog, setOpenResetDialog] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const { login, resetPassword } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -32,6 +40,20 @@ function Login() {
       setError("Failed to log in: " + err.message);
     }
     setLoading(false);
+  }
+
+  async function handleResetPassword() {
+    try {
+      setError("");
+      await resetPassword(resetEmail);
+      setResetMessage("Password reset email sent! Check your inbox.");
+      setTimeout(() => {
+        setOpenResetDialog(false);
+        setResetMessage("");
+      }, 3000);
+    } catch (err) {
+      setError("Failed to reset password: " + err.message);
+    }
   }
 
   return (
@@ -108,7 +130,17 @@ function Login() {
             >
               {loading ? "Signing In..." : "Sign In"}
             </Button>
-            <Box sx={{ textAlign: "center", mt: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2, gap: 1 }}>
+              <MuiLink 
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  setOpenResetDialog(true);
+                  setResetEmail(email);
+                }}
+              >
+                Forgot password?
+              </MuiLink>
               <MuiLink component={Link} to="/signup" variant="body2">
                 Don't have an account? Sign Up
               </MuiLink>
@@ -116,6 +148,45 @@ function Login() {
           </Box>
         </Paper>
       </Box>
+
+      {/* Password Reset Dialog */}
+      <Dialog open={openResetDialog} onClose={() => setOpenResetDialog(false)}>
+        <DialogTitle>Reset Password</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Enter your email address and we'll send you a link to reset your password.
+          </DialogContentText>
+          {resetMessage && (
+            <Alert 
+              severity="success" 
+              sx={{ mt: 2 }}
+              onClose={() => setResetMessage("")}
+            >
+              {resetMessage}
+            </Alert>
+          )}
+          <TextField
+            autoFocus
+            margin="dense"
+            id="resetEmail"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="outlined"
+            value={resetEmail}
+            onChange={(e) => setResetEmail(e.target.value)}
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenResetDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleResetPassword}
+          >
+            Reset Password
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }
