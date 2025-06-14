@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -27,7 +27,11 @@ function getYouTubeEmbedUrl(url) {
 
 export default function DemoModal({ open, project, onClose }) {
   const [videoPlaying, setVideoPlaying] = useState(false);
-  const [viewMode, setViewMode] = useState("desktop"); // "desktop" or "mobile"
+  const [viewMode, setViewMode] = useState("desktop");
+  // reset playback when switching view modes
+  useEffect(() => {
+    setVideoPlaying(false);
+  }, [viewMode]);
 
   if (!project) return null;
 
@@ -40,6 +44,11 @@ export default function DemoModal({ open, project, onClose }) {
     currency: 'INR'
   }).format(project?.price || 0);
 
+  // handler to toggle view and stop playback
+  const handleViewToggle = () => {
+    setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop');
+  };
+
   return (
     <Dialog 
       open={open} 
@@ -51,18 +60,6 @@ export default function DemoModal({ open, project, onClose }) {
       }}
     >
       <Paper elevation={0} sx={{ position: 'relative' }}>
-        <IconButton 
-          onClick={onClose} 
-          sx={{ 
-            position: 'absolute', 
-            top: 8, 
-            right: 8, 
-            zIndex: 1 
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-
         {/* Video Player */}
         <Box
           sx={{
@@ -70,44 +67,32 @@ export default function DemoModal({ open, project, onClose }) {
             width: '100%',
             backgroundColor: 'black',
             overflow: 'hidden',
-            aspectRatio: viewMode === 'desktop' ? '16/9' : '9/16',
+            aspectRatio: viewMode === 'desktop' ? '16/9' : '16/9',
           }}
           onMouseEnter={() => setVideoPlaying(true)}
           onMouseLeave={() => setVideoPlaying(false)}
         >
           {isVideoAvailable ? (
-            <Box
-              sx={{
-                position: 'relative',
+            <iframe
+              key={viewMode}
+              src={`${getYouTubeEmbedUrl(
+                viewMode === 'desktop' 
+                  ? project.demoVideoDesktopUrl 
+                  : project.demoVideoMobileUrl
+              )}?controls=1&modestbranding=1&rel=0&showinfo=0&color=white&iv_load_policy=3${videoPlaying ? '&autoplay=1&mute=1' : '&autoplay=0&mute=1'}`}
+              title={`${project.title} - ${viewMode} Demo`}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
                 width: '100%',
                 height: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                border: 'none',
               }}
-            >
-              <iframe
-                width={viewMode === 'desktop' ? '100%' : '56.25%'}
-                height="100%"
-                src={`${getYouTubeEmbedUrl(
-                  viewMode === 'desktop' 
-                    ? project.demoVideoDesktopUrl 
-                    : project.demoVideoMobileUrl
-                )}?controls=1&modestbranding=1&rel=0&showinfo=0&color=white&iv_load_policy=3${videoPlaying ? '&autoplay=1&mute=1' : '&autoplay=0&mute=1'}`}
-                title={`${project.title} - ${viewMode} Demo`}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                style={{
-                  position: viewMode === 'desktop' ? 'relative' : 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  margin: 'auto',
-                  border: 'none',
-                }}
-              />
-            </Box>
+            />
           ) : (
             <Box
               sx={{
@@ -149,7 +134,7 @@ export default function DemoModal({ open, project, onClose }) {
             </Typography>
             <Switch
               checked={viewMode === 'mobile'}
-              onChange={() => setViewMode(viewMode === 'desktop' ? 'mobile' : 'desktop')}
+              onChange={handleViewToggle}
               color="primary"
               inputProps={{ 'aria-label': 'toggle mobile/desktop view' }}
             />

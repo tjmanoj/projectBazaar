@@ -99,7 +99,7 @@ function Demo() {
           backgroundColor: 'black',
           borderRadius: '8px 8px 0 0',
           overflow: 'hidden',
-          aspectRatio: viewMode === 'desktop' ? '16/9' : '9/16',
+          aspectRatio: viewMode === 'desktop' ? '16/9' : '16/9',
           transition: 'aspect-ratio 0.3s ease-in-out',
         }}
         onMouseEnter={() => setVideoPlaying(true)}
