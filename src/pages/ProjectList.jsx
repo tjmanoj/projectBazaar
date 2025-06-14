@@ -357,7 +357,7 @@ function ProjectList() {
                 xs: '1fr', // 1 card per row on mobile
                 sm: '1fr 1fr', // 2 cards per row on desktop
               },
-              gap: 12, // Reduced from 20 to 12px
+              gap: 4, // Reduced from 12 to 4px for less row space
             }}
           >
             {projects.map((project) => (
