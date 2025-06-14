@@ -8,6 +8,7 @@ import {
   Box,
   Chip,
   Stack,
+  CardMedia,
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -23,6 +24,7 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps) {
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR'
@@ -33,6 +35,10 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
     if (onDemoClick) onDemoClick(project);
   };
 
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   return (
     <Card 
       sx={{ 
@@ -40,8 +46,8 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
         flexDirection: 'column',
         height: '100%',
         width: '100%',
-        minHeight: { xs: '340px', sm: '380px' },
-        maxHeight: { xs: '340px', sm: '380px' },
+        minHeight: { xs: project.thumbnail && !imageError ? '440px' : '340px', sm: project.thumbnail && !imageError ? '480px' : '380px' },
+        maxHeight: { xs: project.thumbnail && !imageError ? '440px' : '340px', sm: project.thumbnail && !imageError ? '480px' : '380px' },
         minWidth: 0,
         boxSizing: 'border-box',
         transition: 'transform 0.2s ease-in-out',
@@ -51,6 +57,21 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
         }
       }}
     >
+      {project.thumbnail && !imageError && (
+        <CardMedia
+          component="img"
+          height="160"
+          image={project.thumbnail}
+          alt={`${project.title} thumbnail`}
+          onError={handleImageError}
+          sx={{ 
+            objectFit: 'cover',
+            borderBottom: 1,
+            borderColor: 'divider'
+          }}
+        />
+      )}
+
       <CardContent sx={{ 
         flexGrow: 1, 
         pt: 2,
