@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { fetchProjects } from "../services/projectService";
 import { ProjectCard } from "../components/ProjectCard";
+import DemoModal from "../components/DemoModal";
 import { db } from "../firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import {
@@ -26,11 +27,11 @@ import {
   Divider,
 } from "@mui/material";
 import { useThemeContext } from "../context/ThemeContext";
-import { 
-  Brightness4, 
-  Brightness7, 
-  AccountCircle, 
-  AdminPanelSettings, 
+import {
+  Brightness4,
+  Brightness7,
+  AccountCircle,
+  AdminPanelSettings,
   Logout as LogoutIcon,
   Menu as MenuIcon,
   Home,
@@ -49,6 +50,8 @@ function ProjectList() {
   const [category, setCategory] = useState("all");
   const [isAdmin, setIsAdmin] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [demoProject, setDemoProject] = useState(null);
+  const [demoOpen, setDemoOpen] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -61,10 +64,10 @@ function ProjectList() {
 
   const checkAdminStatus = async () => {
     try {
-      const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+      const userDoc = await getDoc(doc(db, "users", currentUser.uid));
       setIsAdmin(userDoc.exists() && userDoc.data().isAdmin === true);
     } catch (err) {
-      console.error('Error checking admin status:', err);
+      console.error("Error checking admin status:", err);
       setIsAdmin(false);
     }
   };
@@ -73,7 +76,9 @@ function ProjectList() {
     try {
       setLoading(true);
       setError("");
-      const fetchedProjects = await fetchProjects(category !== "all" ? category : undefined);
+      const fetchedProjects = await fetchProjects(
+        category !== "all" ? category : undefined
+      );
       setProjects(fetchedProjects);
     } catch (err) {
       setError("Failed to load projects: " + err.message);
@@ -96,74 +101,84 @@ function ProjectList() {
   };
 
   const handleDemoClick = (project) => {
-    // If project has a demo URL, open it in a new tab
-    if (project.demoLink) {
-      window.open(project.demoLink, '_blank', 'noopener,noreferrer');
-    }
+    setDemoProject(project);
+    setDemoOpen(true);
   };
 
   return (
-    <Box sx={{ 
-      bgcolor: 'background.default', 
-      minHeight: '100vh',
-      maxWidth: '100vw',
-      overflow: 'hidden'
-    }}>
-      <AppBar 
-        position="sticky" 
-        color="default" 
+    <Box
+      sx={{
+        bgcolor: "background.default",
+        minHeight: "100vh",
+        maxWidth: "100vw",
+        overflow: "hidden",
+      }}
+    >
+      <AppBar
+        position="sticky"
+        color="default"
         elevation={1}
         sx={{
           borderBottom: 1,
-          borderColor: 'divider',
-          backdropFilter: 'blur(8px)',
-          backgroundColor: mode === 'dark' 
-            ? 'rgba(0, 0, 0, 0.9)' 
-            : 'rgba(255, 255, 255, 0.9)'
+          borderColor: "divider",
+          backdropFilter: "blur(8px)",
+          backgroundColor:
+            mode === "dark"
+              ? "rgba(0, 0, 0, 0.9)"
+              : "rgba(255, 255, 255, 0.9)",
         }}
       >
         <Container maxWidth="lg">
-          <Toolbar disableGutters sx={{ minHeight: { xs: '56px', sm: '64px' }, display: 'flex', position: 'relative' }}>
+          <Toolbar
+            disableGutters
+            sx={{
+              minHeight: { xs: "56px", sm: "64px" },
+              display: "flex",
+              position: "relative",
+            }}
+          >
             {/* Mobile Menu Button */}
             <IconButton
               color="inherit"
               aria-label="open drawer"
               edge="start"
               onClick={handleDrawerToggle}
-              sx={{ 
-                mr: 2, 
-                display: { md: 'none' },
-                position: { xs: 'absolute', md: 'static' },
-                left: 0
+              sx={{
+                mr: 2,
+                display: { md: "none" },
+                position: { xs: "absolute", md: "static" },
+                left: 0,
               }}
             >
               <MenuIcon />
             </IconButton>
 
             {/* Logo and Brand */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              flex: 1,
-              justifyContent: { xs: 'center', md: 'flex-start' }
-            }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <img 
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flex: 1,
+                justifyContent: { xs: "center", md: "flex-start" },
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <img
                   src="https://res.cloudinary.com/dejvgjqgh/image/upload/v1749394373/logo_dkpogl.png"
                   alt="Project Bazaar Logo"
-                  style={{ 
-                    height: '32px',
-                    width: 'auto'
+                  style={{
+                    height: "32px",
+                    width: "auto",
                   }}
                 />
-                <Typography 
-                  variant="h6" 
-                  component="h1" 
-                  color="primary" 
+                <Typography
+                  variant="h6"
+                  component="h1"
+                  color="primary"
                   fontWeight="bold"
-                  sx={{ 
-                    fontSize: { xs: '1.1rem', sm: '1.25rem' },
-                    whiteSpace: 'nowrap'
+                  sx={{
+                    fontSize: { xs: "1.1rem", sm: "1.25rem" },
+                    whiteSpace: "nowrap",
                   }}
                 >
                   Project Bazaar
@@ -172,26 +187,28 @@ function ProjectList() {
             </Box>
 
             {/* Navigation Tabs - Hidden on mobile */}
-            <Box sx={{ 
-              display: { xs: 'none', md: 'flex' },
-              alignItems: 'center',
-              height: '100%',
-              mr: 1
-            }}>
-              <Tabs 
-                value={category} 
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                height: "100%",
+                mr: 1,
+              }}
+            >
+              <Tabs
+                value={category}
                 onChange={(_, newValue) => setCategory(newValue)}
                 sx={{
-                  minHeight: '100%',
-                  '& .MuiTab-root': {
-                    minHeight: '100%',
+                  minHeight: "100%",
+                  "& .MuiTab-root": {
+                    minHeight: "100%",
                     py: 1.5,
                     px: 1.5,
-                    minWidth: 'auto',
-                    fontSize: '0.875rem',
-                    textTransform: 'none',
-                    fontWeight: 500
-                  }
+                    minWidth: "auto",
+                    fontSize: "0.875rem",
+                    textTransform: "none",
+                    fontWeight: 500,
+                  },
                 }}
               >
                 <Tab label="All Projects" value="all" />
@@ -202,22 +219,24 @@ function ProjectList() {
             </Box>
 
             {/* Right side actions */}
-            <Box sx={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              gap: 0.5
-            }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+              }}
+            >
               {/* Theme Toggle */}
-              <IconButton 
-                onClick={toggleTheme} 
+              <IconButton
+                onClick={toggleTheme}
                 color="inherit"
                 size="small"
                 disableRipple
-                sx={{ 
-                  '&:hover': { backgroundColor: 'transparent' }
+                sx={{
+                  "&:hover": { backgroundColor: "transparent" },
                 }}
               >
-                {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
+                {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
 
               {/* Admin Button */}
@@ -226,11 +245,11 @@ function ProjectList() {
                   variant="outlined"
                   color="primary"
                   size="small"
-                  onClick={() => navigate('/admin')}
+                  onClick={() => navigate("/admin")}
                   sx={{
                     minWidth: 0,
                     p: 1,
-                    borderRadius: 1
+                    borderRadius: 1,
                   }}
                 >
                   <AdminPanelSettings fontSize="small" />
@@ -238,23 +257,25 @@ function ProjectList() {
               )}
 
               {/* User Profile */}
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center',
-                gap: 0.5,
-                ml: 0.5
-              }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.5,
+                  ml: 0.5,
+                }}
+              >
                 <AccountCircle fontSize="small" color="primary" />
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    display: { xs: 'none', sm: 'block' },
-                    maxWidth: '120px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    color: 'text.secondary',
-                    fontSize: '0.8rem'
+                <Typography
+                  variant="body2"
+                  sx={{
+                    display: { xs: "none", sm: "block" },
+                    maxWidth: "120px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    color: "text.secondary",
+                    fontSize: "0.8rem",
                   }}
                 >
                   {currentUser?.email}
@@ -271,7 +292,7 @@ function ProjectList() {
                   minWidth: 0,
                   p: 1,
                   ml: 0.5,
-                  borderRadius: 1
+                  borderRadius: 1,
                 }}
               >
                 <LogoutIcon fontSize="small" />
@@ -283,25 +304,27 @@ function ProjectList() {
 
       {/* Main Content */}
       <Container maxWidth="lg" sx={{ mt: 4, mb: 8, px: { xs: 2, sm: 3 } }}>
-        <Box sx={{ 
-          borderBottom: 1, 
-          borderColor: 'divider', 
-          mb: 4,
-          maxWidth: '100%',
-          overflow: 'auto'
-        }}>
-          <Tabs 
-            value={category} 
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            mb: 4,
+            maxWidth: "100%",
+            overflow: "auto",
+          }}
+        >
+          <Tabs
+            value={category}
             onChange={(_, newValue) => setCategory(newValue)}
             variant="scrollable"
             scrollButtons="auto"
             allowScrollButtonsMobile
             sx={{
               minHeight: 48, // Reduce tab height
-              '& .MuiTab-root': {
+              "& .MuiTab-root": {
                 minHeight: 48,
-                py: 1
-              }
+                py: 1,
+              },
             }}
           >
             <Tab label="All Projects" value="all" />
@@ -318,16 +341,16 @@ function ProjectList() {
         )}
 
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <CircularProgress />
           </Box>
         ) : (
-          <Grid 
-            container 
+          <Grid
+            container
             spacing={2} // Reduce spacing between cards
-            sx={{ 
-              mx: 'auto', // Center grid
-              width: '100%'
+            sx={{
+              mx: "auto", // Center grid
+              width: "100%",
             }}
           >
             {projects.map((project) => (
@@ -340,9 +363,9 @@ function ProjectList() {
               </Grid>
             ))}
             {!loading && projects.length === 0 && (
-              <Box sx={{ width: '100%', textAlign: 'center', mt: 4 }}>
+              <Box sx={{ width: "100%", textAlign: "center", mt: 4 }}>
                 <Typography variant="h6" color="text.secondary">
-                  {category === "all" 
+                  {category === "all"
                     ? "No projects available yet"
                     : `No ${category} projects available`}
                 </Typography>
@@ -350,6 +373,11 @@ function ProjectList() {
             )}
           </Grid>
         )}
+        <DemoModal
+          open={demoOpen}
+          project={demoProject}
+          onClose={() => setDemoOpen(false)}
+        />
       </Container>
 
       {/* Mobile Navigation Drawer */}
@@ -362,23 +390,23 @@ function ProjectList() {
           keepMounted: true, // Better mobile performance
         }}
         sx={{
-          display: { xs: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { 
-            boxSizing: 'border-box', 
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
             width: 240,
-            bgcolor: 'background.default'
+            bgcolor: "background.default",
           },
         }}
       >
-        <Box sx={{ overflow: 'auto' }}>
-          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ overflow: "auto" }}>
+          <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>
             <AccountCircle color="primary" />
             <Typography
               variant="subtitle2"
               sx={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap'
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
               }}
             >
               {currentUser?.email}
@@ -386,55 +414,59 @@ function ProjectList() {
           </Box>
           <Divider />
           <List>
-            <ListItem 
-              button 
-              selected={category === 'all'}
+            <ListItem
+              button
+              selected={category === "all"}
               onClick={() => {
-                setCategory('all');
+                setCategory("all");
                 handleDrawerToggle();
               }}
             >
               <ListItemIcon>
-                <Home color={category === 'all' ? 'primary' : 'inherit'} />
+                <Home color={category === "all" ? "primary" : "inherit"} />
               </ListItemIcon>
               <ListItemText primary="All Projects" />
             </ListItem>
-            <ListItem 
-              button 
-              selected={category === 'mini-project'}
+            <ListItem
+              button
+              selected={category === "mini-project"}
               onClick={() => {
-                setCategory('mini-project');
+                setCategory("mini-project");
                 handleDrawerToggle();
               }}
             >
               <ListItemIcon>
-                <Assignment color={category === 'mini-project' ? 'primary' : 'inherit'} />
+                <Assignment
+                  color={category === "mini-project" ? "primary" : "inherit"}
+                />
               </ListItemIcon>
               <ListItemText primary="Mini Projects" />
             </ListItem>
-            <ListItem 
-              button 
-              selected={category === 'final-year'}
+            <ListItem
+              button
+              selected={category === "final-year"}
               onClick={() => {
-                setCategory('final-year');
+                setCategory("final-year");
                 handleDrawerToggle();
               }}
             >
               <ListItemIcon>
-                <School color={category === 'final-year' ? 'primary' : 'inherit'} />
+                <School color={category === "final-year" ? "primary" : "inherit"} />
               </ListItemIcon>
               <ListItemText primary="Final Year" />
             </ListItem>
-            <ListItem 
-              button 
-              selected={category === 'mentorship'}
+            <ListItem
+              button
+              selected={category === "mentorship"}
               onClick={() => {
-                setCategory('mentorship');
+                setCategory("mentorship");
                 handleDrawerToggle();
               }}
             >
               <ListItemIcon>
-                <SupervisorAccount color={category === 'mentorship' ? 'primary' : 'inherit'} />
+                <SupervisorAccount
+                  color={category === "mentorship" ? "primary" : "inherit"}
+                />
               </ListItemIcon>
               <ListItemText primary="Mentorship" />
             </ListItem>
@@ -442,10 +474,10 @@ function ProjectList() {
           <Divider />
           <List>
             {isAdmin && (
-              <ListItem 
-                button 
+              <ListItem
+                button
                 onClick={() => {
-                  navigate('/admin');
+                  navigate("/admin");
                   handleDrawerToggle();
                 }}
               >
@@ -455,19 +487,27 @@ function ProjectList() {
                 <ListItemText primary="Admin Panel" />
               </ListItem>
             )}
-            <ListItem button onClick={() => {
-              toggleTheme();
-              handleDrawerToggle();
-            }}>
+            <ListItem
+              button
+              onClick={() => {
+                toggleTheme();
+                handleDrawerToggle();
+              }}
+            >
               <ListItemIcon>
-                {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
+                {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
               </ListItemIcon>
-              <ListItemText primary={mode === 'dark' ? 'Light Mode' : 'Dark Mode'} />
+              <ListItemText
+                primary={mode === "dark" ? "Light Mode" : "Dark Mode"}
+              />
             </ListItem>
-            <ListItem button onClick={() => {
-              handleLogout();
-              handleDrawerToggle();
-            }}>
+            <ListItem
+              button
+              onClick={() => {
+                handleLogout();
+                handleDrawerToggle();
+              }}
+            >
               <ListItemIcon>
                 <LogoutIcon />
               </ListItemIcon>

@@ -19,6 +19,8 @@ export interface Project {
   purchasedBy?: string[];  // Array of user IDs who purchased
   sourceCodeUrl?: string;  // URL to download source code after payment
   lastPurchasedAt?: Date;  // Timestamp of last purchase
+  demoVideoDesktopUrl?: string; // YouTube URL for desktop demo
+  demoVideoMobileUrl?: string;  // YouTube URL for mobile demo
 }
 
 export interface ProjectCreate extends Omit<Project, 'id' | 'createdAt' | 'updatedAt'> {

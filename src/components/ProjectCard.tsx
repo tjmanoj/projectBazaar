@@ -29,10 +29,8 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
   }).format(project.price);
 
   const handleDemoClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the card click
-    if (onDemoClick) {
-      onDemoClick(project);
-    }
+    e.stopPropagation();
+    if (onDemoClick) onDemoClick(project);
   };
 
   return (
@@ -123,7 +121,7 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
       </CardContent>
 
       <CardActions sx={{ p: 2, pt: 0 }}>
-        {project.demoLink && (
+        {project.demoVideoDesktopUrl || project.demoVideoMobileUrl ? (
           <Button
             size="small"
             startIcon={<PlayIcon />}
@@ -132,7 +130,7 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
           >
             Demo
           </Button>
-        )}
+        ) : null}
         <Button 
           size="small" 
           color="primary"

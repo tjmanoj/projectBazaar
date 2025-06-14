@@ -52,6 +52,8 @@ function AdminPanel() {
     demoLink: '',
     sourceCodeUrl: '',
     downloadUrl: '',
+    demoVideoDesktopUrl: '', // New field for desktop demo video
+    demoVideoMobileUrl: '',  // New field for mobile demo video
     status: 'draft'
   });
 
@@ -113,6 +115,8 @@ function AdminPanel() {
         demoLink: project.demoLink || '',
         sourceCodeUrl: project.sourceCodeUrl || '',
         downloadUrl: project.downloadUrl || '',
+        demoVideoDesktopUrl: project.demoVideoDesktopUrl || '',
+        demoVideoMobileUrl: project.demoVideoMobileUrl || '',
         status: project.status || 'draft'
       });
     } else {
@@ -128,6 +132,8 @@ function AdminPanel() {
         demoLink: '',
         sourceCodeUrl: '',
         downloadUrl: '',
+        demoVideoDesktopUrl: '',
+        demoVideoMobileUrl: '',
         status: 'draft'
       });
     }
@@ -397,6 +403,24 @@ function AdminPanel() {
                   value={formData.downloadUrl}
                   onChange={(e) => setFormData({ ...formData, downloadUrl: e.target.value })}
                   helperText="URL for downloading the project files"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Desktop Demo Video (YouTube URL)"
+                  fullWidth
+                  value={formData.demoVideoDesktopUrl}
+                  onChange={(e) => setFormData({ ...formData, demoVideoDesktopUrl: e.target.value })}
+                  helperText="YouTube URL for desktop demo video preview"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  label="Mobile Demo Video (YouTube URL)"
+                  fullWidth
+                  value={formData.demoVideoMobileUrl}
+                  onChange={(e) => setFormData({ ...formData, demoVideoMobileUrl: e.target.value })}
+                  helperText="YouTube URL for mobile demo video preview"
                 />
               </Grid>
             </Grid>
