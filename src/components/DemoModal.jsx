@@ -8,8 +8,11 @@ import {
   Stack,
   Chip,
   Switch,
+  Button
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import { useNavigate } from "react-router-dom";
 
 // Helper to get embeddable YouTube URL from any YouTube link
 function getYouTubeEmbedUrl(url) {
@@ -28,12 +31,18 @@ function getYouTubeEmbedUrl(url) {
 export default function DemoModal({ open, project, onClose }) {
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [viewMode, setViewMode] = useState("desktop");
+  const navigate = useNavigate();
   // reset playback when switching view modes
   useEffect(() => {
     setVideoPlaying(false);
   }, [viewMode]);
 
   if (!project) return null;
+
+  const handlePurchase = () => {
+    onClose(); // Close the modal
+    navigate(`/payment/${project.id}`); // Navigate to payment page
+  };
 
   const isVideoAvailable = viewMode === 'desktop' ? 
     Boolean(project?.demoVideoDesktopUrl) : 
@@ -47,6 +56,15 @@ export default function DemoModal({ open, project, onClose }) {
   // handler to toggle view and stop playback
   const handleViewToggle = () => {
     setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop');
+    // This will trigger the useEffect to reset video playback
+    // Video will reload because of the key={viewMode} prop on the iframe
+  };
+
+  // handler for Buy Now button
+  const handleBuyNow = () => {
+    // Add your buy now logic here
+    // For example, navigating to a checkout page or opening a payment dialog
+    navigate('/checkout');
   };
 
   return (
@@ -67,14 +85,14 @@ export default function DemoModal({ open, project, onClose }) {
             width: '100%',
             backgroundColor: 'black',
             overflow: 'hidden',
-            aspectRatio: viewMode === 'desktop' ? '16/9' : '16/9',
+            aspectRatio: '16/9',
           }}
           onMouseEnter={() => setVideoPlaying(true)}
           onMouseLeave={() => setVideoPlaying(false)}
         >
           {isVideoAvailable ? (
             <iframe
-              key={viewMode}
+              key={viewMode} // Force re-render on viewMode change
               src={`${getYouTubeEmbedUrl(
                 viewMode === 'desktop' 
                   ? project.demoVideoDesktopUrl 
@@ -187,6 +205,20 @@ export default function DemoModal({ open, project, onClose }) {
           <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 2 }}>
             Hover over the video to play (tap on mobile)
           </Typography>
+
+          {/* Buy Now Button */}
+          <Box sx={{ mt: 3, textAlign: 'center' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<ShoppingCartIcon />}
+              onClick={handlePurchase}
+              sx={{ borderRadius: 2, px: 4 }}
+            >
+              Buy Now
+            </Button>
+          </Box>
         </Box>
       </Paper>
     </Dialog>
