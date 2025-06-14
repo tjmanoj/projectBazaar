@@ -347,20 +347,35 @@ function ProjectList() {
         ) : (
           <Grid
             container
-            spacing={2} // Reduce spacing between cards
+            spacing={1.5} // Reduced from 2.5 to 1.5 for less gap
+            alignItems="stretch"
             sx={{
-              mx: "auto", // Center grid
+              mx: "auto",
               width: "100%",
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr', // 1 card per row on mobile
+                sm: '1fr 1fr', // 2 cards per row on desktop
+              },
+              gap: 12, // Reduced from 20 to 12px
             }}
           >
             {projects.map((project) => (
-              <Grid item key={project.id} xs={12} sm={6} md={4}>
+              <Box
+                key={project.id}
+                sx={{
+                  height: '100%',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'stretch',
+                }}
+              >
                 <ProjectCard
                   project={project}
                   onClick={handleProjectClick}
                   onDemoClick={handleDemoClick}
                 />
-              </Grid>
+              </Box>
             ))}
             {!loading && projects.length === 0 && (
               <Box sx={{ width: "100%", textAlign: "center", mt: 4 }}>

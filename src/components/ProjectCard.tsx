@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -12,7 +12,6 @@ import {
 import {
   PlayArrow as PlayIcon,
   ShoppingCart as CartIcon,
-  Code as CodeIcon,
 } from '@mui/icons-material';
 import { Project } from '../types/Project';
 
@@ -23,6 +22,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps) {
+  const [showFullDesc, setShowFullDesc] = useState(false);
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR'
@@ -36,9 +36,14 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
   return (
     <Card 
       sx={{ 
-        height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        minHeight: { xs: '340px', sm: '380px' },
+        maxHeight: { xs: '340px', sm: '380px' },
+        minWidth: 0,
+        boxSizing: 'border-box',
         transition: 'transform 0.2s ease-in-out',
         '&:hover': {
           transform: 'translateY(-4px)',
@@ -46,36 +51,71 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
         }
       }}
     >
-      <CardContent sx={{ flexGrow: 1, pt: 2 }}>
+      <CardContent sx={{ 
+        flexGrow: 1, 
+        pt: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1.5,
+        overflow: 'hidden',
+        minWidth: 0
+      }}>
         <Typography 
-          gutterBottom 
           variant="h6" 
           component="h2" 
           sx={{ 
             fontWeight: 600,
-            mb: 1
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            lineHeight: 1.2,
+            height: '2.4em',
+            mb: 1,
+            minWidth: 0
           }}
         >
           {project.title}
         </Typography>
 
-        <Typography 
-          variant="body2" 
-          color="text.secondary"
-          sx={{
-            mb: 2,
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }}
-        >
-          {project.description}
-        </Typography>
+        <Box>
+          <Typography 
+            variant="body2" 
+            color="text.secondary"
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: showFullDesc ? 'block' : '-webkit-box',
+              WebkitLineClamp: showFullDesc ? 'unset' : 3,
+              WebkitBoxOrient: 'vertical',
+              lineHeight: 1.5,
+              height: showFullDesc ? 'auto' : '4.5em',
+              mb: 1,
+              minWidth: 0
+            }}
+          >
+            {project.description}
+          </Typography>
+          {project.description && project.description.length > 120 && !showFullDesc && (
+            <Button size="small" sx={{ p: 0, minHeight: 0, minWidth: 0, fontSize: '0.8em' }} onClick={() => setShowFullDesc(true)}>
+              See more...
+            </Button>
+          )}
+          {showFullDesc && (
+            <Button size="small" sx={{ p: 0, minHeight: 0, minWidth: 0, fontSize: '0.8em' }} onClick={() => setShowFullDesc(false)}>
+              See less
+            </Button>
+          )}
+        </Box>
 
-        <Box sx={{ mb: 2 }}>
-          <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 1,
+          mt: 'auto' 
+        }}>
+          <Stack direction="row" spacing={1}>
             <Chip 
               size="small" 
               label={project.category} 
@@ -88,12 +128,13 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
               variant="outlined"
             />
           </Stack>
-          <Stack 
-            direction="row" 
-            spacing={0.5} 
+          <Box 
             sx={{ 
+              display: 'flex',
               flexWrap: 'wrap',
-              gap: 0.5
+              gap: 0.5,
+              maxHeight: '48px',
+              overflow: 'hidden'
             }}
           >
             {project.technologies.map((tech) => (
@@ -108,19 +149,27 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
                 }}
               />
             ))}
-          </Stack>
+          </Box>
         </Box>
 
         <Typography 
           variant="body2" 
           color="text.secondary" 
-          sx={{ fontSize: '0.75rem' }}
+          sx={{ 
+            fontSize: '0.75rem',
+            mt: 'auto'
+          }}
         >
           Updated {project.updatedAt.toLocaleDateString()}
         </Typography>
       </CardContent>
 
-      <CardActions sx={{ p: 2, pt: 0 }}>
+      <CardActions sx={{ 
+        p: 2, 
+        pt: 1,
+        borderTop: 1,
+        borderColor: 'divider'
+      }}>
         {project.demoVideoDesktopUrl || project.demoVideoMobileUrl ? (
           <Button
             size="small"
