@@ -65,6 +65,8 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
           alt={`${project.title} thumbnail`}
           onError={handleImageError}
           sx={{ 
+            objectFit: 'cover',
+            objectPosition: 'center top',
             borderBottom: 1,
             borderColor: 'divider'
           }}
