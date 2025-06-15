@@ -201,44 +201,98 @@ const AdminChatMessages = () => {
             {error}
           </Alert>
         )}
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box
+          component="form"
+          onSubmit={e => { e.preventDefault(); handleSendMessage(); }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            bgcolor: 'background.paper',
+            borderRadius: 3,
+            boxShadow: theme => theme.shadows[2],
+            minHeight: 56,
+            p: 1,
+            mt: 1,
+          }}
+        >
           <TextField
             fullWidth
             variant="outlined"
-            size="small"
             placeholder={sending ? "Sending..." : "Type your message..."}
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && !sending && (handleSendMessage(), e.preventDefault())}
             disabled={!selectedUser || adminMessages === null || sending}
             multiline
             maxRows={3}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '20px',
-                bgcolor: 'grey.100',
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey && !sending) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            InputProps={{
+              sx: {
+                borderRadius: 3,
+                bgcolor: 'white',
+                fontSize: '1rem',
+                height: 44,
+                px: 2,
+                py: 0,
+                boxShadow: 'none',
+                '& input': {
+                  p: 0,
+                  height: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                },
                 '& fieldset': {
-                  borderColor: 'transparent',
+                  borderColor: 'grey.300',
+                  borderWidth: 1,
                 },
                 '&:hover fieldset': {
                   borderColor: 'grey.400',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: 'primary.main',
+                  borderColor: 'grey.400',
+                  boxShadow: 'none',
                 },
               },
             }}
+            inputProps={{
+              style: {
+                padding: 0,
+                height: 44,
+                display: 'flex',
+                alignItems: 'center',
+              },
+            }}
+            sx={{
+              flex: 1,
+              mr: 1,
+              minWidth: 0,
+            }}
           />
-          <IconButton 
-            color="primary" 
-            onClick={handleSendMessage} 
+          <IconButton
+            color="primary"
+            type="submit"
             disabled={!newMessage.trim() || !selectedUser || adminMessages === null || sending}
-            sx={{ 
-              ml: 1, 
-              bgcolor: 'primary.main', 
-              color: 'white', 
-              '&:hover': { bgcolor: 'primary.dark' },
-              '&.Mui-disabled': { bgcolor: 'grey.300', color: 'grey.500' }
+            sx={{
+              bgcolor: newMessage.trim() ? 'primary.main' : 'action.disabledBackground',
+              color: 'white',
+              borderRadius: 3,
+              width: 44,
+              height: 44,
+              ml: 0,
+              boxShadow: theme => theme.shadows[1],
+              transition: 'background 0.2s',
+              '&:hover': {
+                bgcolor: newMessage.trim() ? 'primary.dark' : 'action.disabledBackground',
+              },
+              '&.Mui-disabled': {
+                bgcolor: 'action.disabledBackground',
+                color: 'action.disabled',
+              },
             }}
           >
             {sending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}

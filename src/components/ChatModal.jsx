@@ -209,6 +209,14 @@ const ChatModal = () => {
               onChange={(e) => setNewMessage(e.target.value)}
               autoComplete="off"
               inputRef={inputRef}
+              multiline
+              maxRows={3}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (newMessage.trim()) handleSubmit(e);
+                }
+              }}
               InputProps={{
                 sx: {
                   borderRadius: 3,
@@ -217,11 +225,23 @@ const ChatModal = () => {
                   height: 44,
                   px: 2,
                   py: 0,
+                  boxShadow: 'none',
                   '& input': {
                     p: 0,
                     height: 44,
                     display: 'flex',
                     alignItems: 'center',
+                  },
+                  '& fieldset': {
+                    borderColor: 'grey.300',
+                    borderWidth: 1,
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'grey.400',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'grey.400',
+                    boxShadow: 'none',
                   },
                 },
               }}
