@@ -202,10 +202,6 @@ export default function DemoModal({ open, project, onClose }) {
             {project?.description}
           </Typography>
 
-          <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 2 }}>
-            Hover over the video to play (tap on mobile)
-          </Typography>
-
           {/* Buy Now Button */}
           <Box sx={{ mt: 3, textAlign: 'center' }}>
             <Button
