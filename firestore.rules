@@ -30,11 +30,16 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
       allow read, write: if isAdmin();
       match /messages/{messageId} {
+        // Allow user to update 'read' field on admin messages only
+        allow update: if request.auth != null
+          && request.auth.uid == userId
+          && resource.data.sender == 'admin'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
         allow read, write: if request.auth != null && request.auth.uid == userId;
         allow read, write: if isAdmin();
       }
     }
-    // Admin notifications - users can create, admins can read/write/delete
+    // Admin notifications - users can create, admins can read/write
     match /admin_notifications/{notifId} {
       allow read, write, delete: if isAdmin();
       allow create: if request.auth != null;

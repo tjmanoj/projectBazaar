@@ -22,6 +22,8 @@ import {
 } from '@mui/icons-material';
 import { useChat } from '../context/ChatContext';
 import { motion } from 'framer-motion';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import CheckIcon from '@mui/icons-material/Check';
 
 const ChatModal = () => {
   const theme = useTheme();
@@ -50,6 +52,13 @@ const ChatModal = () => {
       }, 300);
     }
   }, [isChatOpen, markMessagesAsRead]);
+
+  // Mark admin messages as read whenever new messages arrive and chat is open
+  useEffect(() => {
+    if (isChatOpen) {
+      markMessagesAsRead();
+    }
+  }, [messages, isChatOpen, markMessagesAsRead]);
 
   // Always scroll to bottom when chat is opened
   useEffect(() => {
@@ -308,7 +317,17 @@ const MessageBubble = ({ message }) => {
   const theme = useTheme();
   const isAdmin = message.sender === 'admin';
   const hasTimestamp = message.timestamp !== null;
-  
+  // Determine tick status
+  let tick = null;
+  if (!isAdmin) {
+    if (message.read) {
+      // Seen: double blue tick
+      tick = <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />;
+    } else {
+      // Sent: double grey tick
+      tick = <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />;
+    }
+  }
   return (
     <Box
       component={motion.div}
@@ -336,7 +355,6 @@ const MessageBubble = ({ message }) => {
           <AdminIcon fontSize="small" />
         </Avatar>
       )}
-      
       <Box
         sx={{
           maxWidth: '75%',
@@ -390,9 +408,9 @@ const MessageBubble = ({ message }) => {
               ? new Date(message.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
               : 'Sending...'}
           </Typography>
+          {tick}
         </Box>
       </Box>
-      
       {!isAdmin && (
         <Avatar 
           sx={{ 

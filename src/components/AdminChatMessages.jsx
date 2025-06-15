@@ -18,6 +18,8 @@ import {
   SupportAgent as SupportAgentIcon,
   ErrorOutline as ErrorIcon 
 } from '@mui/icons-material';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
+import CheckIcon from '@mui/icons-material/Check';
 import { useChat } from '../context/ChatContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -177,18 +179,23 @@ const AdminChatMessages = () => {
               }}
             >
               <Typography variant="body2" sx={{whiteSpace: 'pre-wrap'}}>{msg.text}</Typography>
-              <Typography 
-                variant="caption" 
-                display="block" 
-                sx={{ 
-                  mt: 0.5, 
-                  textAlign: 'right', 
-                  fontSize: '0.65rem',
-                  opacity: 0.8
-                }}
-              >
-                {msg.timestamp && new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mt: 0.5, gap: 0.5 }}>
+                <Typography 
+                  variant="caption" 
+                  display="block" 
+                  sx={{ 
+                    textAlign: 'right', 
+                    fontSize: '0.65rem',
+                    opacity: 0.8
+                  }}
+                >
+                  {msg.timestamp && new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </Typography>
+                {msg.sender !== 'admin' && (msg.read
+                  ? <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />
+                  : <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />
+                )}
+              </Box>
             </Paper>
           </Box>
         ))}
