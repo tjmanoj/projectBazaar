@@ -326,7 +326,14 @@ function AdminPanel() {
           ) : notifications.length === 0 ? (
             <MenuItem disabled>No notifications</MenuItem>
           ) : notifications.map((notif) => (
-            <MenuItem key={notif.id} onClick={() => handleNotifClick(notif)} selected={!notif.read} sx={{ bgcolor: !notif.read ? 'rgba(255,0,0,0.08)' : undefined, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <MenuItem key={notif.id} onClick={() => handleNotifClick(notif)} selected={!notif.read} sx={{ 
+              bgcolor: !notif.read ? 'rgba(255,0,0,0.08)' : undefined, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              gap: 1,
+              pr: 1,
+            }}>
               <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
                 <ListItemAvatar>
                   <Avatar>{notif.userEmail?.[0]?.toUpperCase() || 'U'}</Avatar>
@@ -337,9 +344,11 @@ function AdminPanel() {
                 />
                 {!notif.read && <Badge color="error" variant="dot" sx={{ ml: 1 }} />}
               </Box>
-              <IconButton size="small" color="error" onClick={e => { e.stopPropagation(); handleNotifDelete(notif.id); }}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
+              <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
+                <IconButton size="small" color="error" onClick={e => { e.stopPropagation(); handleNotifDelete(notif.id); }}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
             </MenuItem>
           ))}
         </Menu>
