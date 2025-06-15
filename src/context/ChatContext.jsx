@@ -267,6 +267,7 @@ export function ChatProvider({ children }) {
     if (!currentUser || !text.trim() || !userId || !isAdmin) return;
     
     try {
+      console.log(`[ChatContext Admin] Sending message to user: ${userId}`);
       const messagesRef = collection(db, 'chats', userId, 'messages');
       await addDoc(messagesRef, {
         text: text.trim(),
@@ -275,11 +276,31 @@ export function ChatProvider({ children }) {
         read: false, 
         adminRead: true 
       });
-      // Optionally, trigger a refresh of userChats or update the specific user's last message
-      // This is to make the admin user list update more reactively.
-      // loadUserChats(true); // Or a more targeted update
+      
+      // Update the userChats state to reflect the latest message
+      // This helps the user list update without a full refresh
+      setUserChats(prevUserChats => {
+        return prevUserChats.map(chat => {
+          if (chat.id === userId) {
+            return {
+              ...chat,
+              latestMessage: {
+                text: text.trim(),
+                sender: 'admin',
+                timestamp: new Date(), // Use current date as an approximation until the next refresh
+                read: false,
+                adminRead: true
+              }
+            };
+          }
+          return chat;
+        });
+      });
+      
+      console.log(`[ChatContext Admin] Message sent successfully to user: ${userId}`);
     } catch (error) {
       console.error("Error sending admin message:", error);
+      throw error; // Re-throw to allow handling in the UI
     }
   };
 

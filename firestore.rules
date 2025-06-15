@@ -1,0 +1,58 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if only payment fields are being updated
+    function isOnlyUpdatingPaymentFields(data) {
+      let paymentFields = ['razorpayOrderId', 'razorpayPaymentId', 'paymentStatus', 'lastPurchasedAt', 'purchasedBy', 'updatedAt'];
+      return data.diff(resource.data).affectedKeys().hasOnly(paymentFields);
+    }
+
+    // Helper function to check if user is an admin
+    function isAdmin() {
+      return request.auth != null && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // Allow anyone to read projects
+    match /projects/{projectId} {
+      allow read: if true;
+      // Allow admins full access
+      allow write: if isAdmin();
+      // Allow payment updates by authenticated users
+      allow update: if request.auth != null && 
+        isOnlyUpdatingPaymentFields(request.resource.data);
+    }
+    
+    // User profiles - users can only read/write their own data
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if request.auth != null && request.auth.uid == userId;
+      // Allow admins to write to any user data (for updating admin status, etc.)
+      allow write: if isAdmin();
+    }
+    
+    // Orders - users can only access their own orders
+    match /orders/{orderId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      // Allow admins to read all orders
+      allow read, write: if isAdmin();
+    }
+    
+    // Chat messages - users can only access their own chats
+    match /chats/{userId} {
+      // User can read/write their own chat data
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Admins can read/write any chat data
+      allow read, write: if isAdmin();
+      
+      // Nested messages collection
+      match /messages/{messageId} {
+        // User can read/write their own messages
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        // Admins can read/write any messages
+        allow read, write: if isAdmin();
+      }
+    }
+  }
+}
