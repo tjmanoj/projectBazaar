@@ -32,10 +32,11 @@ export function ChatProvider({ children }) {
   // For admin
   const [userChats, setUserChats] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [adminMessages, setAdminMessages] = useState([]); // Initialize as empty array
+  const [adminMessages, setAdminMessages] = useState([]); // Empty array is safer than null for rendering
   const [isAdmin, setIsAdmin] = useState(false);
-  const [adminLoading, setAdminLoading] = useState(false); // Corrected initial state
+  const [adminLoading, setAdminLoading] = useState(false);
   const [adminError, setAdminError] = useState(null);
+  const [newMessageNotification, setNewMessageNotification] = useState(null); // To track new incoming messages
 
   // Detect admin status
   useEffect(() => {
@@ -179,8 +180,14 @@ export function ChatProvider({ children }) {
       // Filter to only users with chats (for the active chats view)
       const usersWithChats = users.filter(user => user.hasChat);
       
-      // Sort by most recent activity
+      // Sort by unread messages first, then by most recent activity
       usersWithChats.sort((a, b) => {
+        // First sort by unread count (higher count first)
+        if (a.unreadCount !== b.unreadCount) {
+          return b.unreadCount - a.unreadCount;
+        }
+        
+        // Then sort by most recent activity
         const aTime = a.lastActivity?.toMillis ? a.lastActivity.toMillis() : 0;
         const bTime = b.lastActivity?.toMillis ? b.lastActivity.toMillis() : 0;
         return bTime - aTime;
@@ -211,6 +218,79 @@ export function ChatProvider({ children }) {
     }
   }, [isAdmin, currentUser, loadUserChats]);
 
+  // Auto-refresh chats when there's a new message notification
+  useEffect(() => {
+    if (newMessageNotification && isAdmin && currentUser) {
+      console.log('[ChatContext Admin] New message notification received, refreshing chats.');
+      loadUserChats(true);
+    }
+  }, [newMessageNotification, isAdmin, currentUser, loadUserChats]);
+
+  // Listen for new messages across all chats (for admin only)
+  useEffect(() => {
+    if (!isAdmin || !currentUser) return;
+
+    console.log('[ChatContext Admin] Setting up global listener for new messages');
+    
+    // Get all chat collections
+    const listenForNewMessages = async () => {
+      try {
+        const chatsCollectionRef = collection(db, 'chats');
+        const chatCollectionsSnapshot = await getDocs(chatsCollectionRef);
+        const userIdsWithChats = chatCollectionsSnapshot.docs.map(doc => doc.id);
+        
+        // Create listeners for each user's chat
+        const unsubscribes = userIdsWithChats.map(userId => {
+          const messagesRef = collection(db, 'chats', userId, 'messages');
+          const newMessagesQuery = query(messagesRef, 
+            where('adminRead', '==', false),
+            where('sender', '==', 'user'),
+            orderBy('timestamp', 'desc'),
+            limit(1)
+          );
+          
+          return onSnapshot(newMessagesQuery, (snapshot) => {
+            if (!snapshot.empty) {
+              const message = snapshot.docs[0].data();
+              const messageId = snapshot.docs[0].id;
+              
+              // Check if it's a truly new message (within the last minute)
+              const messageTime = message.timestamp?.toDate ? message.timestamp.toDate() : new Date();
+              const now = new Date();
+              const isRecent = (now.getTime() - messageTime.getTime()) < 60000; // 1 minute
+              
+              if (isRecent) {
+                console.log(`[ChatContext Admin] New message from user ${userId}`);
+                setNewMessageNotification({
+                  userId,
+                  messageId,
+                  text: message.text,
+                  timestamp: messageTime
+                });
+                
+                // Refresh the user chats to update the UI
+                loadUserChats(true);
+              }
+            }
+          }, error => {
+            console.error(`[ChatContext Admin] Error listening for new messages from ${userId}:`, error);
+          });
+        });
+        
+        return () => {
+          unsubscribes.forEach(unsubscribe => unsubscribe());
+        };
+      } catch (error) {
+        console.error('[ChatContext Admin] Error setting up message listeners:', error);
+      }
+    };
+    
+    const cleanup = listenForNewMessages();
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [isAdmin, currentUser, loadUserChats]);
+
   // For admin: Load selected user's messages
   useEffect(() => {
     if (!currentUser || !selectedUser || !isAdmin) {
@@ -233,6 +313,73 @@ export function ChatProvider({ children }) {
     });
     return unsubscribe;
   }, [currentUser, selectedUser, isAdmin]);
+
+  // Enhanced global listener for new messages to notify admin
+  useEffect(() => {
+    if (!isAdmin || !currentUser) return;
+
+    console.log('[ChatContext Admin] Setting up global listener for new messages from all users');
+    
+    // Get all chat collections
+    const listenForNewMessages = async () => {
+      try {
+        const chatsCollectionRef = collection(db, 'chats');
+        const chatCollectionsSnapshot = await getDocs(chatsCollectionRef);
+        const userIdsWithChats = chatCollectionsSnapshot.docs.map(doc => doc.id);
+        
+        // Create listeners for each user's chat
+        const unsubscribes = userIdsWithChats.map(userId => {
+          const messagesRef = collection(db, 'chats', userId, 'messages');
+          const newMessagesQuery = query(messagesRef, 
+            where('adminRead', '==', false),
+            where('sender', '==', 'user'),
+            orderBy('timestamp', 'desc'),
+            limit(1)
+          );
+          
+          return onSnapshot(newMessagesQuery, (snapshot) => {
+            if (!snapshot.empty) {
+              const message = snapshot.docs[0].data();
+              const messageId = snapshot.docs[0].id;
+              
+              // Check if it's a truly new message (within the last minute)
+              const messageTime = message.timestamp?.toDate ? message.timestamp.toDate() : new Date();
+              const now = new Date();
+              const isRecent = (now.getTime() - messageTime.getTime()) < 60000; // 1 minute
+              
+              if (isRecent) {
+                console.log(`[ChatContext Admin] New message from user ${userId}: "${message.text}"`);
+                
+                // Create notification with all necessary info
+                setNewMessageNotification({
+                  userId,
+                  messageId,
+                  text: message.text,
+                  timestamp: messageTime
+                });
+                
+                // Refresh the user chats to update the UI with the new message
+                loadUserChats(true);
+              }
+            }
+          }, error => {
+            console.error(`[ChatContext Admin] Error listening for new messages from ${userId}:`, error);
+          });
+        });
+        
+        return () => {
+          unsubscribes.forEach(unsubscribe => unsubscribe());
+        };
+      } catch (error) {
+        console.error('[ChatContext Admin] Error setting up message listeners:', error);
+      }
+    };
+    
+    const cleanup = listenForNewMessages();
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [isAdmin, currentUser, loadUserChats]);
 
   const sendMessage = async (text) => {
     if (!currentUser || !text.trim()) return;
@@ -390,7 +537,9 @@ export function ChatProvider({ children }) {
     markMessagesAsAdminRead,
     isAdmin,
     adminLoading,
-    adminError
+    adminError,
+    newMessageNotification,
+    setNewMessageNotification
   };
 
   return (
