@@ -51,6 +51,13 @@ const ChatModal = () => {
     }
   }, [isChatOpen, markMessagesAsRead]);
 
+  // Always scroll to bottom when chat is opened
+  useEffect(() => {
+    if (isChatOpen && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [isChatOpen]);
+
   useEffect(() => {
     if (isAtBottom && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
