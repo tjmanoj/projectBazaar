@@ -393,6 +393,17 @@ export function ChatProvider({ children }) {
         read: false, 
         adminRead: false 
       });
+      // --- Admin Notification Logic ---
+      // Create a notification for admins in Firestore
+      const notificationsRef = collection(db, 'admin_notifications');
+      await addDoc(notificationsRef, {
+        userId: currentUser.uid,
+        userEmail: currentUser.email || '',
+        message: text.trim(),
+        timestamp: serverTimestamp(),
+        read: false // unread for admin
+      });
+      // --- End Admin Notification Logic ---
       // Optimistically update user details in userChats for admin
       if (isAdmin) {
         const userDocRef = doc(db, 'users', currentUser.uid);

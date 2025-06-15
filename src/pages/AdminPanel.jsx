@@ -37,6 +37,15 @@ import {
   Dashboard as DashboardIcon
 } from '@mui/icons-material';
 import AdminChat from '../components/AdminChat';
+import { collection, query, where, orderBy, onSnapshot, updateDoc, doc as firestoreDoc } from 'firebase/firestore';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import Badge from '@mui/material/Badge';
+import Menu from '@mui/material/Menu';
+import Tooltip from '@mui/material/Tooltip';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import { useChat } from '../context/ChatContext';
 
 function AdminPanel() {
   const navigate = useNavigate();
@@ -63,6 +72,11 @@ function AdminPanel() {
     demoVideoMobileUrl: '',  // New field for mobile demo video
     status: 'draft'
   });
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifAnchorEl, setNotifAnchorEl] = useState(null);
+  const [notifLoading, setNotifLoading] = useState(true);
+  const { setSelectedUser } = useChat(); // Import context hook
 
   // Check admin status
   useEffect(() => {
@@ -86,6 +100,21 @@ function AdminPanel() {
   useEffect(() => {
     loadProjects();
   }, []);
+
+  // Fetch admin notifications
+  useEffect(() => {
+    if (!isAdmin) return;
+    setNotifLoading(true);
+    const notifRef = collection(db, 'admin_notifications');
+    const notifQuery = query(notifRef, orderBy('timestamp', 'desc'));
+    const unsubscribe = onSnapshot(notifQuery, (snapshot) => {
+      const notifs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setNotifications(notifs);
+      setUnreadCount(notifs.filter(n => !n.read).length);
+      setNotifLoading(false);
+    });
+    return unsubscribe;
+  }, [isAdmin]);
 
   const loadProjects = async () => {
     try {
@@ -216,6 +245,24 @@ function AdminPanel() {
     setActiveTab(newValue);
   };
 
+  // Notification menu handlers
+  const handleNotifOpen = (event) => {
+    setNotifAnchorEl(event.currentTarget);
+  };
+  const handleNotifClose = () => {
+    setNotifAnchorEl(null);
+  };
+
+  // Handle notification click: mark as read, go to chat tab, select user
+  const handleNotifClick = async (notif) => {
+    handleNotifClose();
+    // Mark notification as read
+    await updateDoc(firestoreDoc(db, 'admin_notifications', notif.id), { read: true });
+    // Switch to chat tab and select user
+    setActiveTab(1);
+    if (setSelectedUser) setSelectedUser(notif.userId);
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -226,8 +273,8 @@ function AdminPanel() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
-      <Box sx={{ mb: 4 }}>
-        <Paper sx={{ borderRadius: 2 }}>
+      <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Paper sx={{ borderRadius: 2, flex: 1 }}>
           <Tabs 
             value={activeTab} 
             onChange={handleTabChange} 
@@ -250,6 +297,39 @@ function AdminPanel() {
             />
           </Tabs>
         </Paper>
+        {/* Notification Bell */}
+        {isAdmin && (
+          <Tooltip title="User Chat Notifications">
+            <IconButton color="primary" onClick={handleNotifOpen} sx={{ ml: 2 }}>
+              <Badge badgeContent={unreadCount} color="error">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+        )}
+        <Menu
+          anchorEl={notifAnchorEl}
+          open={Boolean(notifAnchorEl)}
+          onClose={handleNotifClose}
+          PaperProps={{ style: { minWidth: 320 } }}
+        >
+          {notifLoading ? (
+            <MenuItem disabled>Loading...</MenuItem>
+          ) : notifications.length === 0 ? (
+            <MenuItem disabled>No notifications</MenuItem>
+          ) : notifications.map((notif) => (
+            <MenuItem key={notif.id} onClick={() => handleNotifClick(notif)} selected={!notif.read} sx={{ bgcolor: !notif.read ? 'rgba(255,0,0,0.08)' : undefined }}>
+              <ListItemAvatar>
+                <Avatar>{notif.userEmail?.[0]?.toUpperCase() || 'U'}</Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={notif.userEmail || notif.userId}
+                secondary={notif.message?.substring(0, 60) || 'New message'}
+              />
+              {!notif.read && <Badge color="error" variant="dot" sx={{ ml: 1 }} />}
+            </MenuItem>
+          ))}
+        </Menu>
       </Box>
 
       {error && (
