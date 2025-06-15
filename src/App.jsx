@@ -10,6 +10,7 @@ import Demo from "./pages/Demo";
 import Payment from "./pages/Payment";
 import Download from "./pages/Download";
 import AdminPanel from "./pages/AdminPanel";
+import ChatWidget from "./components/ChatWidget";
 
 // ProtectedRoute component
 function ProtectedRoute({ children }) {
@@ -88,6 +89,8 @@ function App() {
               }
             />
           </Routes>
+          {/* Chat Widget for authenticated users */}
+          <ChatWidget />
         </div>
       </Router>
     </ThemeProvider>

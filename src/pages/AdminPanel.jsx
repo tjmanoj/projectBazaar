@@ -22,15 +22,21 @@ import {
   MenuItem,
   Alert,
   Chip,
-  CircularProgress
+  CircularProgress,
+  Tabs,
+  Tab,
+  Paper
 } from '@mui/material';
 import {
   Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
+  VisibilityOff as VisibilityOffIcon,
+  Chat as ChatIcon,
+  Dashboard as DashboardIcon
 } from '@mui/icons-material';
+import AdminChat from '../components/AdminChat';
 
 function AdminPanel() {
   const navigate = useNavigate();
@@ -41,6 +47,7 @@ function AdminPanel() {
   const [error, setError] = useState('');
   const [openDialog, setOpenDialog] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -205,6 +212,10 @@ function AdminPanel() {
     }
   };
 
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -215,18 +226,30 @@ function AdminPanel() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Typography variant="h4" component="h1">
-          Project Management
-        </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
-          Add Project
-        </Button>
+      <Box sx={{ mb: 4 }}>
+        <Paper sx={{ borderRadius: 2 }}>
+          <Tabs 
+            value={activeTab} 
+            onChange={handleTabChange} 
+            variant="fullWidth"
+            textColor="primary"
+            indicatorColor="primary"
+            aria-label="admin tabs"
+          >
+            <Tab 
+              icon={<DashboardIcon />} 
+              label="Projects" 
+              id="tab-0" 
+              aria-controls="tabpanel-0" 
+            />
+            <Tab 
+              icon={<ChatIcon />} 
+              label="Customer Chat" 
+              id="tab-1" 
+              aria-controls="tabpanel-1" 
+            />
+          </Tabs>
+        </Paper>
       </Box>
 
       {error && (
@@ -235,70 +258,106 @@ function AdminPanel() {
         </Alert>
       )}
 
-      <Grid container spacing={3}>
-        {projects.map((project) => (
-          <Grid item xs={12} sm={6} md={4} key={project.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" component="h2" noWrap>
-                  {project.title}
-                </Typography>
-                <Typography color="textSecondary" gutterBottom>
-                  {project.category}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" paragraph>
-                  {project.description?.substring(0, 100)}...
-                </Typography>
-                <Box display="flex" gap={1} flexWrap="wrap">
-                  <Chip
-                    label={project.status}
-                    color={project.status === 'published' ? 'success' : 'default'}
-                    size="small"
-                  />
-                  <Chip
-                    label={`₹${project.price}`}
-                    color="primary"
-                    size="small"
-                  />
-                </Box>
-              </CardContent>
-              <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
-                <Box>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleToggleStatus(project)}
-                    title={project.status === 'published' ? 'Unpublish' : 'Publish'}
-                  >
-                    {project.status === 'published' ? 
-                      <VisibilityIcon /> : 
-                      <VisibilityOffIcon />
-                    }
-                  </IconButton>
-                </Box>
-                <Box>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleOpenDialog(project)}
-                    color="primary"
-                    title="Edit project"
-                    sx={{ mr: 1 }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleDelete(project.id)}
-                    color="error"
-                    title="Delete project"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              </CardActions>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      {/* Projects Tab Panel */}
+      <div
+        role="tabpanel"
+        hidden={activeTab !== 0}
+        id="tabpanel-0"
+        aria-labelledby="tab-0"
+      >
+        {activeTab === 0 && (
+          <>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+              <Typography variant="h4" component="h1">
+                Project Management
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={() => handleOpenDialog()}
+              >
+                Add Project
+              </Button>
+            </Box>
+
+            <Grid container spacing={3}>
+              {projects.map((project) => (
+                <Grid item xs={12} sm={6} md={4} key={project.id}>
+                  <Card>
+                    <CardContent>
+                      <Typography variant="h6" component="h2" noWrap>
+                        {project.title}
+                      </Typography>
+                      <Typography color="textSecondary" gutterBottom>
+                        {project.category}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" paragraph>
+                        {project.description?.substring(0, 100)}...
+                      </Typography>
+                      <Box display="flex" gap={1} flexWrap="wrap">
+                        <Chip
+                          label={project.status}
+                          color={project.status === 'published' ? 'success' : 'default'}
+                          size="small"
+                        />
+                        <Chip
+                          label={`₹${project.price}`}
+                          color="primary"
+                          size="small"
+                        />
+                      </Box>
+                    </CardContent>
+                    <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
+                      <Box>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleToggleStatus(project)}
+                          title={project.status === 'published' ? 'Unpublish' : 'Publish'}
+                        >
+                          {project.status === 'published' ? 
+                            <VisibilityIcon /> : 
+                            <VisibilityOffIcon />
+                          }
+                        </IconButton>
+                      </Box>
+                      <Box>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleOpenDialog(project)}
+                          color="primary"
+                          title="Edit project"
+                          sx={{ mr: 1 }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDelete(project.id)}
+                          color="error"
+                          title="Delete project"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </>
+        )}
+      </div>
+
+      {/* Chat Tab Panel */}
+      <div
+        role="tabpanel"
+        hidden={activeTab !== 1}
+        id="tabpanel-1"
+        aria-labelledby="tab-1"
+      >
+        {activeTab === 1 && <AdminChat />}
+      </div>
 
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <form onSubmit={handleSubmit}>
