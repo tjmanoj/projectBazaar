@@ -315,19 +315,12 @@ const ChatModal = () => {
 // Message bubble component
 const MessageBubble = ({ message }) => {
   const theme = useTheme();
-  const isAdmin = message.sender === 'admin';
+  const isUser = message.sender !== 'admin';
   const hasTimestamp = message.timestamp !== null;
   // Determine tick status
   let tick = null;
-  if (isAdmin) {
-    // Admin sent message: use read field
-    if (message.read) {
-      tick = <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />;
-    } else {
-      tick = <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />;
-    }
-  } else {
-    // User sent message: use adminRead field
+  if (isUser) {
+    // Only show tick for messages sent by the user
     if (message.adminRead) {
       tick = <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />;
     } else {
@@ -342,12 +335,12 @@ const MessageBubble = ({ message }) => {
       transition={{ duration: 0.3 }}
       sx={{
         display: 'flex',
-        justifyContent: isAdmin ? 'flex-start' : 'flex-end',
+        justifyContent: isUser ? 'flex-end' : 'flex-start',
         mb: 1,
         maxWidth: '100%',
       }}
     >
-      {isAdmin && (
+      {!isUser && (
         <Avatar 
           sx={{ 
             bgcolor: 'primary.main', 
@@ -366,30 +359,14 @@ const MessageBubble = ({ message }) => {
           maxWidth: '75%',
           p: 1.5,
           borderRadius: 2,
-          bgcolor: isAdmin 
-            ? theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100' 
-            : 'primary.main',
-          color: isAdmin 
-            ? 'text.primary' 
-            : 'white',
+          bgcolor: isUser 
+            ? 'primary.main'
+            : theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
+          color: isUser 
+            ? 'white' 
+            : 'text.primary',
           boxShadow: 1,
           position: 'relative',
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            width: 0,
-            height: 0,
-            borderStyle: 'solid',
-            borderWidth: '8px 8px 0',
-            borderColor: isAdmin 
-              ? theme.palette.mode === 'dark' 
-                ? 'grey.800 transparent transparent' 
-                : 'grey.100 transparent transparent' 
-              : 'primary.main transparent transparent',
-            transform: 'rotate(45deg)',
-            bottom: 0,
-            [isAdmin ? 'left' : 'right']: -4,
-          },
         }}
       >
         <Typography variant="body2">{message.text}</Typography>
@@ -417,7 +394,7 @@ const MessageBubble = ({ message }) => {
           {tick}
         </Box>
       </Box>
-      {!isAdmin && (
+      {isUser && (
         <Avatar 
           sx={{ 
             bgcolor: 'secondary.main', 
