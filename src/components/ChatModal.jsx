@@ -120,13 +120,19 @@ const ChatModal = () => {
               color="inherit" 
               onClick={toggleChat} 
               size="small"
-              sx={{ 
-                '&:hover': { 
-                  bgcolor: 'rgba(255, 255, 255, 0.1)' 
-                } 
+              sx={{
+                background: 'none',
+                borderRadius: 0,
+                boxShadow: 'none',
+                ml: 1,
+                p: 0.5,
+                '&:hover': {
+                  background: 'none',
+                  boxShadow: 'none',
+                },
               }}
             >
-              <CloseIcon />
+              <CloseIcon sx={{ fontSize: 22 }} />
             </IconButton>
           </Box>
           <Divider />

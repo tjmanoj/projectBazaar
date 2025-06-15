@@ -530,6 +530,13 @@ export function ChatProvider({ children }) {
     });
   };
 
+  // Automatically open chatbox for user on login (not admin)
+  useEffect(() => {
+    if (currentUser && !isAdmin) {
+      setIsChatOpen(true);
+    }
+  }, [currentUser, isAdmin]);
+
   const value = {
     messages,
     loading,
