@@ -191,9 +191,15 @@ const AdminChatMessages = () => {
                 >
                   {msg.timestamp && new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Typography>
-                {msg.sender !== 'admin' && (msg.read
-                  ? <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />
-                  : <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />
+                {/* Tick logic for both user and admin messages */}
+                {msg.sender === 'admin' ? (
+                  msg.read
+                    ? <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />
+                    : <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />
+                ) : (
+                  msg.adminRead
+                    ? <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />
+                    : <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />
                 )}
               </Box>
             </Paper>

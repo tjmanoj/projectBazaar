@@ -319,12 +319,18 @@ const MessageBubble = ({ message }) => {
   const hasTimestamp = message.timestamp !== null;
   // Determine tick status
   let tick = null;
-  if (!isAdmin) {
+  if (isAdmin) {
+    // Admin sent message: use read field
     if (message.read) {
-      // Seen: double blue tick
       tick = <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />;
     } else {
-      // Sent: double grey tick
+      tick = <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />;
+    }
+  } else {
+    // User sent message: use adminRead field
+    if (message.adminRead) {
+      tick = <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />;
+    } else {
       tick = <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />;
     }
   }
