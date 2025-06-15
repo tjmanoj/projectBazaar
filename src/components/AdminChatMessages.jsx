@@ -1,88 +1,104 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Box, 
-  Paper, 
-  Typography, 
   TextField, 
   IconButton, 
+  Paper, 
+  Typography, 
   Avatar, 
-  CircularProgress,
-  useTheme,
-  Divider
+  CircularProgress, 
+  Alert, 
+  AlertTitle,
+  Button
 } from '@mui/material';
 import { 
   Send as SendIcon, 
-  Person as PersonIcon,
-  SupportAgent as AdminIcon,
-  AccessTime as PendingIcon
+  Person as PersonIcon, 
+  SupportAgent as SupportAgentIcon,
+  ErrorOutline as ErrorIcon // Added for error display
 } from '@mui/icons-material';
 import { useChat } from '../context/ChatContext';
-import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 const AdminChatMessages = () => {
-  const theme = useTheme();
   const { 
-    adminMessages, 
     selectedUser, 
-    userChats,
-    sendAdminMessage
+    messages, 
+    sendMessage, 
+    loadingMessages, 
+    messageError, 
+    adminLoading, // Added from context
+    adminError    // Added from context
   } = useChat();
-  
+  const { currentUser } = useAuth();
   const [newMessage, setNewMessage] = useState('');
   const messagesEndRef = useRef(null);
-  const chatContainerRef = useRef(null);
-  const inputRef = useRef(null);
 
-  // Scroll to bottom when messages change
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [adminMessages]);
+    scrollToBottom();
+  }, [messages]);
 
-  // Focus the input field when a user is selected
-  useEffect(() => {
-    if (selectedUser && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [selectedUser]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (newMessage.trim() && selectedUser) {
-      sendAdminMessage(newMessage, selectedUser);
-      setNewMessage('');
+  const handleSendMessage = async () => {
+    if (newMessage.trim() && selectedUser && currentUser) {
+      try {
+        await sendMessage(selectedUser, newMessage, currentUser.uid, 'admin');
+        setNewMessage('');
+      } catch (error) {
+        console.error("Error sending message from admin:", error);
+        // Optionally, display an error to the admin UI
+      }
     }
   };
 
-  // Get selected user's details
-  const selectedUserDetails = userChats.find(chat => chat.id === selectedUser);
-
-  if (!selectedUser) {
+  if (!selectedUser && !adminLoading && !adminError) {
     return (
       <Paper 
         elevation={1} 
         sx={{ 
           height: '500px', 
           display: 'flex', 
+          flexDirection: 'column',
           justifyContent: 'center', 
-          alignItems: 'center',
+          alignItems: 'center', 
+          p: 3,
           borderRadius: 2,
-          bgcolor: 'background.paper'
+          textAlign: 'center'
         }}
       >
-        <Box sx={{ 
-          textAlign: 'center', 
-          p: 3,
-          color: 'text.secondary'
-        }}>
-          <Typography variant="h6" gutterBottom>
-            Select a conversation
-          </Typography>
-          <Typography variant="body2">
-            Choose a customer from the list to view their messages
-          </Typography>
+        <SupportAgentIcon sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
+        <Typography variant="h6" color="text.secondary" gutterBottom>
+          Select a Conversation
+        </Typography>
+        <Typography color="text.secondary" variant="body2">
+          Choose a user from the list to view and respond to messages.
+        </Typography>
+      </Paper>
+    );
+  }
+
+  // Display global admin loading or error if no user is selected yet
+  if (adminLoading && !selectedUser) {
+    return (
+      <Paper elevation={1} sx={{ height: '500px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 2, p: 2 }}>
+        <Box sx={{textAlign: 'center'}}>
+            <CircularProgress />
+            <Typography sx={{mt: 1, color: 'text.secondary'}}>Loading conversations...</Typography>
         </Box>
+      </Paper>
+    );
+  }
+
+  if (adminError && !selectedUser) {
+    return (
+      <Paper elevation={1} sx={{ height: '500px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', borderRadius: 2, p: 3, textAlign: 'center' }}>
+        <ErrorIcon color="error" sx={{ fontSize: 40, mb: 1 }} />
+        <Typography color="error" variant="h6" gutterBottom>Error Loading Chats</Typography>
+        <Typography variant="body1" color="text.secondary" sx={{mb: 2}}>{adminError}</Typography>
+        {/* Optional: Add a retry button here that calls loadUserChats(true) */}
       </Paper>
     );
   }
@@ -91,222 +107,121 @@ const AdminChatMessages = () => {
     <Paper 
       elevation={1} 
       sx={{ 
-        height: '500px',
-        display: 'flex',
-        flexDirection: 'column',
+        height: '500px', 
+        display: 'flex', 
+        flexDirection: 'column', 
         borderRadius: 2,
         overflow: 'hidden'
       }}
     >
-      {/* Chat Header */}
-      <Box
-        sx={{
-          p: 2,
-          bgcolor: 'primary.main',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1.5,
-        }}
-      >
-        <Avatar>
-          <PersonIcon />
-        </Avatar>
-        <Box>
-          <Typography variant="subtitle1" fontWeight="medium">
-            {selectedUserDetails?.name || selectedUser}
-          </Typography>
-          <Typography variant="caption">
-            {selectedUserDetails?.email || 'Customer'}
-          </Typography>
-        </Box>
+      <Box sx={{ p: 1.5, borderBottom: 1, borderColor: 'divider' }}>
+        <Typography variant="h6" sx={{ fontSize: '1rem', fontWeight: 'medium' }}>
+          Chat with {selectedUser ? (messages[selectedUser]?.userName || `User ${selectedUser.substring(0,6)}...`) : '...'}
+        </Typography>
       </Box>
-      <Divider />
 
-      {/* Messages Area */}
-      <Box
-        ref={chatContainerRef}
-        sx={{
-          p: 2,
-          flexGrow: 1,
-          overflowY: 'auto',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1.5,
-          bgcolor: theme.palette.mode === 'dark' ? 'background.paper' : 'grey.50',
-        }}
-      >
-        {!adminMessages ? (
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2, display: 'flex', flexDirection: 'column' }}>
+        {loadingMessages && (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-            <CircularProgress size={40} />
+            <CircularProgress />
+            <Typography sx={{ml: 1, color: 'text.secondary'}}>Loading messages...</Typography>
           </Box>
-        ) : adminMessages.length === 0 ? (
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            height: '100%',
-            gap: 2,
-            textAlign: 'center',
-            px: 3
-          }}>
+        )}
+        {!loadingMessages && messageError && (
+          <Alert severity="error" sx={{m: 2}}>
+            <AlertTitle>Error Loading Messages</AlertTitle>
+            {messageError}
+            {/* Optional: Add a retry button here that calls loadMessagesForUser(selectedUser) */}
+          </Alert>
+        )}
+        {!loadingMessages && !messageError && messages[selectedUser] && messages[selectedUser].messages.length === 0 && (
+          <Box sx={{ textAlign: 'center', m: 'auto' }}>
+            <PersonIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
             <Typography variant="body1" color="text.secondary">
               No messages in this conversation yet.
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Send a message to start the conversation.
+            <Typography variant="caption" color="text.disabled">
+              Send a message to start the chat.
             </Typography>
           </Box>
-        ) : (
-          adminMessages.map((message) => (
-            <MessageBubble key={message.id} message={message} />
-          ))
         )}
+        {!loadingMessages && !messageError && messages[selectedUser] && messages[selectedUser].messages.map((msg, index) => (
+          <Box 
+            key={index} 
+            sx={{
+              display: 'flex', 
+              justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start',
+              mb: 1.5,
+            }}
+          >
+            <Paper 
+              elevation={0}
+              sx={{
+                p: '10px 14px',
+                borderRadius: msg.sender === 'admin' ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
+                bgcolor: msg.sender === 'admin' ? 'primary.main' : 'grey.200',
+                color: msg.sender === 'admin' ? 'primary.contrastText' : 'text.primary',
+                maxWidth: '70%',
+                wordBreak: 'break-word',
+              }}
+            >
+              <Typography variant="body2" sx={{whiteSpace: 'pre-wrap'}}>{msg.text}</Typography>
+              <Typography 
+                variant="caption" 
+                display="block" 
+                sx={{ 
+                  mt: 0.5, 
+                  textAlign: 'right', 
+                  fontSize: '0.65rem',
+                  opacity: 0.8
+                }}
+              >
+                {new Date(msg.timestamp?.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </Typography>
+            </Paper>
+          </Box>
+        ))}
         <div ref={messagesEndRef} />
       </Box>
 
-      {/* Input Area */}
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{
-          p: 2,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          borderTop: 1,
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-        }}
-      >
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Type your reply..."
-          size="small"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          autoComplete="off"
-          inputRef={inputRef}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 2,
-            },
-          }}
-        />
-        <IconButton 
-          color="primary" 
-          type="submit" 
-          disabled={!newMessage.trim()}
-          sx={{ 
-            bgcolor: newMessage.trim() ? 'primary.main' : 'action.disabledBackground',
-            color: 'white',
-            '&:hover': { 
-              bgcolor: 'primary.dark' 
-            },
-            '&.Mui-disabled': {
-              bgcolor: 'action.disabledBackground',
-              color: 'action.disabled',
-            }
-          }}
-        >
-          <SendIcon />
-        </IconButton>
-      </Box>
-    </Paper>
-  );
-};
-
-// Message bubble component
-const MessageBubble = ({ message }) => {
-  const theme = useTheme();
-  const isAdmin = message.sender === 'admin';
-  const hasTimestamp = message.timestamp !== null;
-  
-  return (
-    <Box
-      component={motion.div}
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      sx={{
-        display: 'flex',
-        justifyContent: isAdmin ? 'flex-end' : 'flex-start',
-        mb: 1,
-        maxWidth: '100%',
-      }}
-    >
-      {!isAdmin && (
-        <Avatar 
-          sx={{ 
-            bgcolor: 'secondary.main', 
-            width: 32, 
-            height: 32,
-            mr: 1,
-            alignSelf: 'flex-end',
-            mb: 0.5,
-          }}
-        >
-          <PersonIcon fontSize="small" />
-        </Avatar>
-      )}
-      
-      <Box
-        sx={{
-          maxWidth: '70%',
-          p: 1.5,
-          borderRadius: 2,
-          bgcolor: isAdmin 
-            ? 'primary.main'
-            : theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
-          color: isAdmin 
-            ? 'white'
-            : 'text.primary',
-          boxShadow: 1,
-        }}
-      >
-        <Typography variant="body2">{message.text}</Typography>
-        <Box sx={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'flex-end',
-          mt: 0.5,
-          gap: 0.5,
-        }}>
-          {!hasTimestamp && (
-            <PendingIcon sx={{ fontSize: 12, opacity: 0.7 }} />
-          )}
-          <Typography 
-            variant="caption" 
-            sx={{ 
-              opacity: 0.7,
-              fontStyle: hasTimestamp ? 'normal' : 'italic',
-              color: isAdmin ? 'rgba(255,255,255,0.8)' : 'text.secondary'
+      <Box sx={{ p: 1.5, borderTop: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <TextField
+            fullWidth
+            variant="outlined"
+            size="small"
+            placeholder="Type your message..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (handleSendMessage(), e.preventDefault())}
+            disabled={!selectedUser || loadingMessages}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '20px',
+                bgcolor: 'grey.100',
+                '& fieldset': {
+                  borderColor: 'transparent',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'grey.400',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: 'primary.main',
+                },
+              },
             }}
+          />
+          <IconButton 
+            color="primary" 
+            onClick={handleSendMessage} 
+            disabled={!newMessage.trim() || !selectedUser || loadingMessages}
+            sx={{ ml: 1, bgcolor: 'primary.main', color: 'white', '&:hover': { bgcolor: 'primary.dark' } }}
           >
-            {hasTimestamp 
-              ? new Date(message.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-              : 'Sending...'}
-          </Typography>
+            <SendIcon />
+          </IconButton>
         </Box>
       </Box>
-      
-      {isAdmin && (
-        <Avatar 
-          sx={{ 
-            bgcolor: 'primary.dark', 
-            width: 32, 
-            height: 32,
-            ml: 1,
-            alignSelf: 'flex-end',
-            mb: 0.5,
-          }}
-        >
-          <AdminIcon fontSize="small" />
-        </Avatar>
-      )}
-    </Box>
+    </Paper>
   );
 };
 

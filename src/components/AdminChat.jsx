@@ -1,15 +1,23 @@
 import React, { useEffect } from 'react';
-import { Grid, Typography, Box, Paper } from '@mui/material';
+import { Grid, Typography, Box, Paper, CircularProgress } from '@mui/material';
 import AdminChatUserList from './AdminChatUserList';
 import AdminChatMessages from './AdminChatMessages';
 import { useChat } from '../context/ChatContext';
 
 const AdminChat = () => {
-  const { loadUserChats } = useChat();
+  const { loadUserChats, userChats } = useChat();
   
   // Load user chats when the component mounts
   useEffect(() => {
+    // Force load chats when component mounts
     loadUserChats(true);
+    
+    // Refresh chats every 30 seconds to catch new conversations
+    const intervalId = setInterval(() => {
+      loadUserChats(true);
+    }, 30000);
+    
+    return () => clearInterval(intervalId);
   }, [loadUserChats]);
 
   return (
