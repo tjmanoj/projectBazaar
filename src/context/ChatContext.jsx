@@ -254,7 +254,7 @@ export function ChatProvider({ children }) {
             const userData = userDocSnap.data();
             // This part is tricky as sendMessage is for the current user, not necessarily an admin sending to someone.
             // This might be better handled by a separate function or by re-fetching userChats.
-            // For now, let's assume this is a user sending a message, and admin view will update via loadUserChats.
+            // For now,let's assume this is a user sending a message, and admin view will update via loadUserChats.
         }
       }
 
