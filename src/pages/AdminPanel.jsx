@@ -37,7 +37,7 @@ import {
   Dashboard as DashboardIcon
 } from '@mui/icons-material';
 import AdminChat from '../components/AdminChat';
-import { collection, query, where, orderBy, onSnapshot, updateDoc, doc as firestoreDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, updateDoc, doc as firestoreDoc, deleteDoc } from 'firebase/firestore';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import Menu from '@mui/material/Menu';
@@ -263,6 +263,14 @@ function AdminPanel() {
     if (setSelectedUser) setSelectedUser(notif.userId);
   };
 
+  const handleNotifDelete = async (notifId) => {
+    try {
+      await deleteDoc(firestoreDoc(db, 'admin_notifications', notifId));
+    } catch (err) {
+      setError('Failed to delete notification: ' + err.message);
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -318,15 +326,20 @@ function AdminPanel() {
           ) : notifications.length === 0 ? (
             <MenuItem disabled>No notifications</MenuItem>
           ) : notifications.map((notif) => (
-            <MenuItem key={notif.id} onClick={() => handleNotifClick(notif)} selected={!notif.read} sx={{ bgcolor: !notif.read ? 'rgba(255,0,0,0.08)' : undefined }}>
-              <ListItemAvatar>
-                <Avatar>{notif.userEmail?.[0]?.toUpperCase() || 'U'}</Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={notif.userEmail || notif.userId}
-                secondary={notif.message?.substring(0, 60) || 'New message'}
-              />
-              {!notif.read && <Badge color="error" variant="dot" sx={{ ml: 1 }} />}
+            <MenuItem key={notif.id} onClick={() => handleNotifClick(notif)} selected={!notif.read} sx={{ bgcolor: !notif.read ? 'rgba(255,0,0,0.08)' : undefined, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                <ListItemAvatar>
+                  <Avatar>{notif.userEmail?.[0]?.toUpperCase() || 'U'}</Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={notif.userEmail || notif.userId}
+                  secondary={notif.message?.substring(0, 60) || 'New message'}
+                />
+                {!notif.read && <Badge color="error" variant="dot" sx={{ ml: 1 }} />}
+              </Box>
+              <IconButton size="small" color="error" onClick={e => { e.stopPropagation(); handleNotifDelete(notif.id); }}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
             </MenuItem>
           ))}
         </Menu>
