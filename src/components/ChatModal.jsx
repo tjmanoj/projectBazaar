@@ -189,44 +189,76 @@ const ChatModal = () => {
             onSubmit={handleSubmit}
             sx={{
               p: 2,
+              bgcolor: 'background.paper',
+              borderTop: 1,
+              borderColor: 'divider',
               display: 'flex',
               alignItems: 'center',
               gap: 1,
-              borderTop: 1,
-              borderColor: 'divider',
-              bgcolor: 'background.paper',
+              boxShadow: theme => theme.shadows[2],
+              borderRadius: '0 0 16px 16px',
+              minHeight: 56,
             }}
           >
             <TextField
               fullWidth
               variant="outlined"
               placeholder="Type your message..."
-              size="small"
+              size="medium"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               autoComplete="off"
               inputRef={inputRef}
-              sx={{
-                '& .MuiOutlinedInput-root': {
+              InputProps={{
+                sx: {
                   borderRadius: 3,
-                  bgcolor: theme.palette.mode === 'dark' ? 'background.default' : 'background.paper',
+                  bgcolor: 'white',
+                  fontSize: '1rem',
+                  height: 44,
+                  px: 2,
+                  py: 0,
+                  '& input': {
+                    p: 0,
+                    height: 44,
+                    display: 'flex',
+                    alignItems: 'center',
+                  },
                 },
               }}
+              inputProps={{
+                style: {
+                  padding: 0,
+                  height: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                },
+              }}
+              sx={{
+                flex: 1,
+                mr: 1,
+                minWidth: 0,
+              }}
             />
-            <IconButton 
-              color="primary" 
-              type="submit" 
+            <IconButton
+              color="primary"
+              type="submit"
               disabled={!newMessage.trim()}
-              sx={{ 
+              sx={{
                 bgcolor: newMessage.trim() ? 'primary.main' : 'action.disabledBackground',
                 color: 'white',
-                '&:hover': { 
-                  bgcolor: 'primary.dark' 
+                borderRadius: 3,
+                width: 44,
+                height: 44,
+                ml: 0,
+                boxShadow: theme => theme.shadows[1],
+                transition: 'background 0.2s',
+                '&:hover': {
+                  bgcolor: newMessage.trim() ? 'primary.dark' : 'action.disabledBackground',
                 },
                 '&.Mui-disabled': {
                   bgcolor: 'action.disabledBackground',
                   color: 'action.disabled',
-                }
+                },
               }}
             >
               <SendIcon />
