@@ -5,9 +5,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  sendPasswordResetEmail // Add this import
+  sendPasswordResetEmail
 } from 'firebase/auth';
-import { auth } from '../firebaseConfig'; // Adjust path as necessary
+import { auth, db } from '../firebaseConfig';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -19,12 +20,48 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  function signup(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
+  async function signup(email, password) {
+    // First create the user in Firebase Auth
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    
+    // Then store user data in Firestore
+    const user = userCredential.user;
+    await setDoc(doc(db, 'users', user.uid), {
+      email: user.email,
+      displayName: user.displayName || null,
+      photoURL: user.photoURL || null,
+      createdAt: serverTimestamp(),
+      lastLogin: serverTimestamp(),
+      isAdmin: false // Default to regular user
+    });
+    
+    return userCredential;
   }
 
-  function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
+  async function login(email, password) {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    
+    // Update last login timestamp
+    const user = userCredential.user;
+    const userRef = doc(db, 'users', user.uid);
+    
+    // Check if user document exists first
+    const userDoc = await getDoc(userRef);
+    if (userDoc.exists()) {
+      await setDoc(userRef, { lastLogin: serverTimestamp() }, { merge: true });
+    } else {
+      // Create user document if it doesn't exist (for users created before this feature)
+      await setDoc(userRef, {
+        email: user.email,
+        displayName: user.displayName || null,
+        photoURL: user.photoURL || null,
+        createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp(),
+        isAdmin: false
+      });
+    }
+    
+    return userCredential;
   }
 
   function logout() {
@@ -49,13 +86,13 @@ export function AuthProvider({ children }) {
     signup,
     login,
     logout,
-    resetPassword, // Add resetPassword to the context value
-    loading // Export loading state
+    resetPassword,
+    loading
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children} {/* Render children only when not loading */}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }

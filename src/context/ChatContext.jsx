@@ -15,6 +15,7 @@ import {
   getDoc,
   limit // Added limit import
 } from 'firebase/firestore';
+import { fetchAllUsers } from '../services/userService'; // Import fetchAllUsers
 
 const ChatContext = createContext();
 
@@ -102,38 +103,53 @@ export function ChatProvider({ children }) {
 
     setAdminLoading(true);
     setAdminError(null);
-    console.log('[ChatContext Admin] Attempting to fetch chat collections from Firestore path: "chats"');
+    console.log('[ChatContext Admin] Attempting to fetch users from Firestore and chat data');
 
     try {
+      // Fetch all users from Firestore
+      const allUsers = await fetchAllUsers();
+      console.log('[ChatContext Admin] Fetched users from Firestore. Count:', allUsers.length);
+      
+      // Get chat collections to identify users with active chats
       const chatsCollectionRef = collection(db, 'chats');
       const chatCollectionsSnapshot = await getDocs(chatsCollectionRef);
+      const userIdsWithChats = chatCollectionsSnapshot.docs.map(doc => doc.id);
+      
+      console.log('[ChatContext Admin] Found users with chats. Count:', userIdsWithChats.length);
 
-      console.log('[ChatContext Admin] Fetched chat collections. Number of chat documents (users):', chatCollectionsSnapshot.docs.length);
-      if (chatCollectionsSnapshot.empty) {
-        console.warn('[ChatContext Admin] No chat documents found in "chats" collection.');
-      }
-
-      const usersPromises = chatCollectionsSnapshot.docs.map(async (chatDoc) => {
-        const userId = chatDoc.id;
-        // console.log(`[ChatContext Admin] Processing chat for user ID: ${userId}`); // Can be verbose
-        const userDocRef = doc(db, 'users', userId);
+      // Process users and fetch their chat data if they have chats
+      const usersPromises = allUsers.map(async (user) => {
+        const userId = user.uid;
+        const hasChat = userIdsWithChats.includes(userId);
+        
+        // If user has no chat, just return basic user info
+        if (!hasChat) {
+          return {
+            id: userId,
+            name: user.displayName || 'User',
+            email: user.email || 'No email',
+            latestMessage: null,
+            unreadCount: 0,
+            lastActivity: user.lastLogin || null,
+            hasChat: false
+          };
+        }
+        
+        // Otherwise, fetch chat information
         const messagesRef = collection(db, 'chats', userId, 'messages');
         const latestMessageQuery = query(messagesRef, orderBy('timestamp', 'desc'), limit(1));
         const unreadMessagesQuery = query(messagesRef, where('sender', '==', 'user'), where('adminRead', '==', false));
 
         try {
-          const [userDocSnap, latestMessageSnap, unreadMessagesSnap] = await Promise.all([
-            getDoc(userDocRef),
+          const [latestMessageSnap, unreadMessagesSnap] = await Promise.all([
             getDocs(latestMessageQuery),
             getDocs(unreadMessagesQuery)
           ]);
 
-          const userName = userDocSnap.exists() ? userDocSnap.data().displayName || userDocSnap.data().email : `User (${userId.substring(0,6)})`;
-          const userEmail = userDocSnap.exists() ? userDocSnap.data().email : 'No email';
+          const userName = user.displayName || user.email || `User (${userId.substring(0,6)})`;
+          const userEmail = user.email || 'No email';
           const latestMessageData = latestMessageSnap.docs.length > 0 ? latestMessageSnap.docs[0].data() : null;
-          const unreadCountValue = unreadMessagesSnap.size; // Renamed
-
-          // console.log(`[ChatContext Admin] User: ${userName}, Unread: ${unreadCountValue}, Latest Msg:`, latestMessageData); // Can be verbose
+          const unreadCountValue = unreadMessagesSnap.size;
 
           return {
             id: userId,
@@ -141,33 +157,39 @@ export function ChatProvider({ children }) {
             email: userEmail,
             latestMessage: latestMessageData,
             unreadCount: unreadCountValue,
-            lastActivity: latestMessageData ? latestMessageData.timestamp : null
+            lastActivity: latestMessageData ? latestMessageData.timestamp : user.lastLogin,
+            hasChat: true
           };
         } catch (error) {
           console.error(`[ChatContext Admin] Error processing user chat data for ${userId}:`, error);
-          return { // Return a placeholder on error
+          return {
             id: userId,
-            name: `Error (${userId.substring(0,6)})`,
-            email: 'Error',
+            name: user.displayName || `Error (${userId.substring(0,6)})`,
+            email: user.email || 'Error',
             latestMessage: null,
             unreadCount: 0,
-            lastActivity: null
+            lastActivity: user.lastLogin || null,
+            hasChat: hasChat
           };
         }
       });
 
       let users = await Promise.all(usersPromises);
       
-      users.sort((a, b) => {
-        const aTime = a.lastActivity?.toMillis() || 0;
-        const bTime = b.lastActivity?.toMillis() || 0;
-        return bTime - aTime; // Sort by most recent activity
+      // Filter to only users with chats (for the active chats view)
+      const usersWithChats = users.filter(user => user.hasChat);
+      
+      // Sort by most recent activity
+      usersWithChats.sort((a, b) => {
+        const aTime = a.lastActivity?.toMillis ? a.lastActivity.toMillis() : 0;
+        const bTime = b.lastActivity?.toMillis ? b.lastActivity.toMillis() : 0;
+        return bTime - aTime;
       });
       
-      console.log('[ChatContext Admin] Successfully processed user chats. Count:', users.length, users);
-      setUserChats(users);
+      console.log('[ChatContext Admin] Successfully processed user chats. Count:', usersWithChats.length);
+      setUserChats(usersWithChats);
       setAdminLoading(false);
-      return users;
+      return usersWithChats;
     } catch (error) {
       console.error('[ChatContext Admin] Critical error fetching user chats:', error);
       setAdminError('Failed to load user chats. See console for details.');
