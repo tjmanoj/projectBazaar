@@ -8,6 +8,7 @@ import {
   Box,
   Chip,
   Stack,
+  CardMedia,
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -23,6 +24,7 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps) {
   const [showFullDesc, setShowFullDesc] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR'
@@ -32,7 +34,9 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
     e.stopPropagation();
     if (onDemoClick) onDemoClick(project);
   };
-
+  const handleImageError = () => {
+    setImageError(true);
+  };
   return (
     <Card 
       sx={{ 
@@ -40,8 +44,8 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
         flexDirection: 'column',
         height: '100%',
         width: '100%',
-        minHeight: { xs: '340px', sm: '380px' },
-        maxHeight: { xs: '340px', sm: '380px' },
+        minHeight: { xs: project.thumbnail && !imageError ? '500px' : '340px', sm: project.thumbnail && !imageError ? '540px' : '380px' },
+        maxHeight: { xs: project.thumbnail && !imageError ? '500px' : '340px', sm: project.thumbnail && !imageError ? '540px' : '380px' },
         minWidth: 0,
         boxSizing: 'border-box',
         transition: 'transform 0.2s ease-in-out',
@@ -51,12 +55,28 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
         }
       }}
     >
-      <CardContent sx={{ 
+      {project.thumbnail && !imageError && (
+        <CardMedia
+          component="img"
+          height="240"
+          image={project.thumbnail}
+          alt={`${project.title} thumbnail`}
+          onError={handleImageError}
+          sx={{ 
+            objectFit: 'cover',
+            objectPosition: 'center top',
+            borderBottom: 1,
+            borderColor: 'divider'
+          }}
+        />
+      )}
+      <CardContent sx={{
         flexGrow: 1, 
-        pt: 2,
+        pt: 1.5,
+        pb: 1,
         display: 'flex',
         flexDirection: 'column',
-        gap: 1.5,
+        gap: 1,
         overflow: 'hidden',
         minWidth: 0
       }}>
@@ -72,7 +92,7 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
             WebkitBoxOrient: 'vertical',
             lineHeight: 1.2,
             height: '2.4em',
-            mb: 1,
+            mb: -1,
             minWidth: 0
           }}
         >
