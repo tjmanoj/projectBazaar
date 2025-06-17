@@ -10,20 +10,30 @@ import {
   Alert, 
   AlertTitle,
   Button,
-  Snackbar
+  Snackbar,
+  Menu,
+  MenuItem
 } from '@mui/material';
 import { 
   Send as SendIcon, 
   Person as PersonIcon, 
   SupportAgent as SupportAgentIcon,
-  ErrorOutline as ErrorIcon 
+  ErrorOutline as ErrorIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CheckIcon from '@mui/icons-material/Check';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useChat } from '../context/ChatContext';
 import { useAuth } from '../context/AuthContext';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { db } from "../firebaseConfig";
+import { useTheme } from '@mui/material/styles';
 
 const AdminChatMessages = () => {
+  const theme = useTheme();
   const { 
     selectedUser, 
     adminMessages, 
@@ -36,6 +46,12 @@ const AdminChatMessages = () => {
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activeMessage, setActiveMessage] = useState(null);
   const messagesEndRef = useRef(null);
   
   // Find the selected user's info from userChats
@@ -63,6 +79,56 @@ const AdminChatMessages = () => {
         setSending(false);
       }
     }
+  };
+
+  const handleEdit = (msg) => {
+    setEditingId(msg.id);
+    setEditText(msg.text);
+    setNewMessage(msg.text);
+  };
+
+  const handleEditSend = async (e) => {
+    e.preventDefault();
+    if (!editText.trim()) return;
+    setSaving(true);
+    try {
+      await updateDoc(doc(db, 'chats', selectedUser, 'messages', editingId), {
+        text: editText,
+        lastEdited: new Date(),
+      });
+      setEditingId(null);
+      setEditText('');
+      setNewMessage('');
+    } catch (error) {
+      console.error("Error updating message:", error);
+      setError("Failed to update message. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (msg) => {
+    if (!window.confirm('Delete this message?')) return;
+    setDeletingId(msg.id);
+    try {
+      await deleteDoc(doc(db, 'chats', selectedUser, 'messages', msg.id));
+    } catch (error) {
+      console.error("Error deleting message:", error);
+      setError("Failed to delete message.");
+    } finally {
+      setDeletingId(null);
+      setAnchorEl(null);
+    }
+  };
+  
+  const handleMenuOpen = (event, msg) => {
+    setActiveMessage(msg);
+    setAnchorEl(event.currentTarget);
+  };
+  
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setActiveMessage(null);
   };
 
   if (!selectedUser && !adminLoading && !adminError) {
@@ -178,7 +244,36 @@ const AdminChatMessages = () => {
                 wordBreak: 'break-word',
               }}
             >
-              <Typography variant="body2" sx={{whiteSpace: 'pre-wrap'}}>{msg.text}</Typography>
+              {msg.sender === 'admin' && editingId === msg.id ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <TextField 
+                    size="small" 
+                    value={editText} 
+                    onChange={e => setEditText(e.target.value)} 
+                    disabled={saving} 
+                    sx={{ flex: 1, bgcolor: 'white', borderRadius: 1 }} 
+                    autoFocus
+                  />
+                  <IconButton 
+                    size="small" 
+                    color="primary" 
+                    onClick={handleEditSend} 
+                    disabled={saving || !editText.trim()}
+                  >
+                    <SendIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton 
+                    size="small" 
+                    color="error" 
+                    onClick={() => setEditingId(null)} 
+                    disabled={saving}
+                  >
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              ) : (
+                <Typography variant="body2" sx={{whiteSpace: 'pre-wrap'}}>{msg.text}</Typography>
+              )}
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mt: 0.5, gap: 0.5 }}>
                 <Typography 
                   variant="caption" 
@@ -191,16 +286,53 @@ const AdminChatMessages = () => {
                 >
                   {msg.timestamp && new Date(msg.timestamp.toDate()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </Typography>
-                {/* Tick logic: only for admin's own messages */}
                 {msg.sender === 'admin' && (
                   msg.read
                     ? <DoneAllIcon sx={{ fontSize: 16, color: '#2196f3', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Seen" />
                     : <DoneAllIcon sx={{ fontSize: 16, color: 'grey.500', ml: 0.5, verticalAlign: 'middle' }} titleAccess="Sent" />
                 )}
+                {msg.sender === 'admin' && (
+                  <IconButton
+                    className="msg-menu-trigger"
+                    size="small"
+                    sx={{ ml: 0.5, opacity: 0, transition: 'opacity 0.2s', p: 0.5, '&:hover': { opacity: 1 } }}
+                    onClick={(e) => handleMenuOpen(e, msg)}
+                    aria-label="Message options"
+                  >
+                    <KeyboardArrowUpIcon fontSize="small" />
+                  </IconButton>
+                )}
               </Box>
             </Paper>
           </Box>
         ))}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          sx={{ mt: -1 }}
+        >
+          {activeMessage && (
+            <MenuItem onClick={() => { 
+              handleEdit(activeMessage); 
+              handleMenuClose(); 
+            }} disabled={saving || deletingId === activeMessage.id}>
+              <EditIcon fontSize="small" sx={{ mr: 1 }} />
+              Edit
+            </MenuItem>
+          )}
+          {activeMessage && (
+            <MenuItem onClick={() => { 
+              handleDelete(activeMessage); 
+              handleMenuClose(); 
+            }} disabled={deletingId === activeMessage.id || saving}>
+              <DeleteIcon fontSize="small" sx={{ mr: 1 }} />
+              Delete
+            </MenuItem>
+          )}
+        </Menu>
         <div ref={messagesEndRef} />
       </Box>
 
@@ -212,7 +344,7 @@ const AdminChatMessages = () => {
         )}
         <Box
           component="form"
-          onSubmit={e => { e.preventDefault(); handleSendMessage(); }}
+          onSubmit={editingId ? handleEditSend : handleSendMessage}
           sx={{
             display: 'flex',
             alignItems: 'center',
@@ -229,8 +361,8 @@ const AdminChatMessages = () => {
             fullWidth
             variant="outlined"
             placeholder={sending ? "Sending..." : "Type your message..."}
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            value={editingId ? editText : newMessage}
+            onChange={e => editingId ? setEditText(e.target.value) : setNewMessage(e.target.value)}
             disabled={!selectedUser || adminMessages === null || sending}
             multiline
             maxRows={3}
@@ -285,7 +417,7 @@ const AdminChatMessages = () => {
           <IconButton
             color="primary"
             type="submit"
-            disabled={!newMessage.trim() || !selectedUser || adminMessages === null || sending}
+            disabled={editingId ? !editText.trim() : !newMessage.trim()}
             sx={{
               bgcolor: newMessage.trim() ? 'primary.main' : 'action.disabledBackground',
               color: 'white',
@@ -304,7 +436,7 @@ const AdminChatMessages = () => {
               },
             }}
           >
-            {sending ? <CircularProgress size={20} color="inherit" /> : <SendIcon />}
+            <SendIcon />
           </IconButton>
         </Box>
       </Box>

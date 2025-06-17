@@ -35,6 +35,23 @@ service cloud.firestore {
           && request.auth.uid == userId
           && resource.data.sender == 'admin'
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+        // Allow user to edit their own message (text/lastEdited) within 1 hour
+        allow update: if request.auth != null
+          && resource.data.sender == 'user'
+          && request.auth.uid == userId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'lastEdited'])
+          && (request.time.toMillis() - resource.data.timestamp.toMillis() <= 60 * 60 * 1000);
+        // Allow user to delete their own message
+        allow delete: if request.auth != null
+          && resource.data.sender == 'user'
+          && request.auth.uid == userId;
+        // Allow admin to edit their own message (text/lastEdited) within 1 hour
+        allow update: if isAdmin()
+          && resource.data.sender == 'admin'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'lastEdited'])
+          && (request.time.toMillis() - resource.data.timestamp.toMillis() <= 60 * 60 * 1000);
+        // Allow admin to delete their own message
+        allow delete: if isAdmin() && resource.data.sender == 'admin';
         allow read, write: if request.auth != null && request.auth.uid == userId;
         allow read, write: if isAdmin();
       }
