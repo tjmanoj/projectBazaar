@@ -18,6 +18,7 @@ import {
 import { 
   Send as SendIcon, 
   Close as CloseIcon,
+  MoreVert as MoreVertIcon,
   SupportAgent as AdminIcon,
   AccountCircle as UserIcon,
   AccessTime as PendingIcon,
@@ -445,7 +446,7 @@ const MessageBubble = ({ message }) => {
         }}
       >
         <Typography variant="body2">{message.text}</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mt: 0.5, gap: 0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mt: 0.5, gap: 0.5, position: 'relative' }}>
           {!hasTimestamp && (
             <PendingIcon sx={{ fontSize: 12, opacity: 0.7 }} />
           )}
@@ -465,11 +466,26 @@ const MessageBubble = ({ message }) => {
             <IconButton
               className="msg-menu-trigger"
               size="small"
-              sx={{ ml: 0.5, opacity: 0, transition: 'opacity 0.2s', p: 0.5 }}
+              sx={{ 
+                      ml: 0.5, 
+                      opacity: 0,
+                      padding: 0.5,
+                      minWidth: '24px',
+                      minHeight: '24px',
+                      position: 'absolute',
+                      right: -28,
+                      top: -2,
+                      transition: 'opacity 0.2s',
+                      backgroundColor: 'transparent',
+                      '&:hover': { 
+                        opacity: 1,
+                        backgroundColor: 'transparent'
+                      }
+                    }}
               onClick={handleMenuOpen}
               aria-label="Message options"
             >
-              <OptionsIcon fontSize="small" />
+              <MoreVertIcon fontSize="small" />
             </IconButton>
           )}
         </Box>
