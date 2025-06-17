@@ -19,13 +19,13 @@ import {
   Person as PersonIcon, 
   SupportAgent as SupportAgentIcon,
   ErrorOutline as ErrorIcon,
-  Close as CloseIcon
+  Close as CloseIcon,
+  MoreVert as MoreVertIcon
 } from '@mui/icons-material';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import CheckIcon from '@mui/icons-material/Check';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { useChat } from '../context/ChatContext';
 import { useAuth } from '../context/AuthContext';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
@@ -231,6 +231,10 @@ const AdminChatMessages = () => {
               display: 'flex', 
               justifyContent: msg.sender === 'admin' ? 'flex-end' : 'flex-start',
               mb: 1.5,
+              position: 'relative',
+              '&:hover .msg-menu-trigger': {
+                opacity: 1
+              }
             }}
           >
             <Paper 
@@ -242,6 +246,7 @@ const AdminChatMessages = () => {
                 color: msg.sender === 'admin' ? 'primary.contrastText' : 'text.primary',
                 maxWidth: '70%',
                 wordBreak: 'break-word',
+                position: 'relative',
               }}
             >
               {msg.sender === 'admin' && editingId === msg.id ? (
@@ -274,7 +279,7 @@ const AdminChatMessages = () => {
               ) : (
                 <Typography variant="body2" sx={{whiteSpace: 'pre-wrap'}}>{msg.text}</Typography>
               )}
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mt: 0.5, gap: 0.5 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mt: 0.5, gap: 0.5, position: 'relative' }}>
                 <Typography 
                   variant="caption" 
                   display="block" 
@@ -295,11 +300,26 @@ const AdminChatMessages = () => {
                   <IconButton
                     className="msg-menu-trigger"
                     size="small"
-                    sx={{ ml: 0.5, opacity: 0, transition: 'opacity 0.2s', p: 0.5, '&:hover': { opacity: 1 } }}
+                    sx={{ 
+                      ml: 0.5, 
+                      opacity: 0,
+                      padding: 0.5,
+                      minWidth: '24px',
+                      minHeight: '24px',
+                      position: 'absolute',
+                      right: -28,
+                      top: -2,
+                      transition: 'opacity 0.2s',
+                      backgroundColor: 'transparent',
+                      '&:hover': { 
+                        opacity: 1,
+                        backgroundColor: 'transparent'
+                      }
+                    }}
                     onClick={(e) => handleMenuOpen(e, msg)}
                     aria-label="Message options"
                   >
-                    <KeyboardArrowUpIcon fontSize="small" />
+                    <MoreVertIcon fontSize="small" />
                   </IconButton>
                 )}
               </Box>
