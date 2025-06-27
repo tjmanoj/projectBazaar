@@ -253,6 +253,112 @@ function Landing() {
                     </Button>
                   </Stack>
                 </motion.div>
+                
+                {/* Video and Quotes Section */}
+                <motion.div 
+                  variants={fadeIn}
+                  style={{ marginTop: '3rem', width: '100%' }}
+                >
+                  <Grid container spacing={4} alignItems="center">
+                    {/* Left side - Video */}
+                    <Grid item xs={12} md={6}>
+                      <Box
+                        sx={{
+                          position: 'relative',
+                          width: '100%',
+                          height: '240px',
+                          overflow: 'hidden',
+                          borderRadius: 2,
+                          boxShadow: theme => `0 8px 32px ${alpha(theme.palette.primary.main, 0.15)}`,
+                        }}
+                      >
+                        <video
+                          src="/src/assets/hero-video.mp4"
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                          }}
+                        />
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: theme => `linear-gradient(45deg, ${alpha(theme.palette.background.default, 0.7)} 0%, transparent 100%)`,
+                          }}
+                        />
+                      </Box>
+                    </Grid>
+                    
+                    {/* Right side - Animated Quotes */}
+                    <Grid item xs={12} md={6}>
+                      <MotionBox
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        sx={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 2,
+                          position: 'relative',
+                        }}
+                      >
+                        {[
+                          {
+                            text: "Innovation is the heart of progress",
+                            author: "- Project Bazaar"
+                          },
+                          {
+                            text: "Building tomorrow's solutions today",
+                            author: "- Tech Leaders"
+                          },
+                          {
+                            text: "Code with confidence, create with purpose",
+                            author: "- Developer Community"
+                          }
+                        ].map((quote, index) => (
+                          <MotionBox
+                            key={index}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.3 + index * 0.2 }}
+                            sx={{
+                              p: 2,
+                              borderLeft: 3,
+                              borderColor: 'primary.main',
+                              bgcolor: theme => alpha(theme.palette.primary.main, 0.05),
+                              borderRadius: 1,
+                            }}
+                          >
+                            <Typography
+                              variant="h6"
+                              sx={{
+                                fontStyle: 'italic',
+                                color: 'text.primary',
+                                fontWeight: 500,
+                              }}
+                            >
+                              {quote.text}
+                            </Typography>
+                            <Typography
+                              variant="subtitle2"
+                              sx={{
+                                color: 'text.secondary',
+                                mt: 1,
+                              }}
+                            >
+                              {quote.author}
+                            </Typography>
+                          </MotionBox>
+                        ))}
+                      </MotionBox>
+                    </Grid>
+                  </Grid>
+                </motion.div>
               </MotionBox>
             </Grid>
             <Grid item xs={12} md={6} sx={{ 
