@@ -193,7 +193,8 @@ function Landing() {
                   <Stack 
                     direction={{ xs: 'column', sm: 'row' }} 
                     spacing={2}
-                    justifyContent={{ xs: 'center', md: 'flex-start' }}
+                    justifyContent="center"
+                    alignItems="center"
                   >
                     <Button
                       variant="contained"
@@ -208,18 +209,6 @@ function Landing() {
                     >
                       Get Started
                     </Button>
-                    <Button
-                      variant="outlined"
-                      size="large"
-                      href="#pricing"
-                      sx={{
-                        py: 2,
-                        px: 4,
-                        fontSize: '1.1rem'
-                      }}
-                    >
-                      View Pricing
-                    </Button>
                   </Stack>
                 </motion.div>
               </MotionBox>
@@ -227,7 +216,7 @@ function Landing() {
             <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
               <MotionBox
                 component="img"
-                src="/hero-image.png"
+                src="src/assets/hero-image.jpg"
                 alt="Project Development"
                 sx={{
                   width: '100%',
@@ -275,17 +264,17 @@ function Landing() {
               {
                 icon: <Speed sx={{ fontSize: 40 }} />,
                 title: 'Fast Delivery',
-                description: 'Get your project delivered within 48-72 hours with complete documentation.'
+                description: 'Projects delivered with full documentation and assistance in seconds.'
               },
               {
                 icon: <Security sx={{ fontSize: 40 }} />,
                 title: 'Quality Assurance',
-                description: 'All projects are tested and reviewed by experienced developers.'
+                description: 'All projects are tested and reviewed thoroughly by skilled developers.'
               },
               {
                 icon: <Support sx={{ fontSize: 40 }} />,
                 title: '24/7 Support',
-                description: 'Get instant help with implementation and technical queries.'
+                description: 'Expert support available for implementation and technical questions.'
               }
             ].map((feature, index) => (
               <Grid item xs={12} md={4} key={index}>
