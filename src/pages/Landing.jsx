@@ -259,7 +259,7 @@ function Landing() {
             Why Choose Us
           </Typography>
           
-          <Grid container spacing={4}>
+          <Grid container spacing={4} justifyContent="center" alignItems="stretch">
             {[
               {
                 icon: <Speed sx={{ fontSize: 40 }} />,
@@ -269,7 +269,7 @@ function Landing() {
               {
                 icon: <Security sx={{ fontSize: 40 }} />,
                 title: 'Quality Assurance',
-                description: 'All projects are tested and reviewed thoroughly by skilled developers.'
+                description: 'All projects are tested and reviewed\n thoroughly by skilled developers.'
               },
               {
                 icon: <Support sx={{ fontSize: 40 }} />,
@@ -330,24 +330,24 @@ function Landing() {
             Our Services
           </Typography>
           
-          <Grid container spacing={4}>
+          <Grid container spacing={4} justifyContent="center" alignItems="stretch">
             {[
               {
                 icon: <Assignment sx={{ fontSize: 48 }} />,
                 title: 'Mini Projects',
-                description: 'Perfect for semester assignments and learning new technologies.',
+                description: 'Perfect for semester projects and learning the latest tools and technologies.',
                 price: 'Starting at ₹499'
               },
               {
                 icon: <Engineering sx={{ fontSize: 48 }} />,
                 title: 'Final Year Projects',
-                description: 'Complete solution with documentation and presentation.',
+                description: 'Get complete solutions with docs, slides, and presentation-ready materials.',
                 price: 'Starting at ₹1499'
               },
               {
                 icon: <SupervisorAccount sx={{ fontSize: 48 }} />,
                 title: 'Mentorship',
-                description: '1-on-1 guidance sessions with industry experts.',
+                description: '1-on-1 guidance sessions with top industry experts to boost your project skills.',
                 price: 'Starting at ₹2499'
               }
             ].map((service, index) => (
