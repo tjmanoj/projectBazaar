@@ -209,10 +209,18 @@ function ProjectList() {
                     py: 1.5,
                     px: 1.5,
                     minWidth: "auto",
+                    width: "auto",
                     fontSize: "0.875rem",
                     textTransform: "none",
                     fontWeight: 500,
                   },
+                  "& .MuiTab-root:hover": {
+                    backgroundColor: "action.hover",
+                    opacity: 1,
+                  },
+                  "& .MuiTabs-indicator": {
+                    height: 3,
+                  }
                 }}
               >
                 <Tab label="All Projects" value="all" />
@@ -238,6 +246,7 @@ function ProjectList() {
                 disableRipple
                 sx={{
                   "&:hover": { backgroundColor: "transparent" },
+                  "&:active": { backgroundColor: "transparent" }
                 }}
               >
                 {mode === "dark" ? <Brightness7 /> : <Brightness4 />}

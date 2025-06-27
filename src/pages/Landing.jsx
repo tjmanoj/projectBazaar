@@ -154,12 +154,14 @@ function Landing() {
               </Button>
               <IconButton 
                 onClick={toggleTheme} 
+                disableRipple
                 sx={{ 
                   color: 'text.primary',
-                  transition: 'all 0.2s ease-in-out',
                   '&:hover': {
-                    color: 'primary.main',
-                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+                    backgroundColor: 'transparent'
+                  },
+                  '&:active': {
+                    backgroundColor: 'transparent'
                   }
                 }}
               >
