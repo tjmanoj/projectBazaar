@@ -295,7 +295,7 @@ function Landing() {
                     </Grid>
                     
                     {/* Right side - Animated Quotes */}
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
                       <MotionBox
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
