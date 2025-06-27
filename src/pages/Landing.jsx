@@ -148,10 +148,11 @@ function Landing() {
           minHeight: '100vh',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center', // Center horizontally
+          justifyContent: 'center',
           position: 'relative',
           overflow: 'hidden',
-          pt: { xs: 8, md: 0 },
+          pt: { xs: 12, md: 16 }, // Increased top padding to avoid taskbar overlap
+          pb: { xs: 8, md: 12 },
           background: theme => `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`
         }}
         initial="hidden"
@@ -159,8 +160,16 @@ function Landing() {
         variants={fadeIn}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center" justifyContent="center">
-            <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
+          <Grid container spacing={6} alignItems="center" justifyContent="center">
+            <Grid item xs={12} md={6} sx={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              textAlign: 'center',
+              position: 'relative',
+              zIndex: 2 // Ensure text stays above video
+            }}>
               <MotionBox
                 variants={staggerChildren}
                 initial="hidden"
@@ -171,19 +180,47 @@ function Landing() {
                   <Typography 
                     variant="h1" 
                     color="text.primary"
-                    sx={{ mb: 2 }}
+                    sx={{ 
+                      mb: 2,
+                      fontSize: { xs: '2.5rem', sm: '3rem', md: '3.5rem' },
+                      fontWeight: 800,
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.2,
+                      background: theme => `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}
                   >
-                    Turn Your Ideas into{' '}
-                    <Box component="span" sx={{ color: 'primary.main' }}>
+                    Turn Your Ideas into Reality
+                    {/* <Box component="span" sx={{ 
+                      color: 'primary.main',
+                      position: 'relative',
+                      '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        bottom: '-4px',
+                        left: 0,
+                        width: '100%',
+                        height: '4px',
+                        background: theme => `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        borderRadius: '2px',
+                      }
+                    }}>
                       Reality
-                    </Box>
+                    </Box> */}
                   </Typography>
                 </motion.div>
                 <motion.div variants={fadeIn}>
                   <Typography 
                     variant="h5" 
                     color="text.secondary" 
-                    sx={{ mb: 4, lineHeight: 1.6 }}
+                    sx={{ 
+                      mb: 4, 
+                      lineHeight: 1.6,
+                      maxWidth: '600px',
+                      mx: 'auto',
+                      opacity: 0.9
+                    }}
                   >
                     Get professional CS projects with expert guidance. Perfect for students and beginners.
                   </Typography>
@@ -203,7 +240,13 @@ function Landing() {
                       sx={{
                         py: 2,
                         px: 4,
-                        fontSize: '1.1rem'
+                        fontSize: '1.1rem',
+                        background: theme => `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                        '&:hover': {
+                          transform: 'translateY(-2px)',
+                          boxShadow: '0 8px 20px rgba(0,0,0,0.12)'
+                        }
                       }}
                     >
                       Get Started
@@ -212,39 +255,62 @@ function Landing() {
                 </motion.div>
               </MotionBox>
             </Grid>
-            <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+            <Grid item xs={12} md={6} sx={{ 
+              display: 'flex', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              position: 'relative',
+              minHeight: { xs: '300px', md: '500px' }
+            }}>
               <Box sx={{
-                position: 'relative',
-                width: { xs: '90%', sm: '70%', md: '100%' },
-                maxWidth: 500,
-                mx: 'auto',
-                display: 'block',
-                borderRadius: 4,
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
                 overflow: 'hidden',
-                boxShadow: 3,
-                '::after': {
-                  content: '""',
+              }}>
+                <video
+                  src="/hero-video.mp4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transform: 'scale(1.02)', // Slight scale to avoid white edges
+                    filter: 'brightness(0.95) contrast(1.02)',
+                  }}
+                />
+                {/* Modern gradient overlay */}
+                <Box sx={{
                   position: 'absolute',
                   inset: 0,
+                  background: theme => `
+                    linear-gradient(
+                      45deg,
+                      ${alpha(theme.palette.background.default, 0.7)} 0%,
+                      ${alpha(theme.palette.background.default, 0.4)} 50%,
+                      ${alpha(theme.palette.background.default, 0.2)} 100%
+                    )
+                  `,
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                }} />
+                {/* Animated spotlight effect */}
+                <Box sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.1) 0%, transparent 50%)',
                   pointerEvents: 'none',
-                  background: `radial-gradient(circle at 50% 80%, ${theme.palette.background.default} 0%, transparent 70%)`
-                }
-              }}>
-                <MotionBox
-                  component="img"
-                  src="src/assets/hero-image.jpg"
-                  alt="Project Development"
-                  sx={{
-                    width: '100%',
-                    height: 'auto',
-                    display: 'block',
-                    filter: mode === 'dark' ? 'brightness(0.8)' : 'none',
-                    borderRadius: 4,
-                  }}
-                  initial={{ opacity: 0, x: 100 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
-                />
+                  opacity: 0.6,
+                  '@keyframes pulse': {
+                    '0%': { opacity: 0.4 },
+                    '50%': { opacity: 0.6 },
+                    '100%': { opacity: 0.4 }
+                  },
+                  animation: 'pulse 4s ease-in-out infinite'
+                }} />
               </Box>
             </Grid>
           </Grid>
