@@ -79,7 +79,10 @@ function Landing() {
                 component="h1" 
                 color="primary" 
                 fontWeight="bold"
-                sx={{ display: { xs: 'none', sm: 'block' } }}
+                sx={{ 
+                  fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                  display: 'block' // Show on all screen sizes
+                }}
               >
                 Project Bazaar
               </Typography>
@@ -273,7 +276,7 @@ function Landing() {
                         }}
                       >
                         <video
-                          src="/src/assets/hero-video.mp4"
+                          src="https://res.cloudinary.com/dejvgjqgh/video/upload/v1751047469/6999824_Motion_Graphics_Animation_1920x1080_spfupf.mp4"
                           autoPlay
                           loop
                           muted
