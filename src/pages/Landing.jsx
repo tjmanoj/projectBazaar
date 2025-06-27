@@ -769,6 +769,33 @@ function Landing() {
                     variant="outlined"
                     fullWidth
                     required
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                      }
+                    }}
+                    InputProps={{
+                      sx: {
+                        color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'primary.main'
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'primary.main'
+                        }
+                      }
+                    }}
+                    InputLabelProps={{
+                      sx: { 
+                        color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                        '&.Mui-focused': {
+                          color: 'primary.main'
+                        }
+                      }
+                    }}
                   />
                   <TextField
                     label="Email"
@@ -776,6 +803,33 @@ function Landing() {
                     variant="outlined"
                     fullWidth
                     required
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                      }
+                    }}
+                    InputProps={{
+                      sx: {
+                        color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'primary.main'
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'primary.main'
+                        }
+                      }
+                    }}
+                    InputLabelProps={{
+                      sx: { 
+                        color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                        '&.Mui-focused': {
+                          color: 'primary.main'
+                        }
+                      }
+                    }}
                   />
                   <TextField
                     label="Project Requirements"
@@ -783,6 +837,33 @@ function Landing() {
                     rows={4}
                     variant="outlined"
                     fullWidth
+                    sx={{
+                      '& .MuiInputBase-root': {
+                        bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                      }
+                    }}
+                    InputProps={{
+                      sx: {
+                        color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                        '& .MuiOutlinedInput-notchedOutline': {
+                          borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                        },
+                        '&:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'primary.main'
+                        },
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'primary.main'
+                        }
+                      }
+                    }}
+                    InputLabelProps={{
+                      sx: { 
+                        color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                        '&.Mui-focused': {
+                          color: 'primary.main'
+                        }
+                      }
+                    }}
                   />
                   <Button 
                     type="submit"
