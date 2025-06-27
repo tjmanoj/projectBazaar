@@ -162,7 +162,11 @@ function ProjectList() {
                 justifyContent: { xs: "center", md: "flex-start" },
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                onClick={() => navigate('/')}
+                style={{ cursor: 'pointer' }}
+              >
                 <img
                   src="https://res.cloudinary.com/dejvgjqgh/image/upload/v1749394373/logo_dkpogl.png"
                   alt="Project Bazaar Logo"
