@@ -736,151 +736,158 @@ function Landing() {
         </MotionContainer>
       </Box>
 
-      {/* Contact Section */}
-      <Box 
-        component="section" 
-        id="contact"
-        sx={{ 
-          py: { xs: 8, md: 12 },
-          bgcolor: 'background.subtle'
-        }}
-      >
-        <MotionContainer
-          maxWidth="md"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeIn}
-        >
-          <Typography 
-            variant="h2" 
-            align="center" 
-            sx={{ mb: { xs: 4, md: 6 } }}
-          >
-            Get Started Today
-          </Typography>
-          
-          <Card>
-            <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-              <form onSubmit={(e) => e.preventDefault()}>
-                <Stack spacing={3}>
-                  <TextField
-                    label="Name"
-                    variant="outlined"
-                    fullWidth
-                    required
-                    sx={{
-                      '& .MuiInputBase-root': {
-                        bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                      }
-                    }}
-                    InputProps={{
-                      sx: {
-                        color: mode === 'dark' ? 'grey.900' : 'text.primary',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'primary.main'
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'primary.main'
-                        }
-                      }
-                    }}
-                    InputLabelProps={{
-                      sx: { 
-                        color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-                        '&.Mui-focused': {
-                          color: 'primary.main'
-                        }
-                      }
-                    }}
-                  />
-                  <TextField
-                    label="Email"
-                    type="email"
-                    variant="outlined"
-                    fullWidth
-                    required
-                    sx={{
-                      '& .MuiInputBase-root': {
-                        bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                      }
-                    }}
-                    InputProps={{
-                      sx: {
-                        color: mode === 'dark' ? 'grey.900' : 'text.primary',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'primary.main'
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'primary.main'
-                        }
-                      }
-                    }}
-                    InputLabelProps={{
-                      sx: { 
-                        color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-                        '&.Mui-focused': {
-                          color: 'primary.main'
-                        }
-                      }
-                    }}
-                  />
-                  <TextField
-                    label="Project Requirements"
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                    fullWidth
-                    sx={{
-                      '& .MuiInputBase-root': {
-                        bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                      }
-                    }}
-                    InputProps={{
-                      sx: {
-                        color: mode === 'dark' ? 'grey.900' : 'text.primary',
-                        '& .MuiOutlinedInput-notchedOutline': {
-                          borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-                        },
-                        '&:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'primary.main'
-                        },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                          borderColor: 'primary.main'
-                        }
-                      }
-                    }}
-                    InputLabelProps={{
-                      sx: { 
-                        color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-                        '&.Mui-focused': {
-                          color: 'primary.main'
-                        }
-                      }
-                    }}
-                  />
-                  <Button 
-                    type="submit"
-                    variant="contained"
-                    size="large"
-                    endIcon={<ArrowForward />}
-                  >
-                    Submit Request
-                  </Button>
-                </Stack>
-              </form>
-            </CardContent>
-          </Card>
-        </MotionContainer>
-      </Box>
 
-      {/* Footer */}
+        <Box 
+          component="section" 
+          id="contact"
+          sx={{ 
+            py: { xs: 8, md: 12 },
+            bgcolor: 'background.subtle'
+          }}
+        >
+          <MotionContainer
+            maxWidth="md"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+          >
+            <Typography 
+          variant="h2" 
+          align="center" 
+          sx={{ mb: { xs: 4, md: 6 } }}
+            >
+          Get Started Today
+            </Typography>
+            
+            <Card
+          elevation={0}
+          sx={{
+            border: 'none',
+            boxShadow: 'none',
+            bgcolor: 'transparent'
+          }}
+            >
+          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+            <form onSubmit={(e) => e.preventDefault()} >
+              <Stack spacing={3}>
+            <TextField
+              label="Name"
+              variant="outlined"
+              fullWidth
+              required
+              sx={{
+                '& .MuiInputBase-root': {
+              bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                }
+              }}
+              InputProps={{
+                sx: {
+              color: mode === 'dark' ? 'grey.900' : 'text.primary',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'primary.main'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'primary.main'
+              }
+                }
+              }}
+              InputLabelProps={{
+                sx: { 
+              color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+              '&.Mui-focused': {
+                color: 'primary.main'
+              }
+                }
+              }}
+            />
+            <TextField
+              label="Email"
+              type="email"
+              variant="outlined"
+              fullWidth
+              required
+              sx={{
+                '& .MuiInputBase-root': {
+              bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                }
+              }}
+              InputProps={{
+                sx: {
+              color: mode === 'dark' ? 'grey.900' : 'text.primary',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'primary.main'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'primary.main'
+              }
+                }
+              }}
+              InputLabelProps={{
+                sx: { 
+              color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+              '&.Mui-focused': {
+                color: 'primary.main'
+              }
+                }
+              }}
+            />
+            <TextField
+              label="Project Requirements"
+              multiline
+              rows={4}
+              variant="outlined"
+              fullWidth
+              sx={{
+                '& .MuiInputBase-root': {
+              bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                }
+              }}
+              InputProps={{
+                sx: {
+              color: mode === 'dark' ? 'grey.900' : 'text.primary',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'primary.main'
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'primary.main'
+              }
+                }
+              }}
+              InputLabelProps={{
+                sx: { 
+              color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+              '&.Mui-focused': {
+                color: 'primary.main'
+              }
+                }
+              }}
+            />
+            <Button 
+              type="submit"
+              variant="contained"
+              size="large"
+              endIcon={<ArrowForward />}
+            >
+              Submit Request
+            </Button>
+              </Stack>
+            </form>
+          </CardContent>
+            </Card>
+          </MotionContainer>
+        </Box>
+
+        {/* Footer */}
       <Box 
         component="footer" 
         sx={{ 
