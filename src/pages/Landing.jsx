@@ -15,20 +15,29 @@ import {
   Toolbar,
   Stack,
   IconButton,
-  CssBaseline
+  CssBaseline,
+  alpha
 } from '@mui/material';
 import { 
   School, 
   Assignment, 
   SupervisorAccount,
-  Star,
   Engineering,
-  LiveHelp,
   Brightness4,
   Brightness7,
-  Menu as MenuIcon
+  Menu as MenuIcon,
+  ArrowForward,
+  Security,
+  Speed,
+  Support
 } from '@mui/icons-material';
+import { motion } from 'framer-motion';
 import { useThemeContext } from '../context/ThemeContext';
+
+// Wrap MUI components with motion
+const MotionBox = motion(Box);
+const MotionCard = motion(Card);
+const MotionContainer = motion(Container);
 
 function Landing() {
   const navigate = useNavigate();
@@ -38,75 +47,66 @@ function Landing() {
   const currentYear = new Date().getFullYear();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  const staggerChildren = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
   };
 
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', overflow: 'hidden' }}>
       <CssBaseline />
-      <AppBar position="sticky" color="default" elevation={1}>
+      <AppBar position="fixed" elevation={0}>
         <Container maxWidth="lg">
-          <Toolbar sx={{ justifyContent: 'space-between' }}>
+          <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <img 
                 src="/logo.png" 
                 alt="Project Bazaar Logo" 
-                style={{ 
-                  height: '32px',
-                  width: 'auto',
-                  objectFit: 'contain'
-                }} 
+                style={{ height: '32px' }} 
               />
               <Typography 
-                variant="h5" 
+                variant="h6" 
                 component="h1" 
                 color="primary" 
-                fontWeight="bold" 
-                sx={{ flexGrow: { xs: 1, md: 0 } }}
+                fontWeight="bold"
+                sx={{ display: { xs: 'none', sm: 'block' } }}
               >
                 Project Bazaar
               </Typography>
             </Box>
             
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
+            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3, alignItems: 'center' }}>
               <Button color="inherit" href="#services">Services</Button>
               <Button color="inherit" href="#pricing">Pricing</Button>
               <Button color="inherit" href="#contact">Contact</Button>
-              <IconButton 
-                onClick={toggleTheme} 
-                color="inherit"
-                sx={{ 
-                  ml: 1,
-                  borderRadius: 1,
-                  '&:hover': {
-                    background: 'rgba(0, 0, 0, 0.04)'
-                  }
-                }}
-              >
+              <IconButton onClick={toggleTheme} color="inherit">
                 {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
+              <Button 
+                variant="contained" 
+                color="primary"
+                onClick={() => navigate('/login')}
+                sx={{ ml: 2 }}
+              >
+                Get Started
+              </Button>
             </Box>
 
-            <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-              <IconButton
-                color="inherit"
-                onClick={toggleTheme}
-                sx={{ 
-                  mr: 1,
-                  borderRadius: 1,
-                  '&:hover': {
-                    background: 'rgba(0, 0, 0, 0.04)'
-                  }
-                }}
-              >
+            <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
+              <IconButton onClick={toggleTheme} color="inherit">
                 {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
-              <IconButton
-                color="inherit"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
+              <IconButton color="inherit" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                 <MenuIcon />
               </IconButton>
             </Box>
@@ -141,223 +141,292 @@ function Landing() {
         </Stack>
       </Box>
 
-      <Box 
-        sx={{ 
-          bgcolor: 'primary.main', 
-          color: 'primary.contrastText',
-          py: { xs: 8, md: 12 },
-          textAlign: 'center',
-          mt: mobileMenuOpen ? 8 : 0
+      {/* Hero Section */}
+      <MotionBox
+        component="section"
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+          pt: { xs: 8, md: 0 },
+          background: theme => `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`
         }}
-      >
-        <Container maxWidth="md">
-          <Typography 
-            variant="h2" 
-            component="h2" 
-            sx={{ 
-              mb: 2,
-              fontSize: { xs: '2.5rem', md: '3.75rem' },
-              fontWeight: 'bold'
-            }}
-          >
-            Affordable CS Projects for Students
-          </Typography>
-          <Typography variant="h5" sx={{ mb: 4, opacity: 0.9 }}>
-            Mini Projects, Final Year Projects, Mentorship & More
-          </Typography>
-          <Button 
-            variant="contained" 
-            size="large"
-            color="secondary"
-            onClick={() => navigate('/login')}
-            sx={{ 
-              py: 2,
-              px: 4,
-              fontSize: '1.2rem'
-            }}
-          >
-            Get Started
-          </Button>
-        </Container>
-      </Box>
-
-      <Container maxWidth="lg" sx={{ py: 8 }} id="services">
-        <Typography variant="h3" align="center" sx={{ mb: 6, fontWeight: 'bold' }}>
-          What We Offer
-        </Typography>
-        <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 4 }}>
-                <Assignment sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
-                  Custom Mini Projects
-                </Typography>
-                <Typography>
-                  Quick turnaround small-scale projects for early semesters with documentation.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 4 }}>
-                <Engineering sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
-                  Final Year Projects
-                </Typography>
-                <Typography>
-                  Major projects with source code, report, and guidance on viva preparation.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center', p: 4 }}>
-                <SupervisorAccount sx={{ fontSize: 48, color: 'primary.main', mb: 2 }} />
-                <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
-                  Mentorship & Guidance
-                </Typography>
-                <Typography>
-                  1-on-1 sessions with experienced developers to help you understand your project better.
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-      </Container>
-
-      <Box 
-        sx={{ 
-          bgcolor: 'grey.100', 
-          py: { xs: 6, md: 8 },
-          px: { xs: 2, md: 0 }
-        }} 
-        id="pricing"
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
       >
         <Container maxWidth="lg">
-          <Typography 
-            variant="h3" 
-            align="center" 
-            sx={{ 
-              mb: { xs: 4, md: 6 }, 
-              fontWeight: 'bold',
-              fontSize: { xs: '2rem', md: '3rem' }
-            }}
-          >
-            Simple Pricing
-          </Typography>
           <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={4}>
-              <Card 
-                sx={{ 
-                  height: '100%', 
-                  transform: 'scale(1)', 
-                  transition: 'all 0.3s ease',
-                  '&:hover': { 
-                    transform: 'scale(1.03)',
-                    boxShadow: 6
-                  } 
-                }}
+            <Grid item xs={12} md={6}>
+              <MotionBox
+                variants={staggerChildren}
+                initial="hidden"
+                animate="visible"
+                sx={{ textAlign: { xs: 'center', md: 'left' } }}
               >
-                <CardContent sx={{ p: 4, textAlign: 'center' }}>
-                  <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
-                    Starter
-                  </Typography>
-                  <Typography variant="h3" color="primary" sx={{ my: 2 }}>
-                    ₹499
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    Basic mini project + source code + instructions
-                  </Typography>
-                  <Button 
-                    variant="outlined" 
-                    color="primary" 
-                    fullWidth 
-                    sx={{ mt: 2 }}
-                    onClick={() => navigate('/login')}
+                <motion.div variants={fadeIn}>
+                  <Typography 
+                    variant="h1" 
+                    color="text.primary"
+                    sx={{ mb: 2 }}
                   >
-                    Get Started
-                  </Button>
-                </CardContent>
-              </Card>
+                    Turn Your Ideas into{' '}
+                    <Box component="span" sx={{ color: 'primary.main' }}>
+                      Reality
+                    </Box>
+                  </Typography>
+                </motion.div>
+                
+                <motion.div variants={fadeIn}>
+                  <Typography 
+                    variant="h5" 
+                    color="text.secondary" 
+                    sx={{ mb: 4, lineHeight: 1.6 }}
+                  >
+                    Get professional CS projects with expert guidance. Perfect for students and beginners.
+                  </Typography>
+                </motion.div>
+
+                <motion.div variants={fadeIn}>
+                  <Stack 
+                    direction={{ xs: 'column', sm: 'row' }} 
+                    spacing={2}
+                    justifyContent={{ xs: 'center', md: 'flex-start' }}
+                  >
+                    <Button
+                      variant="contained"
+                      size="large"
+                      onClick={() => navigate('/login')}
+                      endIcon={<ArrowForward />}
+                      sx={{
+                        py: 2,
+                        px: 4,
+                        fontSize: '1.1rem'
+                      }}
+                    >
+                      Get Started
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="large"
+                      href="#pricing"
+                      sx={{
+                        py: 2,
+                        px: 4,
+                        fontSize: '1.1rem'
+                      }}
+                    >
+                      View Pricing
+                    </Button>
+                  </Stack>
+                </motion.div>
+              </MotionBox>
             </Grid>
-            <Grid item xs={12} md={4}>
-              <Card sx={{ 
-                height: '100%', 
-                transform: 'scale(1.05)',
-                transition: '0.3s',
-                '&:hover': { transform: 'scale(1.08)' },
-                border: 2,
-                borderColor: 'primary.main'
-              }}>
-                <CardContent sx={{ p: 4, textAlign: 'center' }}>
-                  <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
-                    Advanced
-                  </Typography>
-                  <Typography variant="h3" color="primary" sx={{ my: 2 }}>
-                    ₹1499
-                  </Typography>
-                  <Typography>
-                    Customized project + report + screenshots
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Card sx={{ height: '100%', transform: 'scale(1)', transition: '0.3s', '&:hover': { transform: 'scale(1.03)' } }}>
-                <CardContent sx={{ p: 4, textAlign: 'center' }}>
-                  <Typography variant="h5" component="h3" gutterBottom fontWeight="bold">
-                    Premium
-                  </Typography>
-                  <Typography variant="h3" color="primary" sx={{ my: 2 }}>
-                    ₹2499
-                  </Typography>
-                  <Typography>
-                    Final year project + presentation + mentorship call
-                  </Typography>
-                </CardContent>
-              </Card>
+            <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
+              <MotionBox
+                component="img"
+                src="/hero-image.png"
+                alt="Project Development"
+                sx={{
+                  width: '100%',
+                  height: 'auto',
+                  maxWidth: 600,
+                  filter: mode === 'dark' ? 'brightness(0.8)' : 'none'
+                }}
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5 }}
+              />
             </Grid>
           </Grid>
         </Container>
+      </MotionBox>
+
+      {/* Features Section */}
+      <Box 
+        component="section"
+        sx={{ 
+          py: { xs: 8, md: 12 },
+          background: theme => mode === 'light' 
+            ? 'linear-gradient(180deg, #fff 0%, #f5f5f7 100%)'
+            : 'linear-gradient(180deg, #121212 0%, #1a1a1a 100%)'
+        }}
+      >
+        <MotionContainer
+          maxWidth="lg"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerChildren}
+        >
+          <Typography 
+            variant="h2" 
+            align="center" 
+            gutterBottom
+            sx={{ mb: { xs: 6, md: 8 } }}
+          >
+            Why Choose Us
+          </Typography>
+          
+          <Grid container spacing={4}>
+            {[
+              {
+                icon: <Speed sx={{ fontSize: 40 }} />,
+                title: 'Fast Delivery',
+                description: 'Get your project delivered within 48-72 hours with complete documentation.'
+              },
+              {
+                icon: <Security sx={{ fontSize: 40 }} />,
+                title: 'Quality Assurance',
+                description: 'All projects are tested and reviewed by experienced developers.'
+              },
+              {
+                icon: <Support sx={{ fontSize: 40 }} />,
+                title: '24/7 Support',
+                description: 'Get instant help with implementation and technical queries.'
+              }
+            ].map((feature, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <MotionCard
+                  variants={fadeIn}
+                  sx={{
+                    height: '100%',
+                    textAlign: 'center',
+                    p: 4,
+                    transition: 'transform 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-8px)'
+                    }
+                  }}
+                >
+                  <Box 
+                    sx={{ 
+                      color: 'primary.main',
+                      mb: 2,
+                      display: 'flex',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    {feature.icon}
+                  </Box>
+                  <Typography variant="h5" gutterBottom fontWeight="bold">
+                    {feature.title}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    {feature.description}
+                  </Typography>
+                </MotionCard>
+              </Grid>
+            ))}
+          </Grid>
+        </MotionContainer>
       </Box>
 
-      <Box 
-        sx={{ 
-          py: { xs: 6, md: 8 },
-          px: { xs: 2, md: 0 },
-          bgcolor: theme.palette.mode === 'dark' ? 'background.paper' : 'background.default'
-        }} 
-        id="contact"
-      >
-        <Container maxWidth="md">
+      {/* Services Section */}
+      <Box component="section" id="services" sx={{ py: { xs: 8, md: 12 } }}>
+        <MotionContainer
+          maxWidth="lg"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerChildren}
+        >
           <Typography 
-            variant="h3" 
+            variant="h2" 
             align="center" 
-            sx={{ 
-              mb: { xs: 4, md: 6 }, 
-              fontWeight: 'bold',
-              fontSize: { xs: '2rem', md: '3rem' }
-            }}
+            sx={{ mb: { xs: 6, md: 8 } }}
           >
-            Get In Touch
+            Our Services
           </Typography>
-          <Card elevation={theme.palette.mode === 'dark' ? 2 : 1}>
+          
+          <Grid container spacing={4}>
+            {[
+              {
+                icon: <Assignment sx={{ fontSize: 48 }} />,
+                title: 'Mini Projects',
+                description: 'Perfect for semester assignments and learning new technologies.',
+                price: 'Starting at ₹499'
+              },
+              {
+                icon: <Engineering sx={{ fontSize: 48 }} />,
+                title: 'Final Year Projects',
+                description: 'Complete solution with documentation and presentation.',
+                price: 'Starting at ₹1499'
+              },
+              {
+                icon: <SupervisorAccount sx={{ fontSize: 48 }} />,
+                title: 'Mentorship',
+                description: '1-on-1 guidance sessions with industry experts.',
+                price: 'Starting at ₹2499'
+              }
+            ].map((service, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <MotionCard
+                  variants={fadeIn}
+                  sx={{
+                    height: '100%',
+                    transition: 'transform 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-8px)'
+                    }
+                  }}
+                >
+                  <CardContent sx={{ p: 4 }}>
+                    <Box sx={{ color: 'primary.main', mb: 2 }}>
+                      {service.icon}
+                    </Box>
+                    <Typography variant="h5" gutterBottom fontWeight="bold">
+                      {service.title}
+                    </Typography>
+                    <Typography color="text.secondary" sx={{ mb: 2 }}>
+                      {service.description}
+                    </Typography>
+                    <Typography variant="h6" color="primary.main" fontWeight="bold">
+                      {service.price}
+                    </Typography>
+                  </CardContent>
+                </MotionCard>
+              </Grid>
+            ))}
+          </Grid>
+        </MotionContainer>
+      </Box>
+
+      {/* Contact Section */}
+      <Box 
+        component="section" 
+        id="contact"
+        sx={{ 
+          py: { xs: 8, md: 12 },
+          bgcolor: 'background.subtle'
+        }}
+      >
+        <MotionContainer
+          maxWidth="md"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeIn}
+        >
+          <Typography 
+            variant="h2" 
+            align="center" 
+            sx={{ mb: { xs: 4, md: 6 } }}
+          >
+            Get Started Today
+          </Typography>
+          
+          <Card>
             <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={(e) => e.preventDefault()}>
                 <Stack spacing={3}>
                   <TextField
                     label="Name"
                     variant="outlined"
                     fullWidth
                     required
-                    sx={{ 
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2
-                      }
-                    }}
                   />
                   <TextField
                     label="Email"
@@ -365,11 +434,6 @@ function Landing() {
                     variant="outlined"
                     fullWidth
                     required
-                    sx={{ 
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2
-                      }
-                    }}
                   />
                   <TextField
                     label="Project Requirements"
@@ -377,36 +441,91 @@ function Landing() {
                     rows={4}
                     variant="outlined"
                     fullWidth
-                    sx={{ 
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: 2
-                      }
-                    }}
                   />
                   <Button 
                     type="submit"
                     variant="contained"
                     size="large"
-                    sx={{ 
-                      py: 1.5,
-                      px: 4,
-                      borderRadius: 2,
-                      alignSelf: { xs: 'stretch', sm: 'flex-start' }
-                    }}
+                    endIcon={<ArrowForward />}
                   >
-                    Send Request
+                    Submit Request
                   </Button>
                 </Stack>
               </form>
             </CardContent>
           </Card>
-        </Container>
+        </MotionContainer>
       </Box>
 
-      <Box component="footer" sx={{ bgcolor: 'background.paper', py: 3, textAlign: 'center' }}>
-        <Typography color="text.secondary">
-          &copy; {currentYear} Project Bazaar. All rights reserved.
-        </Typography>
+      {/* Footer */}
+      <Box 
+        component="footer" 
+        sx={{ 
+          bgcolor: 'background.paper',
+          py: 4,
+          borderTop: 1,
+          borderColor: 'divider'
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={4}>
+              <Stack spacing={2}>
+                <Typography variant="h6" fontWeight="bold">
+                  Project Bazaar
+                </Typography>
+                <Typography color="text.secondary">
+                  Making quality projects accessible to every student
+                </Typography>
+              </Stack>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <Grid container spacing={4}>
+                <Grid item xs={6} sm={3}>
+                  <Stack spacing={2}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Services
+                    </Typography>
+                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
+                      Mini Projects
+                    </Button>
+                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
+                      Final Year Projects
+                    </Button>
+                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
+                      Mentorship
+                    </Button>
+                  </Stack>
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Stack spacing={2}>
+                    <Typography variant="subtitle1" fontWeight="bold">
+                      Support
+                    </Typography>
+                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
+                      FAQ
+                    </Button>
+                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
+                      Contact
+                    </Button>
+                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
+                      Terms
+                    </Button>
+                  </Stack>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography 
+                color="text.secondary" 
+                align="center"
+                sx={{ mt: 2 }}
+              >
+                © {currentYear} Project Bazaar. All rights reserved.
+              </Typography>
+            </Grid>
+          </Grid>
+        </Container>
       </Box>
     </Box>
   );
