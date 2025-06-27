@@ -148,6 +148,7 @@ function Landing() {
           minHeight: '100vh',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'center', // Center horizontally
           position: 'relative',
           overflow: 'hidden',
           pt: { xs: 8, md: 0 },
@@ -158,13 +159,13 @@ function Landing() {
         variants={fadeIn}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
+          <Grid container spacing={4} alignItems="center" justifyContent="center">
+            <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
               <MotionBox
                 variants={staggerChildren}
                 initial="hidden"
                 animate="visible"
-                sx={{ textAlign: { xs: 'center', md: 'left' } }}
+                sx={{ width: '100%' }}
               >
                 <motion.div variants={fadeIn}>
                   <Typography 
@@ -178,7 +179,6 @@ function Landing() {
                     </Box>
                   </Typography>
                 </motion.div>
-                
                 <motion.div variants={fadeIn}>
                   <Typography 
                     variant="h5" 
@@ -188,7 +188,6 @@ function Landing() {
                     Get professional CS projects with expert guidance. Perfect for students and beginners.
                   </Typography>
                 </motion.div>
-
                 <motion.div variants={fadeIn}>
                   <Stack 
                     direction={{ xs: 'column', sm: 'row' }} 
@@ -213,21 +212,40 @@ function Landing() {
                 </motion.div>
               </MotionBox>
             </Grid>
-            <Grid item xs={12} md={6} sx={{ display: { xs: 'none', md: 'block' } }}>
-              <MotionBox
-                component="img"
-                src="src/assets/hero-image.jpg"
-                alt="Project Development"
-                sx={{
-                  width: '100%',
-                  height: 'auto',
-                  maxWidth: 600,
-                  filter: mode === 'dark' ? 'brightness(0.8)' : 'none'
-                }}
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-              />
+            <Grid item xs={12} md={6} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+              <Box sx={{
+                position: 'relative',
+                width: { xs: '90%', sm: '70%', md: '100%' },
+                maxWidth: 500,
+                mx: 'auto',
+                display: 'block',
+                borderRadius: 4,
+                overflow: 'hidden',
+                boxShadow: 3,
+                '::after': {
+                  content: '""',
+                  position: 'absolute',
+                  inset: 0,
+                  pointerEvents: 'none',
+                  background: `radial-gradient(circle at 50% 80%, ${theme.palette.background.default} 0%, transparent 70%)`
+                }
+              }}>
+                <MotionBox
+                  component="img"
+                  src="src/assets/hero-image.jpg"
+                  alt="Project Development"
+                  sx={{
+                    width: '100%',
+                    height: 'auto',
+                    display: 'block',
+                    filter: mode === 'dark' ? 'brightness(0.8)' : 'none',
+                    borderRadius: 4,
+                  }}
+                  initial={{ opacity: 0, x: 100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5 }}
+                />
+              </Box>
             </Grid>
           </Grid>
         </Container>
