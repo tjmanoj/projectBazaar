@@ -29,14 +29,14 @@ const ChatWidget = () => {
     checkAdminStatus();
   }, [currentUser]);
   
-  // Get current path to determine if we're on login/signup pages
+  // Get current path to determine if we should show the chat widget
   const path = location.pathname;
   const isAuthPage = path === '/login' || path === '/signup';
   const isAdminPage = path === '/admin';
+  const isLandingPage = path === '/';
   
-  // Show chat widget for all authenticated users except on auth pages
-  // For admin users, only hide on the admin page where they have the admin chat panel
-  if (!currentUser || isAuthPage || (isAdmin && isAdminPage)) return null;
+  // Hide chat widget on landing page, auth pages, and admin page (for admin users)
+  if (!currentUser || isAuthPage || isLandingPage || (isAdmin && isAdminPage)) return null;
 
   return (
     <>
