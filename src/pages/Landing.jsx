@@ -47,6 +47,21 @@ function Landing() {
   const currentYear = new Date().getFullYear();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      const offset = 80; // Account for the fixed header
+      const elementPosition = section.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+    setMobileMenuOpen(false); // Close mobile menu after navigation
+  };
+
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 }
@@ -89,10 +104,65 @@ function Landing() {
             </Box>
             
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 3, alignItems: 'center' }}>
-              <Button color="inherit" href="#services">Services</Button>
-              <Button color="inherit" href="#pricing">Pricing</Button>
-              <Button color="inherit" href="#contact">Contact</Button>
-              <IconButton onClick={toggleTheme} color="inherit">
+              <Button 
+                onClick={() => scrollToSection('features')}
+                sx={{
+                  color: 'text.primary',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+                  }
+                }}
+              >
+                Features
+              </Button>
+              <Button 
+                onClick={() => scrollToSection('services')}
+                sx={{
+                  color: 'text.primary',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+                  }
+                }}
+              >
+                Services
+              </Button>
+              <Button 
+                onClick={() => scrollToSection('contact')}
+                sx={{
+                  color: 'text.primary',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+                  }
+                }}
+              >
+                Contact
+              </Button>
+              <IconButton 
+                onClick={toggleTheme} 
+                sx={{ 
+                  color: 'text.primary',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+                  }
+                }}
+              >
                 {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
               <Button 
@@ -106,10 +176,30 @@ function Landing() {
             </Box>
 
             <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
-              <IconButton onClick={toggleTheme} color="inherit">
+              <IconButton 
+                onClick={toggleTheme}
+                sx={{ 
+                  color: 'text.primary',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+                  }
+                }}
+              >
                 {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
-              <IconButton color="inherit" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              <IconButton 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                sx={{ 
+                  color: 'text.primary',
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': {
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+                  }
+                }}
+              >
                 <MenuIcon />
               </IconButton>
             </Box>
@@ -129,16 +219,62 @@ function Landing() {
           borderBottom: 1,
           borderColor: 'divider',
           zIndex: 1100,
+          boxShadow: 2
         }}
       >
         <Stack spacing={1} sx={{ p: 2 }}>
-          <Button fullWidth color="inherit" href="#services" onClick={() => setMobileMenuOpen(false)}>
+          <Button 
+            fullWidth 
+            onClick={() => scrollToSection('features')}
+            sx={{
+              color: 'text.primary',
+              py: 1.5,
+              borderRadius: 1,
+              justifyContent: 'flex-start',
+              px: 2,
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                color: 'primary.main',
+                bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+              }
+            }}
+          >
+            Features
+          </Button>
+          <Button 
+            fullWidth 
+            onClick={() => scrollToSection('services')}
+            sx={{
+              color: 'text.primary',
+              py: 1.5,
+              borderRadius: 1,
+              justifyContent: 'flex-start',
+              px: 2,
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                color: 'primary.main',
+                bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+              }
+            }}
+          >
             Services
           </Button>
-          <Button fullWidth color="inherit" href="#pricing" onClick={() => setMobileMenuOpen(false)}>
-            Pricing
-          </Button>
-          <Button fullWidth color="inherit" href="#contact" onClick={() => setMobileMenuOpen(false)}>
+          <Button 
+            fullWidth 
+            onClick={() => scrollToSection('contact')}
+            sx={{
+              color: 'text.primary',
+              py: 1.5,
+              borderRadius: 1,
+              justifyContent: 'flex-start',
+              px: 2,
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                color: 'primary.main',
+                bgcolor: theme => alpha(theme.palette.primary.main, 0.08),
+              }
+            }}
+          >
             Contact
           </Button>
         </Stack>
@@ -429,6 +565,7 @@ function Landing() {
       {/* Features Section */}
       <Box 
         component="section"
+        id="features"
         sx={{ 
           py: { xs: 8, md: 12 },
           background: theme => mode === 'light' 
