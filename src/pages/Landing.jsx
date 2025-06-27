@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   AppBar, 
@@ -33,6 +33,8 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useThemeContext } from '../context/ThemeContext';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import Zoom from '@mui/material/Zoom';
 
 // Wrap MUI components with motion
 const MotionBox = motion(Box);
@@ -46,6 +48,7 @@ function Landing() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const currentYear = new Date().getFullYear();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -75,6 +78,24 @@ function Landing() {
         staggerChildren: 0.2
       }
     }
+  };
+
+  // Handle scroll to top visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setShowScrollTop(scrollY > 400); // Show button when scrolled down 400px
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -848,6 +869,36 @@ function Landing() {
           </Grid>
         </Container>
       </Box>
+
+      {/* Scroll to Top Button */}
+      <Zoom in={showScrollTop}>
+        <Box
+          onClick={scrollToTop}
+          role="presentation"
+          sx={{
+            position: 'fixed',
+            bottom: 32,
+            right: 32,
+            zIndex: 1000
+          }}
+        >
+          <IconButton
+            color="primary"
+            aria-label="scroll to top"
+            sx={{
+              bgcolor: 'background.paper',
+              boxShadow: 3,
+              '&:hover': {
+                bgcolor: 'background.paper',
+                transform: 'translateY(-4px)',
+              },
+              transition: 'transform 0.2s',
+            }}
+          >
+            <KeyboardArrowUpIcon />
+          </IconButton>
+        </Box>
+      </Zoom>
     </Box>
   );
 }
