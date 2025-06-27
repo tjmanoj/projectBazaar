@@ -755,7 +755,7 @@ function Landing() {
             <Typography 
           variant="h2" 
           align="center" 
-          sx={{ mb: { xs: 4, md: 6 } }}
+          sx={{ mb: { xs: 1, md: -1 } }}
             >
           Get Started Today
             </Typography>
