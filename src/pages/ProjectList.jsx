@@ -137,21 +137,7 @@ function ProjectList() {
               position: "relative",
             }}
           >
-            {/* Mobile Menu Button */}
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{
-                mr: 2,
-                display: { md: "none" },
-                position: { xs: "absolute", md: "static" },
-                left: 0,
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
+
 
             {/* Logo and Brand */}
             <Box
@@ -159,7 +145,7 @@ function ProjectList() {
                 display: "flex",
                 alignItems: "center",
                 flex: 1,
-                justifyContent: { xs: "center", md: "flex-start" },
+                justifyContent: "flex-start",
               }}
             >
               <Box
@@ -238,13 +224,14 @@ function ProjectList() {
                 gap: 0.5,
               }}
             >
-              {/* Theme Toggle */}
+              {/* Theme Toggle - Hidden on mobile */}
               <IconButton
                 onClick={toggleTheme}
                 color="inherit"
                 size="small"
                 disableRipple
                 sx={{
+                  display: { xs: 'none', md: 'flex' },
                   "&:hover": { backgroundColor: "transparent" },
                   "&:active": { backgroundColor: "transparent" }
                 }}
@@ -278,7 +265,22 @@ function ProjectList() {
                   ml: 0.5,
                 }}
               >
-                <AccountCircle fontSize="small" color="primary" />
+                <IconButton
+                  onClick={handleDrawerToggle}
+                  sx={{
+                    p: 0.5,
+                    display: { xs: 'flex', md: 'none' },
+                    '&:hover': {
+                      backgroundColor: 'transparent'
+                    }
+                  }}
+                  disableRipple
+                >
+                  <AccountCircle 
+                    fontSize="small" 
+                    color="primary"
+                  />
+                </IconButton>
                 <Typography
                   variant="body2"
                   sx={{
