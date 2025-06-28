@@ -176,7 +176,8 @@ function Login() {
                       sx={{
                         '&:hover': {
                           backgroundColor: 'transparent'
-                        }
+                        },
+                        color: theme => theme.palette.mode === 'dark' ? 'primary.main' : 'text.secondary'
                       }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
