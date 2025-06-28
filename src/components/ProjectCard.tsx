@@ -154,12 +154,38 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
             {project.description}
           </Typography>
           {project.description && project.description.length > 120 && !showFullDesc && (
-            <Button size="small" sx={{ p: 0, minHeight: 0, minWidth: 0, fontSize: '0.8em' }} onClick={() => setShowFullDesc(true)}>
+            <Button 
+              size="small" 
+              sx={{ 
+                p: 0, 
+                minHeight: 0, 
+                minWidth: 0, 
+                fontSize: '0.8em',
+                '&:hover': {
+                  bgcolor: 'transparent',
+                  textDecoration: 'underline'
+                }
+              }} 
+              onClick={() => setShowFullDesc(true)}
+            >
               See more...
             </Button>
           )}
           {showFullDesc && (
-            <Button size="small" sx={{ p: 0, minHeight: 0, minWidth: 0, fontSize: '0.8em' }} onClick={() => setShowFullDesc(false)}>
+            <Button 
+              size="small" 
+              sx={{ 
+                p: 0, 
+                minHeight: 0, 
+                minWidth: 0, 
+                fontSize: '0.8em',
+                '&:hover': {
+                  bgcolor: 'transparent',
+                  textDecoration: 'underline'
+                }
+              }} 
+              onClick={() => setShowFullDesc(false)}
+            >
               See less
             </Button>
           )}
