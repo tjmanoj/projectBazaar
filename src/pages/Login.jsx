@@ -41,7 +41,30 @@ function Login() {
       await login(email, password);
       navigate("/dashboard");
     } catch (err) {
-      setError("Failed to log in: " + err.message);
+      console.error(err);
+      // Handle specific Firebase auth errors
+      switch (err.code) {
+        case 'auth/invalid-credential':
+          setError('Invalid email or password. Please try again.');
+          break;
+        case 'auth/user-not-found':
+          setError('No account found with this email. Please sign up first.');
+          break;
+        case 'auth/wrong-password':
+          setError('Incorrect password. Please try again.');
+          break;
+        case 'auth/invalid-email':
+          setError('Invalid email address format.');
+          break;
+        case 'auth/too-many-requests':
+          setError('Too many failed attempts. Please try again later.');
+          break;
+        case 'auth/network-request-failed':
+          setError('Network error. Please check your internet connection.');
+          break;
+        default:
+          setError('Failed to sign in. Please try again.');
+      }
     }
     setLoading(false);
   }
