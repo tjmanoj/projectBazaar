@@ -80,6 +80,43 @@ function Signup() {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.100"
+                      : "background.paper",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& input": {
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.900"
+                        : "text.primary",
+                  },
+                  "& fieldset": {
+                    borderColor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.400"
+                        : "divider",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "primary.main",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "primary.main",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.700"
+                      : "text.secondary",
+                  "&.Mui-focused": {
+                    color: "primary.main",
+                  },
+                },
+              }}
             />
             <TextField
               margin="normal"
@@ -92,6 +129,43 @@ function Signup() {
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.100"
+                      : "background.paper",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& input": {
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.900"
+                        : "text.primary",
+                  },
+                  "& fieldset": {
+                    borderColor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.400"
+                        : "divider",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "primary.main",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "primary.main",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.700"
+                      : "text.secondary",
+                  "&.Mui-focused": {
+                    color: "primary.main",
+                  },
+                },
+              }}
             />
             <TextField
               margin="normal"
@@ -104,6 +178,43 @@ function Signup() {
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.100"
+                      : "background.paper",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& input": {
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.900"
+                        : "text.primary",
+                  },
+                  "& fieldset": {
+                    borderColor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.400"
+                        : "divider",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "primary.main",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "primary.main",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.700"
+                      : "text.secondary",
+                  "&.Mui-focused": {
+                    color: "primary.main",
+                  },
+                },
+              }}
             />
             <Button
               type="submit"

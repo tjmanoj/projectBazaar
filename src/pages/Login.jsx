@@ -108,6 +108,43 @@ function Login() {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.100"
+                      : "background.paper",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& input": {
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.900"
+                        : "text.primary",
+                  },
+                  "& fieldset": {
+                    borderColor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.400"
+                        : "divider",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "primary.main",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "primary.main",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.700"
+                      : "text.secondary",
+                  "&.Mui-focused": {
+                    color: "primary.main",
+                  },
+                },
+              }}
             />
             <TextField
               margin="normal"
@@ -120,6 +157,43 @@ function Login() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                "& .MuiInputBase-root": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.100"
+                      : "background.paper",
+                },
+                "& .MuiOutlinedInput-root": {
+                  "& input": {
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.900"
+                        : "text.primary",
+                  },
+                  "& fieldset": {
+                    borderColor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "grey.400"
+                        : "divider",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "primary.main",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "primary.main",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.700"
+                      : "text.secondary",
+                  "&.Mui-focused": {
+                    color: "primary.main",
+                  },
+                },
+              }}
             />
             <Button
               type="submit"
@@ -130,8 +204,16 @@ function Login() {
             >
               {loading ? "Signing In..." : "Sign In"}
             </Button>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 2, gap: 1 }}>
-              <MuiLink 
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                mt: 2,
+                gap: 1,
+              }}
+            >
+              <MuiLink
                 component="button"
                 variant="body2"
                 onClick={() => {
@@ -154,11 +236,12 @@ function Login() {
         <DialogTitle>Reset Password</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Enter your email address and we'll send you a link to reset your password.
+            Enter your email address and we'll send you a link to reset your
+            password.
           </DialogContentText>
           {resetMessage && (
-            <Alert 
-              severity="success" 
+            <Alert
+              severity="success"
               sx={{ mt: 2 }}
               onClose={() => setResetMessage("")}
             >
@@ -180,11 +263,7 @@ function Login() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenResetDialog(false)}>Cancel</Button>
-          <Button
-            onClick={handleResetPassword}
-          >
-            Reset Password
-          </Button>
+          <Button onClick={handleResetPassword}>Reset Password</Button>
         </DialogActions>
       </Dialog>
     </Container>
