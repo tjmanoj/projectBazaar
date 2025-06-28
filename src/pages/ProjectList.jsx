@@ -299,7 +299,6 @@ function ProjectList() {
 
               {/* Logout Button */}
               <Button
-                variant="outlined"
                 color="inherit"
                 size="small"
                 onClick={handleLogout}
@@ -307,10 +306,14 @@ function ProjectList() {
                   minWidth: 0,
                   p: 1,
                   ml: 0.5,
-                  borderRadius: 1,
+                  border: 'none',
+                  '&:hover': {
+                    border: 'none',
+                    backgroundColor: 'action.hover'
+                  }
                 }}
               >
-                <LogoutIcon fontSize="small" />
+                <LogoutIcon fontSize="small" color="primary" />
               </Button>
             </Box>
           </Toolbar>
