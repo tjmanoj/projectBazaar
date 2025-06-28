@@ -139,6 +139,10 @@ function ProjectList() {
             return (a.price || 0) - (b.price || 0);
           case "price-high-low":
             return (b.price || 0) - (a.price || 0);
+          case "latest":
+            return (new Date(b.createdAt || 0)).getTime() - (new Date(a.createdAt || 0)).getTime();
+          case "oldest":
+            return (new Date(a.createdAt || 0)).getTime() - (new Date(b.createdAt || 0)).getTime();
           default:
             return 0;
         }
@@ -298,9 +302,11 @@ function ProjectList() {
                       borderRadius: 1,
                     }}
                   >
-                    <MenuItem value="none">Sort by price</MenuItem>
+                    <MenuItem value="none">Sort</MenuItem>
                     <MenuItem value="price-low-high">Price: Low to High</MenuItem>
                     <MenuItem value="price-high-low">Price: High to Low</MenuItem>
+                    <MenuItem value="latest">Latest</MenuItem>
+                    <MenuItem value="oldest">Oldest</MenuItem>
                   </Select>
                 </FormControl>
               </Box>
