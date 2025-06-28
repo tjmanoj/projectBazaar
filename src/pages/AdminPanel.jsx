@@ -568,7 +568,14 @@ function AdminPanel() {
                     <Grid item xs={12} key={request.id}>
                       <Card variant="outlined">
                         <CardContent>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                          <Box sx={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between', 
+                            alignItems: 'flex-start', 
+                            mb: 2,
+                            position: 'relative',
+                            pr: 4 // Add padding to account for delete button
+                          }}>
                             <Box>
                               <Typography variant="h6" gutterBottom>
                                 {request.name}
@@ -576,50 +583,82 @@ function AdminPanel() {
                               <Typography color="text.secondary" variant="body2">
                                 {request.email}
                               </Typography>
-                              <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
+                              <Typography color="text.secondary" variant="body2">
                                 Submitted: {request.createdAt}
                               </Typography>
                             </Box>
-                            <Chip 
-                              label={request.status} 
-                              color={
-                                request.status === 'new' ? 'info' : 
-                                request.status === 'in-progress' ? 'warning' :
-                                request.status === 'completed' ? 'success' : 'default'
-                              }
-                            />
+                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                              <Chip 
+                                label={request.status} 
+                                color={
+                                  request.status === 'new' ? 'info' : 
+                                  request.status === 'in-progress' ? 'warning' :
+                                  request.status === 'completed' ? 'success' : 'default'
+                                }
+                                size="small"
+                              />
+                            </Box>
+                            <IconButton 
+                              onClick={() => {
+                                if (window.confirm('Are you sure you want to delete this request?')) {
+                                  deleteDoc(firestoreDoc(db, 'project_requests', request.id));
+                                }
+                              }}
+                              color="error"
+                              size="small"
+                              disableRipple
+                              sx={{ 
+                                position: 'absolute',
+                                right: -8,
+                                top: -8,
+                                '&:hover': { 
+                                  backgroundColor: 'transparent'
+                                },
+                                '&:active': {
+                                  backgroundColor: 'transparent'
+                                }
+                              }}
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
                           </Box>
-                          <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
-                            {request.requirements}
-                          </Typography>
+                          
+                          <Box sx={{ mb: 2 }}>
+                            <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                              {request.requirements}
+                            </Typography>
+                          </Box>
+
+                          <Box sx={{ 
+                            display: 'flex', 
+                            gap: 2,
+                            borderTop: 1,
+                            borderColor: 'divider',
+                            pt: 2,
+                            mt: 2
+                          }}>
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              size="small"
+                              onClick={() => handleUpdateRequestStatus(request.id, 'in-progress')}
+                              disabled={request.status !== 'new'}
+                              sx={{ flex: 1 }}
+                            >
+                              Mark In Progress
+                            </Button>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              size="small"
+                              onClick={() => handleUpdateRequestStatus(request.id, 'completed')}
+                              disabled={request.status === 'completed'}
+                              sx={{ flex: 1 }}
+                            >
+                              Mark Completed
+                            </Button>
+                          </Box>
                         </CardContent>
-                        <CardActions sx={{ justifyContent: 'flex-end' }}>
-                          <Button
-                            size="small"
-                            onClick={() => handleUpdateRequestStatus(request.id, 'in-progress')}
-                            disabled={request.status !== 'new'}
-                          >
-                            Mark In Progress
-                          </Button>
-                          <Button
-                            size="small"
-                            onClick={() => handleUpdateRequestStatus(request.id, 'completed')}
-                            disabled={request.status === 'completed'}
-                          >
-                            Mark Completed
-                          </Button>
-                          <IconButton 
-                            onClick={() => {
-                              if (window.confirm('Are you sure you want to delete this request?')) {
-                                deleteDoc(firestoreDoc(db, 'project_requests', request.id));
-                            }
-                          }}
-                          color="error"
-                          size="small"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                        </CardActions>
                       </Card>
                     </Grid>
                   ))}

@@ -63,8 +63,9 @@ service cloud.firestore {
     }
     match /project_requests/{requestId} {
       // Anyone can create a new request
-      allow create: if request.resource.data.keys().hasOnly(['name', 'email', 'requirements', 'status', 'createdAt']) &&
-                     request.resource.data.status == 'new';
+      allow create: if request.auth != null || 
+        (request.resource.data.keys().hasOnly(['name', 'email', 'requirements', 'status', 'createdAt']) &&
+        request.resource.data.status == 'new');
       // Only admins can read, update or delete
       allow read, update, delete: if isAdmin();
     }

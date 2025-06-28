@@ -19,7 +19,9 @@ import {
   IconButton,
   CssBaseline,
   alpha,
-  Divider
+  Divider,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { 
   School, 
@@ -64,6 +66,11 @@ function Landing() {
   const [formError, setFormError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -122,6 +129,13 @@ function Landing() {
     setFormError('');
   };
 
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
   const handleProjectRequest = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -144,20 +158,25 @@ function Landing() {
         createdAt: serverTimestamp()
       });
 
-      // Show success and reset form
-      setSubmitSuccess(true);
+      // Show success message
+      setSnackbar({
+        open: true,
+        message: 'Project request submitted successfully! We will contact you soon.',
+        severity: 'success'
+      });
+
+      // Reset form
       setFormData({
         name: '',
         email: '',
         requirements: ''
       });
-
-      // Hide success message after 5 seconds
-      setTimeout(() => {
-        setSubmitSuccess(false);
-      }, 5000);
     } catch (error) {
-      setFormError(error.message);
+      setSnackbar({
+        open: true,
+        message: error.message,
+        severity: 'error'
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -1134,6 +1153,22 @@ function Landing() {
           </IconButton>
         </Box>
       </Zoom>
+
+      <Snackbar 
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleCloseSnackbar} 
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
