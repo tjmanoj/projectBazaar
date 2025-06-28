@@ -9,6 +9,7 @@ import {
   Chip,
   Stack,
   CardMedia,
+  alpha,
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -228,6 +229,12 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
             sx={{ 
               minWidth: 'auto',
               px: { xs: 1.5, sm: 2 },
+              '&:hover': {
+                bgcolor: theme => 
+                  theme.palette.mode === 'dark' 
+                    ? alpha(theme.palette.primary.main, 0.08)
+                    : alpha(theme.palette.primary.main, 0.08),
+              }
             }}
           >
             Demo
