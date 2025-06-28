@@ -15,12 +15,16 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [resetMessage, setResetMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -152,25 +156,39 @@ function Login() {
               fullWidth
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              sx={{
-                "& .MuiInputBase-root": {
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+                sx: {
                   bgcolor: (theme) =>
                     theme.palette.mode === "dark"
                       ? "grey.100"
                       : "background.paper",
-                },
-                "& .MuiOutlinedInput-root": {
                   "& input": {
                     color: (theme) =>
                       theme.palette.mode === "dark"
                         ? "grey.900"
                         : "text.primary",
                   },
+                },
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
                   "& fieldset": {
                     borderColor: (theme) =>
                       theme.palette.mode === "dark"
