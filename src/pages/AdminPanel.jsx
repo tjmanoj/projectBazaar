@@ -308,7 +308,16 @@ function AdminPanel() {
         {/* Notification Bell */}
         {isAdmin && (
           <Tooltip title="User Chat Notifications">
-            <IconButton color="primary" onClick={handleNotifOpen} sx={{ ml: 2 }}>
+            <IconButton 
+              color="primary" 
+              onClick={handleNotifOpen} 
+              sx={{ 
+                ml: 2,
+                '&:hover': {
+                  backgroundColor: 'transparent'
+                }
+              }}
+            >
               <Badge badgeContent={unreadCount} color="error">
                 <NotificationsIcon />
               </Badge>
