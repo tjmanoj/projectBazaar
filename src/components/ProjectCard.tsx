@@ -80,24 +80,52 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
         overflow: 'hidden',
         minWidth: 0
       }}>
-        <Typography 
-          variant="h6" 
-          component="h2" 
-          sx={{ 
-            fontWeight: 600,
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            lineHeight: 1.2,
-            height: '2.4em',
-            mb: -1,
-            minWidth: 0
-          }}
-        >
-          {project.title}
-        </Typography>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start',
+          gap: 2,
+          mb: 1
+        }}>
+          <Typography 
+            variant="h6" 
+            component="h2" 
+            sx={{ 
+              fontWeight: 600,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              lineHeight: 1.2,
+              minWidth: 0,
+              flex: 1
+            }}
+          >
+            {project.title}
+          </Typography>
+          <Typography
+            variant="h6"
+            component="div"
+            color="primary"
+            sx={{
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              fontSize: { xs: '1.1rem', sm: '1.25rem' },
+              bgcolor: theme => 
+                theme.palette.mode === 'dark' 
+                  ? 'rgba(144, 202, 249, 0.08)'
+                  : 'rgba(33, 150, 243, 0.08)',
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 1.5,
+              lineHeight: 1,
+              letterSpacing: 0.5,
+            }}
+          >
+            {formattedPrice}
+          </Typography>
+        </Box>
 
         <Box>
           <Typography 
@@ -135,19 +163,14 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
           gap: 1,
           mt: 'auto' 
         }}>
-          <Stack direction="row" spacing={1}>
+          <Box>
             <Chip 
               size="small" 
               label={project.category} 
               color="primary" 
               sx={{ textTransform: 'capitalize' }}
             />
-            <Chip 
-              size="small" 
-              label={formattedPrice} 
-              variant="outlined"
-            />
-          </Stack>
+          </Box>
           <Box 
             sx={{ 
               display: 'flex',
