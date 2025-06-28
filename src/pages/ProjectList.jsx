@@ -28,6 +28,10 @@ import {
   alpha,
   TextField,
   InputAdornment,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useThemeContext } from "../context/ThemeContext";
@@ -59,6 +63,11 @@ function ProjectList() {
   const [searchQuery, setSearchQuery] = useState("");
   const [allProjects, setAllProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const [sortBy, setSortBy] = useState("none");
+
+  const handleSortChange = (event) => {
+    setSortBy(event.target.value);
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -75,7 +84,7 @@ function ProjectList() {
 
   useEffect(() => {
     filterProjects(allProjects, searchQuery, category);
-  }, [searchQuery, category]);
+  }, [searchQuery, category, sortBy]);
 
   const checkAdminStatus = async () => {
     try {
@@ -106,21 +115,34 @@ function ProjectList() {
   const filterProjects = (projects, search, cat) => {
     let filtered = projects;
     
-    // Apply category filter
-    if (cat !== "all") {
-      filtered = filtered.filter(project => project.category === cat);
-    }
-    
-    // Apply search filter
+    // If there's a search query, ignore category and search across all projects
     if (search.trim()) {
       const searchLower = search.toLowerCase();
-      filtered = filtered.filter(project => 
+      filtered = projects.filter(project => 
         project.title?.toLowerCase().includes(searchLower) ||
         project.description?.toLowerCase().includes(searchLower) ||
         project.technologies?.some(tech => 
           tech.toLowerCase().includes(searchLower)
         )
       );
+    }
+    // Only apply category filter if there's no search query
+    else if (cat !== "all") {
+      filtered = filtered.filter(project => project.category === cat);
+    }
+    
+    // Apply sorting
+    if (sortBy !== "none") {
+      filtered = [...filtered].sort((a, b) => {
+        switch (sortBy) {
+          case "price-low-high":
+            return (a.price || 0) - (b.price || 0);
+          case "price-high-low":
+            return (b.price || 0) - (a.price || 0);
+          default:
+            return 0;
+        }
+      });
     }
     
     setProjects(filtered);
@@ -226,34 +248,62 @@ function ProjectList() {
                 maxWidth: "400px",
               }}
             >
-              <TextField
-                size="small"
-                placeholder="Search projects..."
-                value={searchQuery}
-                onChange={handleSearch}
-                variant="outlined"
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon color="action" />
-                    </InputAdornment>
-                  ),
-                  sx: {
-                    bgcolor: theme => 
-                      theme.palette.mode === 'dark' 
-                        ? alpha(theme.palette.common.white, 0.05)
-                        : alpha(theme.palette.common.black, 0.04),
-                    '&:hover': {
+              <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
+                <TextField
+                  size="small"
+                  placeholder="Search projects..."
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  variant="outlined"
+                  fullWidth
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon color="action" />
+                      </InputAdornment>
+                    ),
+                    sx: {
                       bgcolor: theme => 
                         theme.palette.mode === 'dark' 
-                          ? alpha(theme.palette.common.white, 0.08)
-                          : alpha(theme.palette.common.black, 0.06),
-                    },
-                    borderRadius: 1,
-                  }
-                }}
-              />
+                          ? alpha(theme.palette.common.white, 0.05)
+                          : alpha(theme.palette.common.black, 0.04),
+                      '&:hover': {
+                        bgcolor: theme => 
+                          theme.palette.mode === 'dark' 
+                            ? alpha(theme.palette.common.white, 0.08)
+                            : alpha(theme.palette.common.black, 0.06),
+                      },
+                      borderRadius: 1,
+                    }
+                  }}
+                />
+                <FormControl size="small" sx={{ minWidth: 140 }}>
+                  <Select
+                    value={sortBy}
+                    onChange={handleSortChange}
+                    displayEmpty
+                    variant="outlined"
+                    sx={{
+                      bgcolor: theme => 
+                        theme.palette.mode === 'dark' 
+                          ? alpha(theme.palette.common.white, 0.05)
+                          : alpha(theme.palette.common.black, 0.04),
+                      '&:hover': {
+                        bgcolor: theme => 
+                          theme.palette.mode === 'dark' 
+                            ? alpha(theme.palette.common.white, 0.08)
+                            : alpha(theme.palette.common.black, 0.06),
+                      },
+                      '.MuiOutlinedInput-notchedOutline': { border: 'none' },
+                      borderRadius: 1,
+                    }}
+                  >
+                    <MenuItem value="none">Sort by price</MenuItem>
+                    <MenuItem value="price-low-high">Price: Low to High</MenuItem>
+                    <MenuItem value="price-high-low">Price: High to Low</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
             </Box>
 
             {/* Right side actions */}
