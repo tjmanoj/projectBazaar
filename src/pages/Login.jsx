@@ -220,6 +220,12 @@ function Login() {
                   setOpenResetDialog(true);
                   setResetEmail(email);
                 }}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: "transparent",
+                    color: "primary.main",
+                  },
+                }}
               >
                 Forgot password?
               </MuiLink>
