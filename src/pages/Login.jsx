@@ -169,6 +169,11 @@ function Login() {
                       onClick={() => setShowPassword(!showPassword)}
                       onMouseDown={(e) => e.preventDefault()}
                       edge="end"
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'transparent'
+                        }
+                      }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>

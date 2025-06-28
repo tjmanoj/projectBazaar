@@ -142,6 +142,11 @@ function Signup() {
                       onClick={() => setShowPassword(!showPassword)}
                       onMouseDown={(e) => e.preventDefault()}
                       edge="end"
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'transparent'
+                        }
+                      }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -205,6 +210,11 @@ function Signup() {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       onMouseDown={(e) => e.preventDefault()}
                       edge="end"
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: 'transparent'
+                        }
+                      }}
                     >
                       {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
