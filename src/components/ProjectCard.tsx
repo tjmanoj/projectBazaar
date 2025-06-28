@@ -227,7 +227,7 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
             </Box>
           </Box>
 
-          <Typography 
+          {/* <Typography 
             variant="body2" 
             color="text.secondary" 
             sx={{ 
@@ -235,7 +235,7 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
             }}
           >
             Updated {project.updatedAt.toLocaleDateString()}
-          </Typography>
+          </Typography> */}
         </Box>
       </CardContent>
 
