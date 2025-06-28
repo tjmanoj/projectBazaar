@@ -166,8 +166,12 @@ function Login() {
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowPassword(!showPassword);
+                      }}
                       onMouseDown={(e) => e.preventDefault()}
+                      onMouseUp={(e) => e.preventDefault()}
                       edge="end"
                       sx={{
                         '&:hover': {

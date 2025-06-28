@@ -139,8 +139,12 @@ function Signup() {
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowPassword(!showPassword);
+                      }}
                       onMouseDown={(e) => e.preventDefault()}
+                      onMouseUp={(e) => e.preventDefault()}
                       edge="end"
                       sx={{
                         '&:hover': {
@@ -207,8 +211,12 @@ function Signup() {
                   <InputAdornment position="end">
                     <IconButton
                       aria-label="toggle confirm password visibility"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowConfirmPassword(!showConfirmPassword);
+                      }}
                       onMouseDown={(e) => e.preventDefault()}
+                      onMouseUp={(e) => e.preventDefault()}
                       edge="end"
                       sx={{
                         '&:hover': {
