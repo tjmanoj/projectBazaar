@@ -25,6 +25,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  alpha,
 } from "@mui/material";
 import { useThemeContext } from "../context/ThemeContext";
 import {
@@ -199,9 +200,10 @@ function ProjectList() {
                     fontSize: "0.875rem",
                     textTransform: "none",
                     fontWeight: 500,
+                    transition: 'all 0.2s ease-in-out',
                   },
                   "& .MuiTab-root:hover": {
-                    backgroundColor: "action.hover",
+                    backgroundColor: theme => alpha(theme.palette.primary.main, 0.08),
                     opacity: 1,
                   },
                   "& .MuiTabs-indicator": {
@@ -338,10 +340,15 @@ function ProjectList() {
             scrollButtons="auto"
             allowScrollButtonsMobile
             sx={{
-              minHeight: 48, // Reduce tab height
+              minHeight: 48,
               "& .MuiTab-root": {
                 minHeight: 48,
                 py: 1,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': {
+                  backgroundColor: theme => alpha(theme.palette.primary.main, 0.08),
+                  opacity: 1,
+                }
               },
             }}
           >
