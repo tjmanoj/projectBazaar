@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 import { 
   AppBar, 
   Button, 
@@ -54,6 +56,14 @@ function Landing() {
   const currentYear = new Date().getFullYear();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    requirements: ''
+  });
+  const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const scrollToSection = (sectionId) => {
     const section = document.getElementById(sectionId);
@@ -101,6 +111,56 @@ function Landing() {
       top: 0,
       behavior: 'smooth'
     });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    setFormError('');
+  };
+
+  const handleProjectRequest = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormError('');
+
+    try {
+      // Validate form
+      if (!formData.name.trim() || !formData.email.trim() || !formData.requirements.trim()) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Add to Firestore
+      await addDoc(collection(db, 'project_requests'), {
+        ...formData,
+        status: 'new',
+        createdAt: serverTimestamp()
+      });
+
+      // Show success and reset form
+      setSubmitSuccess(true);
+      setFormData({
+        name: '',
+        email: '',
+        requirements: ''
+      });
+
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        setSubmitSuccess(false);
+      }, 5000);
+    } catch (error) {
+      setFormError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -766,117 +826,141 @@ function Landing() {
           }}
             >
           <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-            <form onSubmit={(e) => e.preventDefault()} >
+            <form onSubmit={handleProjectRequest}>
               <Stack spacing={3}>
-            <TextField
-              label="Name"
-              variant="outlined"
-              fullWidth
-              required
-              sx={{
-                '& .MuiInputBase-root': {
-              bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                }
-              }}
-              InputProps={{
-                sx: {
-              color: mode === 'dark' ? 'grey.900' : 'text.primary',
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'primary.main'
-              },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'primary.main'
-              }
-                }
-              }}
-              InputLabelProps={{
-                sx: { 
-              color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-              '&.Mui-focused': {
-                color: 'primary.main'
-              }
-                }
-              }}
-            />
-            <TextField
-              label="Email"
-              type="email"
-              variant="outlined"
-              fullWidth
-              required
-              sx={{
-                '& .MuiInputBase-root': {
-              bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                }
-              }}
-              InputProps={{
-                sx: {
-              color: mode === 'dark' ? 'grey.900' : 'text.primary',
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'primary.main'
-              },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'primary.main'
-              }
-                }
-              }}
-              InputLabelProps={{
-                sx: { 
-              color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-              '&.Mui-focused': {
-                color: 'primary.main'
-              }
-                }
-              }}
-            />
-            <TextField
-              label="Project Requirements"
-              multiline
-              rows={4}
-              variant="outlined"
-              fullWidth
-              sx={{
-                '& .MuiInputBase-root': {
-              bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                }
-              }}
-              InputProps={{
-                sx: {
-              color: mode === 'dark' ? 'grey.900' : 'text.primary',
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-              },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'primary.main'
-              },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'primary.main'
-              }
-                }
-              }}
-              InputLabelProps={{
-                sx: { 
-              color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-              '&.Mui-focused': {
-                color: 'primary.main'
-              }
-                }
-              }}
-            />
-            <Button 
-              type="submit"
-              variant="contained"
-              size="large"
-              endIcon={<ArrowForward />}
-            >
-              Submit Request
-            </Button>
+                {formError && (
+                  <Typography color="error" textAlign="center">
+                    {formError}
+                  </Typography>
+                )}
+                {submitSuccess && (
+                  <Typography color="success.main" textAlign="center">
+                    Your project request has been submitted successfully! We'll get back to you soon.
+                  </Typography>
+                )}
+                <TextField
+                  label="Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  fullWidth
+                  required
+                  disabled={isSubmitting}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                    }
+                  }}
+                  InputProps={{
+                    sx: {
+                      color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main'
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main'
+                      }
+                    }
+                  }}
+                  InputLabelProps={{
+                    sx: { 
+                      color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                      '&.Mui-focused': {
+                        color: 'primary.main'
+                      }
+                    }
+                  }}
+                />
+                <TextField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  variant="outlined"
+                  fullWidth
+                  required
+                  disabled={isSubmitting}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                    }
+                  }}
+                  InputProps={{
+                    sx: {
+                      color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main'
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main'
+                      }
+                    }
+                  }}
+                  InputLabelProps={{
+                    sx: { 
+                      color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                      '&.Mui-focused': {
+                        color: 'primary.main'
+                      }
+                    }
+                  }}
+                />
+                <TextField
+                  label="Project Requirements"
+                  name="requirements"
+                  value={formData.requirements}
+                  onChange={handleInputChange}
+                  multiline
+                  rows={4}
+                  variant="outlined"
+                  fullWidth
+                  required
+                  disabled={isSubmitting}
+                  sx={{
+                    '& .MuiInputBase-root': {
+                      bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                    }
+                  }}
+                  InputProps={{
+                    sx: {
+                      color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                      '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                      },
+                      '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main'
+                      },
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'primary.main'
+                      }
+                    }
+                  }}
+                  InputLabelProps={{
+                    sx: { 
+                      color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                      '&.Mui-focused': {
+                        color: 'primary.main'
+                      }
+                    }
+                  }}
+                />
+                <Button 
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  endIcon={<ArrowForward />}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Submitting...' : 'Submit Request'}
+                </Button>
               </Stack>
             </form>
           </CardContent>

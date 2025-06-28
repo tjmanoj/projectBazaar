@@ -34,10 +34,21 @@ import {
   Visibility as VisibilityIcon,
   VisibilityOff as VisibilityOffIcon,
   Chat as ChatIcon,
-  Dashboard as DashboardIcon
+  Dashboard as DashboardIcon,
+  Assignment as AssignmentIcon
 } from '@mui/icons-material';
 import AdminChat from '../components/AdminChat';
-import { collection, query, where, orderBy, onSnapshot, updateDoc, doc as firestoreDoc, deleteDoc } from 'firebase/firestore';
+import { 
+  collection, 
+  query, 
+  where, 
+  orderBy, 
+  onSnapshot, 
+  updateDoc, 
+  doc as firestoreDoc, 
+  deleteDoc,
+  getDocs
+} from 'firebase/firestore';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import Badge from '@mui/material/Badge';
 import Menu from '@mui/material/Menu';
@@ -76,6 +87,9 @@ function AdminPanel() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);
   const [notifLoading, setNotifLoading] = useState(true);
+  const [projectRequests, setProjectRequests] = useState([]);
+  const [loadingRequests, setLoadingRequests] = useState(true);
+  const [requestError, setRequestError] = useState('');
   const { setSelectedUser } = useChat(); // Import context hook
 
   // Check admin status
@@ -114,6 +128,36 @@ function AdminPanel() {
       setNotifLoading(false);
     });
     return unsubscribe;
+  }, [isAdmin]);
+
+  // Load project requests
+  useEffect(() => {
+    if (!isAdmin) return;
+    
+    const loadProjectRequests = async () => {
+      try {
+        setLoadingRequests(true);
+        const requestsRef = collection(db, 'project_requests');
+        const q = query(requestsRef, orderBy('createdAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+          const requests = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            createdAt: doc.data().createdAt?.toDate().toLocaleString() || 'Unknown'
+          }));
+          setProjectRequests(requests);
+          setLoadingRequests(false);
+        });
+
+        return unsubscribe;
+      } catch (error) {
+        console.error('Error loading project requests:', error);
+        setRequestError('Failed to load project requests');
+        setLoadingRequests(false);
+      }
+    };
+
+    loadProjectRequests();
   }, [isAdmin]);
 
   const loadProjects = async () => {
@@ -271,6 +315,18 @@ function AdminPanel() {
     }
   };
 
+  const handleUpdateRequestStatus = async (requestId, newStatus) => {
+    try {
+      await updateDoc(firestoreDoc(db, 'project_requests', requestId), {
+        status: newStatus,
+        updatedAt: new Date()
+      });
+    } catch (error) {
+      console.error('Error updating request status:', error);
+      setRequestError('Failed to update request status');
+    }
+  };
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
@@ -302,6 +358,16 @@ function AdminPanel() {
               label="Customer Chat" 
               id="tab-1" 
               aria-controls="tabpanel-1" 
+            />
+            <Tab 
+              icon={
+                <Badge badgeContent={projectRequests.filter(r => r.status === 'new').length} color="error">
+                  <AssignmentIcon />
+                </Badge>
+              } 
+              label="Project Requests" 
+              id="tab-2" 
+              aria-controls="tabpanel-2" 
             />
           </Tabs>
         </Paper>
@@ -468,6 +534,100 @@ function AdminPanel() {
         aria-labelledby="tab-1"
       >
         {activeTab === 1 && <AdminChat />}
+      </div>
+
+      {/* Project Requests Tab Panel */}
+      <div
+        role="tabpanel"
+        hidden={activeTab !== 2}
+        id="tabpanel-2"
+        aria-labelledby="tab-2"
+      >
+        {activeTab === 2 && (
+          <Box>
+            <Paper elevation={0} sx={{ p: 3, mb: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Project Requests
+              </Typography>
+              {requestError && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {requestError}
+                </Alert>
+              )}
+              {loadingRequests ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                  <CircularProgress />
+                </Box>
+              ) : projectRequests.length === 0 ? (
+                <Typography color="text.secondary">
+                  No project requests yet.
+                </Typography>
+              ) : (
+                <Grid container spacing={3}>
+                  {projectRequests.map((request) => (
+                    <Grid item xs={12} key={request.id}>
+                      <Card variant="outlined">
+                        <CardContent>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                            <Box>
+                              <Typography variant="h6" gutterBottom>
+                                {request.name}
+                              </Typography>
+                              <Typography color="text.secondary" variant="body2">
+                                {request.email}
+                              </Typography>
+                              <Typography color="text.secondary" variant="body2" sx={{ mb: 2 }}>
+                                Submitted: {request.createdAt}
+                              </Typography>
+                            </Box>
+                            <Chip 
+                              label={request.status} 
+                              color={
+                                request.status === 'new' ? 'info' : 
+                                request.status === 'in-progress' ? 'warning' :
+                                request.status === 'completed' ? 'success' : 'default'
+                              }
+                            />
+                          </Box>
+                          <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                            {request.requirements}
+                          </Typography>
+                        </CardContent>
+                        <CardActions sx={{ justifyContent: 'flex-end' }}>
+                          <Button
+                            size="small"
+                            onClick={() => handleUpdateRequestStatus(request.id, 'in-progress')}
+                            disabled={request.status !== 'new'}
+                          >
+                            Mark In Progress
+                          </Button>
+                          <Button
+                            size="small"
+                            onClick={() => handleUpdateRequestStatus(request.id, 'completed')}
+                            disabled={request.status === 'completed'}
+                          >
+                            Mark Completed
+                          </Button>
+                          <IconButton 
+                            onClick={() => {
+                              if (window.confirm('Are you sure you want to delete this request?')) {
+                                deleteDoc(firestoreDoc(db, 'project_requests', request.id));
+                            }
+                          }}
+                          color="error"
+                          size="small"
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                        </CardActions>
+                      </Card>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+            </Paper>
+          </Box>
+        )}
       </div>
 
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
