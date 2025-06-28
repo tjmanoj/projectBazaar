@@ -193,14 +193,6 @@ function Landing() {
               >
                 {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
               </IconButton>
-              <Button 
-                variant="contained" 
-                color="primary"
-                onClick={() => navigate('/login')}
-                sx={{ ml: 2 }}
-              >
-                Get Started
-              </Button>
             </Box>
 
             <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
