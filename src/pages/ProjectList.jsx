@@ -287,6 +287,7 @@ function ProjectList() {
                     onChange={handleSortChange}
                     displayEmpty
                     variant="outlined"
+                    renderValue={(value) => value === "none" ? "Sort" : value === "price-low-high" ? "Price: Low to High" : value === "price-high-low" ? "Price: High to Low" : value === "latest" ? "Latest" : "Oldest"}
                     sx={{
                       bgcolor: theme => 
                         theme.palette.mode === 'dark' 
@@ -302,7 +303,6 @@ function ProjectList() {
                       borderRadius: 1,
                     }}
                   >
-                    <MenuItem value="none">Sort</MenuItem>
                     <MenuItem value="price-low-high">Price: Low to High</MenuItem>
                     <MenuItem value="price-high-low">Price: High to Low</MenuItem>
                     <MenuItem value="latest">Latest</MenuItem>
