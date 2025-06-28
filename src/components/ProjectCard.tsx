@@ -34,9 +34,11 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
     e.stopPropagation();
     if (onDemoClick) onDemoClick(project);
   };
+  
   const handleImageError = () => {
     setImageError(true);
   };
+
   return (
     <Card 
       sx={{ 
@@ -44,21 +46,23 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
         flexDirection: 'column',
         height: '100%',
         width: '100%',
-        minHeight: { xs: project.thumbnail && !imageError ? '500px' : '340px', sm: project.thumbnail && !imageError ? '540px' : '380px' },
-        maxHeight: { xs: project.thumbnail && !imageError ? '500px' : '340px', sm: project.thumbnail && !imageError ? '540px' : '380px' },
+        minHeight: { xs: 'auto', sm: project.thumbnail && !imageError ? '540px' : '380px' },
+        maxHeight: { xs: 'none', sm: project.thumbnail && !imageError ? '540px' : '380px' },
         minWidth: 0,
+        maxWidth: '100%',
         boxSizing: 'border-box',
         transition: 'transform 0.2s ease-in-out',
         '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: 4
-        }
+          transform: { xs: 'none', sm: 'translateY(-4px)' },
+          boxShadow: { xs: 2, sm: 4 }
+        },
+        overflow: 'hidden'
       }}
     >
       {project.thumbnail && !imageError && (
         <CardMedia
           component="img"
-          height="240"
+          height={200}
           image={project.thumbnail}
           alt={`${project.title} thumbnail`}
           onError={handleImageError}
@@ -66,19 +70,22 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
             objectFit: 'cover',
             objectPosition: 'center top',
             borderBottom: 1,
-            borderColor: 'divider'
+            borderColor: 'divider',
+            width: '100%',
+            height: { xs: '200px', sm: '240px' }
           }}
         />
       )}
       <CardContent sx={{
         flexGrow: 1, 
         pt: 1.5,
-        pb: 1,
+        pb: '8px !important',
         display: 'flex',
         flexDirection: 'column',
-        gap: 1,
+        gap: 1.5,
         overflow: 'hidden',
-        minWidth: 0
+        minWidth: 0,
+        px: { xs: 1.5, sm: 2 }
       }}>
         <Box sx={{ 
           display: 'flex', 
@@ -157,68 +164,71 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
           )}
         </Box>
 
-        <Box sx={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: 1,
-          mt: 'auto' 
-        }}>
-          <Box>
-            <Chip 
-              size="small" 
-              label={project.category} 
-              color="primary" 
-              sx={{ textTransform: 'capitalize' }}
-            />
-          </Box>
-          <Box 
-            sx={{ 
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 0.5,
-              maxHeight: '48px',
-              overflow: 'hidden'
-            }}
-          >
-            {project.technologies.map((tech) => (
-              <Chip
-                key={tech}
-                label={tech}
-                size="small"
-                variant="outlined"
+        <Box sx={{ mt: 'auto' }}>
+          <Box sx={{ mb: 2 }}>
+            <Box sx={{ mb: 1 }}>
+              <Chip 
+                size="small" 
+                label={project.category} 
+                color="primary" 
                 sx={{ 
-                  fontSize: '0.75rem',
-                  height: '20px'
+                  textTransform: 'capitalize'
                 }}
               />
-            ))}
+            </Box>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 0.75,
+                width: '100%',
+                maxWidth: '100%'
+              }}
+            >
+              {project.technologies.map((tech) => (
+                <Chip
+                  key={tech}
+                  label={tech}
+                  size="small"
+                  variant="outlined"
+                  sx={{ 
+                    fontSize: '0.75rem',
+                    height: '20px'
+                  }}
+                />
+              ))}
+            </Box>
           </Box>
-        </Box>
 
-        <Typography 
-          variant="body2" 
-          color="text.secondary" 
-          sx={{ 
-            fontSize: '0.75rem',
-            mt: 'auto'
-          }}
-        >
-          Updated {project.updatedAt.toLocaleDateString()}
-        </Typography>
+          <Typography 
+            variant="body2" 
+            color="text.secondary" 
+            sx={{ 
+              fontSize: '0.75rem'
+            }}
+          >
+            Updated {project.updatedAt.toLocaleDateString()}
+          </Typography>
+        </Box>
       </CardContent>
 
       <CardActions sx={{ 
-        p: 2, 
-        pt: 1,
+        px: { xs: 1.5, sm: 2 },
+        py: 1.5,
+        mt: 'auto',
         borderTop: 1,
-        borderColor: 'divider'
+        borderColor: 'divider',
+        gap: 1
       }}>
         {project.demoVideoDesktopUrl || project.demoVideoMobileUrl ? (
           <Button
             size="small"
             startIcon={<PlayIcon />}
             onClick={handleDemoClick}
-            sx={{ mr: 1 }}
+            sx={{ 
+              minWidth: 'auto',
+              px: { xs: 1.5, sm: 2 },
+            }}
           >
             Demo
           </Button>
@@ -229,6 +239,10 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
           variant="contained"
           startIcon={<CartIcon />}
           onClick={() => onClick?.(project)}
+          sx={{ 
+            minWidth: 'auto',
+            px: { xs: 1.5, sm: 2 },
+          }}
         >
           Buy Now
         </Button>
