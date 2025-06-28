@@ -16,7 +16,8 @@ import {
   Stack,
   IconButton,
   CssBaseline,
-  alpha
+  alpha,
+  Divider
 } from '@mui/material';
 import { 
   School, 
@@ -29,7 +30,11 @@ import {
   ArrowForward,
   Security,
   Speed,
-  Support
+  Support,
+  Instagram,
+  Twitter,
+  YouTube,
+  LinkedIn,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useThemeContext } from '../context/ThemeContext';
@@ -892,72 +897,112 @@ function Landing() {
         component="footer" 
         sx={{ 
           bgcolor: 'background.paper',
-          py: 4,
+          pt: 8,
+          pb: 4,
           borderTop: 1,
           borderColor: 'divider'
         }}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={4}>
+          <Grid container spacing={6}>
             <Grid item xs={12} md={4}>
-              <Stack spacing={2}>
-                <Typography variant="h6" fontWeight="bold">
-                  Project Bazaar
+              <Stack spacing={3}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <img 
+                    src="/logo.png" 
+                    alt="Project Bazaar Logo" 
+                    style={{ height: '32px' }} 
+                  />
+                  <Typography variant="h6" fontWeight="bold">
+                    Project Bazaar
+                  </Typography>
+                </Box>
+                <Typography color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                  Making quality projects accessible to every student. We help you turn your ideas into reality with professional guidance and support.
                 </Typography>
-                <Typography color="text.secondary">
-                  Making quality projects accessible to every student
-                </Typography>
+                <Stack direction="row" spacing={2}>
+                  <IconButton 
+                    color="primary" 
+                    component="a" 
+                    href="https://instagram.com" 
+                    target="_blank"
+                    sx={{ 
+                      '&:hover': { 
+                        transform: 'translateY(-3px)',
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      },
+                      transition: 'transform 0.2s'
+                    }}
+                  >
+                    <Instagram />
+                  </IconButton>
+                  <IconButton 
+                    color="primary" 
+                    component="a" 
+                    href="https://twitter.com" 
+                    target="_blank"
+                    sx={{ 
+                      '&:hover': { 
+                        transform: 'translateY(-3px)',
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      },
+                      transition: 'transform 0.2s'
+                    }}
+                  >
+                    <Twitter />
+                  </IconButton>
+                  <IconButton 
+                    color="primary" 
+                    component="a" 
+                    href="https://youtube.com" 
+                    target="_blank"
+                    sx={{ 
+                      '&:hover': { 
+                        transform: 'translateY(-3px)',
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      },
+                      transition: 'transform 0.2s'
+                    }}
+                  >
+                    <YouTube />
+                  </IconButton>
+                  <IconButton 
+                    color="primary" 
+                    component="a" 
+                    href="https://linkedin.com" 
+                    target="_blank"
+                    sx={{ 
+                      '&:hover': { 
+                        transform: 'translateY(-3px)',
+                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                      },
+                      transition: 'transform 0.2s'
+                    }}
+                  >
+                    <LinkedIn />
+                  </IconButton>
+                </Stack>
               </Stack>
             </Grid>
-            <Grid item xs={12} md={8}>
-              <Grid container spacing={4}>
-                <Grid item xs={6} sm={3}>
-                  <Stack spacing={2}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Services
-                    </Typography>
-                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
-                      Mini Projects
-                    </Button>
-                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
-                      Final Year Projects
-                    </Button>
-                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
-                      Mentorship
-                    </Button>
-                  </Stack>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                  <Stack spacing={2}>
-                    <Typography variant="subtitle1" fontWeight="bold">
-                      Support
-                    </Typography>
-                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
-                      FAQ
-                    </Button>
-                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
-                      Contact
-                    </Button>
-                    <Button color="inherit" sx={{ justifyContent: 'flex-start' }}>
-                      Terms
-                    </Button>
-                  </Stack>
-                </Grid>
-              </Grid>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography 
-                color="text.secondary" 
-                align="center"
-                sx={{ mt: 2 }}
-              >
-                © {currentYear} Project Bazaar. All rights reserved.
-              </Typography>
-            </Grid>
+          
           </Grid>
+          <Divider sx={{ mt: 6, mb: 4 }} />
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+            <Typography color="text.secondary" variant="body2">
+              © {currentYear} Project Bazaar. All rights reserved.
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              <Button color="inherit" size="small" sx={{ '&:hover': { color: 'primary.main' } }}>
+                Privacy Policy
+              </Button>
+              <Button color="inherit" size="small" sx={{ '&:hover': { color: 'primary.main' } }}>
+                Terms of Service
+              </Button>
+            </Stack>
+          </Box>
         </Container>
       </Box>
-
+      
       {/* Scroll to Top Button */}
       <Zoom in={showScrollTop}>
         <Box
