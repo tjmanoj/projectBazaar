@@ -924,7 +924,7 @@ function Landing() {
                   <IconButton 
                     color="primary" 
                     component="a" 
-                    href="https://instagram.com" 
+                    href="https://www.instagram.com/projectbazaarofficial/" 
                     target="_blank"
                     sx={{ 
                       '&:hover': { 
@@ -939,7 +939,7 @@ function Landing() {
                   <IconButton 
                     color="primary" 
                     component="a" 
-                    href="https://twitter.com" 
+                    href="https://x.com/ProjectBazaar_" 
                     target="_blank"
                     sx={{ 
                       '&:hover': { 
@@ -954,7 +954,7 @@ function Landing() {
                   <IconButton 
                     color="primary" 
                     component="a" 
-                    href="https://youtube.com" 
+                    href="https://www.youtube.com/@ProjectBazaarOfficial" 
                     target="_blank"
                     sx={{ 
                       '&:hover': { 
@@ -969,7 +969,7 @@ function Landing() {
                   <IconButton 
                     color="primary" 
                     component="a" 
-                    href="https://linkedin.com" 
+                    href="https://www.linkedin.com/company/projectbazaar/" 
                     target="_blank"
                     sx={{ 
                       '&:hover': { 
@@ -992,10 +992,36 @@ function Landing() {
               © {currentYear} Project Bazaar. All rights reserved.
             </Typography>
             <Stack direction="row" spacing={2}>
-              <Button color="inherit" size="small" sx={{ '&:hover': { color: 'primary.main' } }}>
+              <Button 
+                color="inherit" 
+                size="small" 
+                sx={{ 
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': { 
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                  } 
+                }}
+              >
                 Privacy Policy
               </Button>
-              <Button color="inherit" size="small" sx={{ '&:hover': { color: 'primary.main' } }}>
+              <Button 
+                color="inherit" 
+                size="small" 
+                sx={{ 
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': { 
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                  } 
+                }}
+              >
                 Terms of Service
               </Button>
             </Stack>
