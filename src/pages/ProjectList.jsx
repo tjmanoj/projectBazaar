@@ -26,7 +26,10 @@ import {
   ListItemText,
   Divider,
   alpha,
+  TextField,
+  InputAdornment,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { useThemeContext } from "../context/ThemeContext";
 import {
   Brightness4,
@@ -53,15 +56,26 @@ function ProjectList() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [demoProject, setDemoProject] = useState(null);
   const [demoOpen, setDemoOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [allProjects, setAllProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
   };
 
   useEffect(() => {
     loadProjects();
     checkAdminStatus();
   }, [category]);
+
+  useEffect(() => {
+    filterProjects(allProjects, searchQuery, category);
+  }, [searchQuery, category]);
 
   const checkAdminStatus = async () => {
     try {
@@ -80,12 +94,36 @@ function ProjectList() {
       const fetchedProjects = await fetchProjects(
         category !== "all" ? category : undefined
       );
-      setProjects(fetchedProjects);
+      setAllProjects(fetchedProjects);
+      filterProjects(fetchedProjects, searchQuery, category);
     } catch (err) {
       setError("Failed to load projects: " + err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const filterProjects = (projects, search, cat) => {
+    let filtered = projects;
+    
+    // Apply category filter
+    if (cat !== "all") {
+      filtered = filtered.filter(project => project.category === cat);
+    }
+    
+    // Apply search filter
+    if (search.trim()) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(project => 
+        project.title?.toLowerCase().includes(searchLower) ||
+        project.description?.toLowerCase().includes(searchLower) ||
+        project.technologies?.some(tech => 
+          tech.toLowerCase().includes(searchLower)
+        )
+      );
+    }
+    
+    setProjects(filtered);
   };
 
   const handleLogout = async () => {
@@ -177,45 +215,45 @@ function ProjectList() {
               </Box>
             </Box>
 
-            {/* Navigation Tabs - Hidden on mobile */}
+            {/* Search Input - Desktop Only */}
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
                 alignItems: "center",
                 height: "100%",
                 mr: 1,
+                flex: 1,
+                maxWidth: "400px",
               }}
             >
-              <Tabs
-                value={category}
-                onChange={(_, newValue) => setCategory(newValue)}
-                sx={{
-                  minHeight: "100%",
-                  "& .MuiTab-root": {
-                    minHeight: "100%",
-                    py: 1.5,
-                    px: 1.5,
-                    minWidth: "auto",
-                    width: "auto",
-                    fontSize: "0.875rem",
-                    textTransform: "none",
-                    fontWeight: 500,
-                    transition: 'all 0.2s ease-in-out',
-                  },
-                  "& .MuiTab-root:hover": {
-                    backgroundColor: theme => alpha(theme.palette.primary.main, 0.08),
-                    opacity: 1,
-                  },
-                  "& .MuiTabs-indicator": {
-                    height: 3,
+              <TextField
+                size="small"
+                placeholder="Search projects..."
+                value={searchQuery}
+                onChange={handleSearch}
+                variant="outlined"
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon color="action" />
+                    </InputAdornment>
+                  ),
+                  sx: {
+                    bgcolor: theme => 
+                      theme.palette.mode === 'dark' 
+                        ? alpha(theme.palette.common.white, 0.05)
+                        : alpha(theme.palette.common.black, 0.04),
+                    '&:hover': {
+                      bgcolor: theme => 
+                        theme.palette.mode === 'dark' 
+                          ? alpha(theme.palette.common.white, 0.08)
+                          : alpha(theme.palette.common.black, 0.06),
+                    },
+                    borderRadius: 1,
                   }
                 }}
-              >
-                <Tab label="All Projects" value="all" />
-                <Tab label="Mini Projects" value="mini-project" />
-                <Tab label="Final Year" value="final-year" />
-                <Tab label="Mentorship" value="mentorship" />
-              </Tabs>
+              />
             </Box>
 
             {/* Right side actions */}
