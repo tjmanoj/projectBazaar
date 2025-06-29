@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import { 
@@ -21,7 +21,8 @@ import {
   alpha,
   Divider,
   Snackbar,
-  Alert
+  Alert,
+  Link
 } from '@mui/material';
 import { 
   School, 
@@ -1079,18 +1080,189 @@ function Landing() {
                 </Stack>
               </Stack>
             </Grid>
-          
+            <Grid item xs={12} md={4}>
+              <Stack spacing={3}>
+                <Typography variant="h6" fontWeight="medium">
+                  Useful Links
+                </Typography>
+                <Stack spacing={1}>
+                  <Button 
+                    component={RouterLink}
+                    to="/about"
+                    color="inherit" 
+                    size="small" 
+                    sx={{ 
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': { 
+                        color: 'primary.main',
+                        bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                      } 
+                    }}
+                  >
+                    About Us
+                  </Button>
+                  <Button 
+                    component={RouterLink}
+                    to="/services"
+                    color="inherit" 
+                    size="small" 
+                    sx={{ 
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': { 
+                        color: 'primary.main',
+                        bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                      } 
+                    }}
+                  >
+                    Our Services
+                  </Button>
+                  <Button 
+                    component={RouterLink}
+                    to="/contact"
+                    color="inherit" 
+                    size="small" 
+                    sx={{ 
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': { 
+                        color: 'primary.main',
+                        bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                      } 
+                    }}
+                  >
+                    Contact Us
+                  </Button>
+                  <Button 
+                    component={RouterLink}
+                    to="/faq"
+                    color="inherit" 
+                    size="small" 
+                    sx={{ 
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': { 
+                        color: 'primary.main',
+                        bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                      } 
+                    }}
+                  >
+                    FAQ
+                  </Button>
+                </Stack>
+              </Stack>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Stack spacing={3}>
+                <Typography variant="h6" fontWeight="medium">
+                  Legal
+                </Typography>
+                <Stack spacing={1}>
+                  <Button 
+                    component={RouterLink}
+                    to="/privacy-policy"
+                    color="inherit" 
+                    size="small" 
+                    sx={{ 
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': { 
+                        color: 'primary.main',
+                        bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                      } 
+                    }}
+                  >
+                    Privacy Policy
+                  </Button>
+                  <Button 
+                    component={RouterLink}
+                    to="/terms-of-service"
+                    color="inherit" 
+                    size="small" 
+                    sx={{ 
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': { 
+                        color: 'primary.main',
+                        bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                      } 
+                    }}
+                  >
+                    Terms of Service
+                  </Button>
+                  <Button 
+                    component={RouterLink}
+                    to="/cancellation-refund"
+                    color="inherit" 
+                    size="small" 
+                    sx={{ 
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': { 
+                        color: 'primary.main',
+                        bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                      } 
+                    }}
+                  >
+                    Cancellation & Refund
+                  </Button>
+                  <Button 
+                    component={RouterLink}
+                    to="/shipping-delivery"
+                    color="inherit" 
+                    size="small" 
+                    sx={{ 
+                      justifyContent: 'flex-start',
+                      px: 2,
+                      py: 1,
+                      borderRadius: 1,
+                      transition: 'all 0.2s ease-in-out',
+                      '&:hover': { 
+                        color: 'primary.main',
+                        bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                      } 
+                    }}
+                  >
+                    Shipping & Delivery
+                  </Button>
+                </Stack>
+              </Stack>
+            </Grid>
           </Grid>
           <Divider sx={{ mt: 6, mb: 4 }} />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
             <Typography color="text.secondary" variant="body2">
               © {currentYear} Project Bazaar. All rights reserved.
             </Typography>
-            <Stack direction="row" spacing={2}>
-              <Button 
-                color="inherit" 
-                size="small" 
+            <Stack direction="row" spacing={2} flexWrap="wrap">
+              <Link
+                component={RouterLink}
+                to="/privacy-policy"
                 sx={{ 
+                  color: 'text.primary',
+                  textDecoration: 'none',
                   px: 2,
                   py: 1,
                   borderRadius: 1,
@@ -1102,11 +1274,13 @@ function Landing() {
                 }}
               >
                 Privacy Policy
-              </Button>
-              <Button 
-                color="inherit" 
-                size="small" 
+              </Link>
+              <Link
+                component={RouterLink}
+                to="/terms-of-service"
                 sx={{ 
+                  color: 'text.primary',
+                  textDecoration: 'none',
                   px: 2,
                   py: 1,
                   borderRadius: 1,
@@ -1118,7 +1292,61 @@ function Landing() {
                 }}
               >
                 Terms of Service
-              </Button>
+              </Link>
+              <Link
+                component={RouterLink}
+                to="/cancellation-refund"
+                sx={{ 
+                  color: 'text.primary',
+                  textDecoration: 'none',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': { 
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                  } 
+                }}
+              >
+                Cancellation & Refund
+              </Link>
+              <Link
+                component={RouterLink}
+                to="/shipping-delivery"
+                sx={{ 
+                  color: 'text.primary',
+                  textDecoration: 'none',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': { 
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                  } 
+                }}
+              >
+                Shipping & Delivery
+              </Link>
+              <Link
+                component={RouterLink}
+                to="/contact"
+                sx={{ 
+                  color: 'text.primary',
+                  textDecoration: 'none',
+                  px: 2,
+                  py: 1,
+                  borderRadius: 1,
+                  transition: 'all 0.2s ease-in-out',
+                  '&:hover': { 
+                    color: 'primary.main',
+                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                  } 
+                }}
+              >
+                Contact Us
+              </Link>
             </Stack>
           </Box>
         </Container>

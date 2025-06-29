@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import CancellationRefund from "./pages/CancellationRefund";
 import ShippingDelivery from "./pages/ShippingDelivery";
 import ContactUs from "./pages/ContactUs";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import Signup from "./pages/Signup";
 import ProjectList from "./pages/ProjectList";
 import Demo from "./pages/Demo";
@@ -44,6 +46,8 @@ function App() {
             <Route path="/cancellation-refund" element={<CancellationRefund />} />
             <Route path="/shipping-delivery" element={<ShippingDelivery />} />
             <Route path="/contact" element={<ContactUs />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route 
               path="/login" 
               element={currentUser ? <Navigate to="/dashboard" /> : <Login />} 
