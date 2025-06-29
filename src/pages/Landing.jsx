@@ -1161,7 +1161,7 @@ function Landing() {
               </Link>
               <Link
                 component={RouterLink}
-                to="/contact"
+                onClick={() => scrollToSection('contact')}
                 sx={{ 
                   color: 'text.primary',
                   textDecoration: 'none',
