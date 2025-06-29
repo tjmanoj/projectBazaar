@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Typography, Paper, Box, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { MoneyOff, Assignment, Warning, Info } from '@mui/icons-material';
 
 function CancellationRefund() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
       <Paper elevation={0} sx={{ p: { xs: 3, md: 6 }, borderRadius: 2 }}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   Container, 
   Typography, 
@@ -18,6 +18,10 @@ import {
 } from '@mui/icons-material';
 
 function PrivacyPolicy() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <Container maxWidth="md" sx={{ py: 8 }}>
       <Paper elevation={0} sx={{ p: { xs: 3, md: 6 }, borderRadius: 2 }}>
