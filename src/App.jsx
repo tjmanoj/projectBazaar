@@ -4,6 +4,9 @@ import { useAuth } from "./context/AuthContext";
 import { ThemeProvider } from './context/ThemeContext';
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
+import CancellationRefund from "./pages/CancellationRefund";
+import ShippingDelivery from "./pages/ShippingDelivery";
+import ContactUs from "./pages/ContactUs";
 import Signup from "./pages/Signup";
 import ProjectList from "./pages/ProjectList";
 import Demo from "./pages/Demo";
@@ -38,6 +41,9 @@ function App() {
           <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
+            <Route path="/cancellation-refund" element={<CancellationRefund />} />
+            <Route path="/shipping-delivery" element={<ShippingDelivery />} />
+            <Route path="/contact" element={<ContactUs />} />
             <Route 
               path="/login" 
               element={currentUser ? <Navigate to="/dashboard" /> : <Login />} 
