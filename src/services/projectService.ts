@@ -249,6 +249,18 @@ export async function downloadProjectFile(projectId: string, token: string): Pro
       throw new Error('Authentication required');
     }
 
+    // First fetch the project details to get the title
+    const project = await fetchProjectById(projectId);
+    if (!project) {
+      throw new Error('Project not found');
+    }
+
+    // Create a filename from the project title
+    const safeTitle = project.title
+      .toLowerCase()
+      .replace(/\s+/g, '-')        // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]/g, ''); // Remove any characters that aren't letters, numbers, or hyphens
+
     // Create the download URL with the project ID
     const downloadUrl = `${BACKEND_URL}/download/${projectId}`;
 
@@ -264,10 +276,7 @@ export async function downloadProjectFile(projectId: string, token: string): Pro
       throw new Error(error.message || 'Download failed');
     }
 
-    // Get filename from Content-Disposition header or use a default
-    const contentDisposition = response.headers.get('Content-Disposition');
-    const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
-    const filename = filenameMatch ? filenameMatch[1] : `project-${projectId}.zip`;
+    const filename = `${safeTitle}.zip`;
 
     // Create a blob from the response and trigger download
     const blob = await response.blob();
