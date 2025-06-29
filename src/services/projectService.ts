@@ -57,6 +57,7 @@ const projectConverter: FirestoreDataConverter<Project> = {
 };
 
 const projectsCollection = 'projects';
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 export async function fetchProjects(category?: string) {
   try {
@@ -238,6 +239,48 @@ export async function fetchAllProjects() {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   } catch (error) {
     console.error('Error fetching all projects:', error);
+    throw error;
+  }
+}
+
+export async function downloadProjectFile(projectId: string, token: string): Promise<void> {
+  try {
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
+    // Create the download URL with the project ID
+    const downloadUrl = `${BACKEND_URL}/download/${projectId}`;
+
+    // Fetch the file with authentication
+    const response = await fetch(downloadUrl, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Download failed');
+    }
+
+    // Get filename from Content-Disposition header or use a default
+    const contentDisposition = response.headers.get('Content-Disposition');
+    const filenameMatch = contentDisposition?.match(/filename="(.+)"/);
+    const filename = filenameMatch ? filenameMatch[1] : `project-${projectId}.zip`;
+
+    // Create a blob from the response and trigger download
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error('Download error:', error);
     throw error;
   }
 }

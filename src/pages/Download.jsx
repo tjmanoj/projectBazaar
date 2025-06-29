@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { fetchProjectById, checkPurchaseStatus } from "../services/projectService";
+import { fetchProjectById, checkPurchaseStatus, downloadProjectFile } from "../services/projectService";
 import {
   Box,
   Container,
@@ -65,10 +65,19 @@ function Download() {
     }
   };
 
-  const handleDownload = () => {
-    // Open the source code URL in a new tab
-    if (project?.sourceCodeUrl) {
-      window.open(project.sourceCodeUrl, '_blank');
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState("");
+
+  const handleDownload = async () => {
+    try {
+      setDownloading(true);
+      setDownloadError("");
+      const token = await currentUser.getIdToken();
+      await downloadProjectFile(projectId, token);
+    } catch (err) {
+      setDownloadError(err.message || "Failed to download project");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -145,20 +154,28 @@ function Download() {
           </ListItem>
         </List>
 
+        {downloadError && (
+          <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
+            {downloadError}
+          </Alert>
+        )}
+
         <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
           <Button
             variant="contained"
             color="primary"
             size="large"
-            startIcon={<DownloadIcon />}
+            startIcon={downloading ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
             onClick={handleDownload}
+            disabled={downloading}
           >
-            Download Source Code
+            {downloading ? 'Downloading...' : 'Download Source Code'}
           </Button>
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
             onClick={() => navigate('/dashboard')}
+            disabled={downloading}
           >
             Back to Dashboard
           </Button>
