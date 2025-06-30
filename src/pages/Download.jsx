@@ -173,36 +173,35 @@ function Download() {
           </ListItem>
         </List>
 
-        <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ mt: 3 }}>
           {downloadError && (
             <Alert severity="error">{downloadError}</Alert>
           )}
           
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             Downloads remaining: {Math.max(0, 3 - downloadCount)} of 3
           </Typography>
 
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={downloading ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
-            onClick={handleDownload}
-            disabled={downloading || downloadCount >= 3}
-            fullWidth
-          >
-            {downloading ? "Downloading..." : "Download Source Code"}
-          </Button>
-        </Box>
-        
-        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate('/dashboard')}
-            disabled={downloading}
-          >
-            Back to Dashboard
-          </Button>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={downloading ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
+              onClick={handleDownload}
+              disabled={downloading || downloadCount >= 3}
+            >
+              {downloading ? "Downloading..." : "Download Source Code"}
+            </Button>
+
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate('/dashboard')}
+              disabled={downloading}
+            >
+              Back to Dashboard
+            </Button>
+          </Box>
         </Box>
       </Paper>
     </Container>
