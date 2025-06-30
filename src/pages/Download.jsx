@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { fetchProjectById, checkPurchaseStatus, downloadProjectFile } from "../services/projectService";
+import { getDownloadCount, tryIncrementDownload } from "../services/userService";
 import {
   Box,
   Container,
@@ -33,6 +34,7 @@ function Download() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hasPurchased, setHasPurchased] = useState(false);
+  const [downloadCount, setDownloadCount] = useState(0);
 
   useEffect(() => {
     loadProjectAndCheckPurchase();
@@ -41,9 +43,10 @@ function Download() {
   const loadProjectAndCheckPurchase = async () => {
     try {
       setLoading(true);
-      const [projectData, purchased] = await Promise.all([
+      const [projectData, purchased, downloads] = await Promise.all([
         fetchProjectById(projectId),
-        checkPurchaseStatus(projectId, currentUser?.uid)
+        checkPurchaseStatus(projectId, currentUser?.uid),
+        getDownloadCount(currentUser?.uid, projectId)
       ]);
 
       if (!projectData) {
@@ -53,6 +56,7 @@ function Download() {
 
       setProject(projectData);
       setHasPurchased(purchased);
+      setDownloadCount(downloads);
 
       if (!purchased) {
         setError("You need to purchase this project first");
@@ -70,10 +74,25 @@ function Download() {
 
   const handleDownload = async () => {
     try {
+      if (downloadCount >= 3) {
+        setDownloadError("You have reached the maximum number of downloads (3) for this project.");
+        return;
+      }
+
       setDownloading(true);
       setDownloadError("");
+
+      const incrementSuccess = await tryIncrementDownload(currentUser.uid, projectId);
+      if (!incrementSuccess) {
+        setDownloadError("You have reached the maximum number of downloads (3) for this project.");
+        return;
+      }
+
       const token = await currentUser.getIdToken();
       await downloadProjectFile(projectId, token);
+      
+      // Update local download count
+      setDownloadCount(prev => prev + 1);
     } catch (err) {
       setDownloadError(err.message || "Failed to download project");
     } finally {
@@ -154,23 +173,28 @@ function Download() {
           </ListItem>
         </List>
 
-        {downloadError && (
-          <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
-            {downloadError}
-          </Alert>
-        )}
+        <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {downloadError && (
+            <Alert severity="error">{downloadError}</Alert>
+          )}
+          
+          <Typography variant="body2" color="text.secondary">
+            Downloads remaining: {Math.max(0, 3 - downloadCount)} of 3
+          </Typography>
 
-        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
           <Button
             variant="contained"
             color="primary"
-            size="large"
             startIcon={downloading ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
             onClick={handleDownload}
-            disabled={downloading}
+            disabled={downloading || downloadCount >= 3}
+            fullWidth
           >
-            {downloading ? 'Downloading...' : 'Download Source Code'}
+            {downloading ? "Downloading..." : "Download Source Code"}
           </Button>
+        </Box>
+        
+        <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
           <Button
             variant="outlined"
             startIcon={<ArrowBackIcon />}
