@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { fetchProjects } from "../services/projectService";
+import { fetchProjects, checkPurchaseStatus } from "../services/projectService";
 import { ProjectCard } from "../components/ProjectCard";
 import DemoModal from "../components/DemoModal";
 import { db } from "../firebaseConfig";
@@ -165,8 +165,16 @@ function ProjectList() {
     navigate(`/payment/${project.id}`);
   };
 
-  const handleDemoClick = (project) => {
-    setDemoProject(project);
+  const handleDemoClick = async (project) => {
+    // Check purchase status
+    let hasPurchased = false;
+    if (currentUser && project.id) {
+      hasPurchased = await checkPurchaseStatus(project.id, currentUser.uid);
+    }
+    setDemoProject({
+      ...project,
+      hasPurchased
+    });
     setDemoOpen(true);
   };
 
@@ -509,7 +517,10 @@ function ProjectList() {
         )}
         <DemoModal
           open={demoOpen}
-          project={demoProject}
+          project={demoProject ? { 
+            ...demoProject, 
+            hasPurchased: currentUser ? Boolean(demoProject?.purchasedBy?.includes(currentUser.uid)) : false 
+          } : null}
           onClose={() => setDemoOpen(false)}
         />
       </Container>

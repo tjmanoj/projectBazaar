@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import DownloadIcon from '@mui/icons-material/Download';
 import { useNavigate } from "react-router-dom";
 
 // Helper to get embeddable YouTube URL from any YouTube link
@@ -58,13 +59,6 @@ export default function DemoModal({ open, project, onClose }) {
     setViewMode(prev => prev === 'desktop' ? 'mobile' : 'desktop');
     // This will trigger the useEffect to reset video playback
     // Video will reload because of the key={viewMode} prop on the iframe
-  };
-
-  // handler for Buy Now button
-  const handleBuyNow = () => {
-    // Add your buy now logic here
-    // For example, navigating to a checkout page or opening a payment dialog
-    navigate('/checkout');
   };
 
   return (
@@ -202,18 +196,34 @@ export default function DemoModal({ open, project, onClose }) {
             {project?.description}
           </Typography>
 
-          {/* Buy Now Button */}
+          {/* Action Button */}
           <Box sx={{ mt: 3, textAlign: 'center' }}>
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              startIcon={<ShoppingCartIcon />}
-              onClick={handlePurchase}
-              sx={{ borderRadius: 2, px: 4 }}
-            >
-              Buy Now
-            </Button>
+            {project.hasPurchased ? (
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<DownloadIcon />}
+                onClick={() => {
+                  onClose();
+                  navigate(`/download/${project.id}`);
+                }}
+                sx={{ borderRadius: 2, px: 4 }}
+              >
+                Download Source Code
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<ShoppingCartIcon />}
+                onClick={handlePurchase}
+                sx={{ borderRadius: 2, px: 4 }}
+              >
+                Buy Now
+              </Button>
+            )}
           </Box>
         </Box>
       </Paper>

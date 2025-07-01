@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -14,8 +14,12 @@ import {
 import {
   PlayArrow as PlayIcon,
   ShoppingCart as CartIcon,
+  Download as DownloadIcon,
 } from '@mui/icons-material';
 import { Project } from '../types/Project';
+import { useAuth } from '../context/AuthContext';
+import { checkPurchaseStatus } from '../services/projectService';
+import { useNavigate } from 'react-router-dom';
 
 interface ProjectCardProps {
   project: Project;
@@ -26,10 +30,23 @@ interface ProjectCardProps {
 export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps) {
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
   const formattedPrice = new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR'
   }).format(project.price);
+
+  useEffect(() => {
+    const checkPurchase = async () => {
+      if (currentUser && project.id) {
+        const purchased = await checkPurchaseStatus(project.id, currentUser.uid);
+        setHasPurchased(purchased);
+      }
+    };
+    checkPurchase();
+  }, [currentUser, project.id]);
 
   const handleDemoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -247,7 +264,7 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
         borderColor: 'divider',
         gap: 1
       }}>
-        {project.demoVideoDesktopUrl || project.demoVideoMobileUrl ? (
+        {(project.demoVideoDesktopUrl || project.demoVideoMobileUrl) && (
           <Button
             size="small"
             startIcon={<PlayIcon />}
@@ -265,20 +282,30 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
           >
             Demo
           </Button>
-        ) : null}
-        <Button 
-          size="small" 
-          color="primary"
-          variant="contained"
-          startIcon={<CartIcon />}
-          onClick={() => onClick?.(project)}
-          sx={{ 
-            minWidth: 'auto',
-            px: { xs: 1.5, sm: 2 },
-          }}
-        >
-          Buy Now
-        </Button>
+        )}
+        {hasPurchased ? (
+          <Button
+            size="small"
+            color="primary"
+            variant="contained"
+            startIcon={<DownloadIcon />}
+            onClick={() => navigate(`/download/${project.id}`)}
+            sx={{ minWidth: 'auto', px: { xs: 1.5, sm: 2 } }}
+          >
+            Download Source Code
+          </Button>
+        ) : (
+          <Button
+            size="small"
+            color="primary"
+            variant="contained"
+            startIcon={<CartIcon />}
+            onClick={() => onClick?.(project)}
+            sx={{ minWidth: 'auto', px: { xs: 1.5, sm: 2 } }}
+          >
+            Buy Now
+          </Button>
+        )}
       </CardActions>
     </Card>
   );

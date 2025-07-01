@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchProjectById } from "../services/projectService";
+import { useAuth } from "../context/AuthContext";
+import { fetchProjectById, checkPurchaseStatus } from "../services/projectService";
 import {
   Box,
   Typography,
@@ -33,21 +34,29 @@ function getYouTubeEmbedUrl(url) {
 function Demo() {
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [viewMode, setViewMode] = useState("desktop");
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
 
   useEffect(() => {
     const loadProject = async () => {
       try {
         setLoading(true);
-        const data = await fetchProjectById(projectId);
-        if (!data) {
+        const projectData = await fetchProjectById(projectId);
+        if (!projectData) {
           setError("Project not found");
-        } else {
-          setProject(data);
+          return;
+        }
+        setProject(projectData);
+
+        // Check purchase status if user is logged in
+        if (currentUser) {
+          const purchased = await checkPurchaseStatus(projectId, currentUser.uid);
+          setHasPurchased(purchased);
         }
       } catch (err) {
         setError("Failed to load project: " + err.message);
@@ -56,7 +65,7 @@ function Demo() {
       }
     };
     loadProject();
-  }, [projectId]);
+  }, [projectId, currentUser]);
 
   const handlePurchase = () => {
     navigate(`/payment/${projectId}`);
@@ -255,37 +264,56 @@ function Demo() {
               <Typography variant="h5" gutterBottom>
                 {formattedPrice}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Get instant access to:
-              </Typography>
-              <Box component="ul" sx={{ pl: 2, mb: 2 }}>
-                <Typography component="li" variant="body2">
-                  Complete source code
-                </Typography>
-                <Typography component="li" variant="body2">
-                  Documentation and setup guide
-                </Typography>
-                <Typography component="li" variant="body2">
-                  All project assets and resources
-                </Typography>
-              </Box>
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                fullWidth
-                startIcon={<ShoppingCart />}
-                onClick={handlePurchase}
-              >
-                Buy Now
-              </Button>
-              <Typography 
-                variant="caption" 
-                color="text.secondary"
-                align="center"
-              >
-                Secure payment via Razorpay
-              </Typography>
+              {!hasPurchased ? (
+                <>
+                  <Typography variant="body2" color="text.secondary">
+                    Get instant access to:
+                  </Typography>
+                  <Box component="ul" sx={{ pl: 2, mb: 2 }}>
+                    <Typography component="li" variant="body2">
+                      Complete source code
+                    </Typography>
+                    <Typography component="li" variant="body2">
+                      Documentation and setup guide
+                    </Typography>
+                    <Typography component="li" variant="body2">
+                      All project assets and resources
+                    </Typography>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    fullWidth
+                    startIcon={<ShoppingCart />}
+                    onClick={handlePurchase}
+                  >
+                    Buy Now
+                  </Button>
+                  <Typography 
+                    variant="caption" 
+                    color="text.secondary"
+                    align="center"
+                  >
+                    Secure payment via Razorpay
+                  </Typography>
+                </>
+              ) : (
+                <>
+                  <Alert severity="success" sx={{ mb: 2 }}>
+                    You already own this project
+                  </Alert>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    fullWidth
+                    onClick={() => navigate(`/download/${project.id}`)}
+                  >
+                    Download Source Code
+                  </Button>
+                </>
+              )}
             </Stack>
           </Paper>
         </Grid>
