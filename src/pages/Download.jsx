@@ -190,7 +190,7 @@ function Download() {
               onClick={handleDownload}
               disabled={downloading || downloadCount >= 3}
             >
-              {downloading ? "Downloading..." : "Download Source Code"}
+              {downloading ? "Downloading..." : "Download"}
             </Button>
 
             <Button
@@ -199,7 +199,7 @@ function Download() {
               onClick={() => navigate('/dashboard')}
               disabled={downloading}
             >
-              Back to Dashboard
+              Back
             </Button>
           </Box>
         </Box>

@@ -310,7 +310,7 @@ function Demo() {
                     fullWidth
                     onClick={() => navigate(`/download/${project.id}`)}
                   >
-                    Download Source Code
+                    Download
                   </Button>
                 </>
               )}

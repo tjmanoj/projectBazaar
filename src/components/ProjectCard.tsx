@@ -292,7 +292,7 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
             onClick={() => navigate(`/download/${project.id}`)}
             sx={{ minWidth: 'auto', px: { xs: 1.5, sm: 2 } }}
           >
-            Download Source Code
+            Download
           </Button>
         ) : (
           <Button

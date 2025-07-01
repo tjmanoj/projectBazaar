@@ -210,7 +210,7 @@ export default function DemoModal({ open, project, onClose }) {
                 }}
                 sx={{ borderRadius: 2, px: 4 }}
               >
-                Download Source Code
+                Download
               </Button>
             ) : (
               <Button

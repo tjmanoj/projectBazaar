@@ -157,7 +157,7 @@ function Payment() {
                 }
               }}
             >
-              Download Source Code
+              Download
             </Button>
           </Paper>
         </Fade>
