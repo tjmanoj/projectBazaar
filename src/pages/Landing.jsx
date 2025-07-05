@@ -73,6 +73,220 @@ const staggerChildren = {
   }
 };
 
+// Testimonial Carousel Component
+const TestimonialCarousel = ({ testimonials }) => {
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!isDragging) {
+        setActiveTestimonial(prev => (prev === testimonials.length - 1 ? 0 : prev + 1));
+      }
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(timer);
+  }, [testimonials.length, isDragging]);
+
+  const handleDragEnd = (event, info) => {
+    const threshold = 100;
+    if (info.offset.x > threshold) {
+      setActiveTestimonial(prev => prev === 0 ? testimonials.length - 1 : prev - 1);
+    } else if (info.offset.x < -threshold) {
+      setActiveTestimonial(prev => prev === testimonials.length - 1 ? 0 : prev + 1);
+    }
+    setIsDragging(false);
+  };
+
+  return (
+    <Box sx={{ position: 'relative', px: { xs: 4, md: 8 } }}>
+      <IconButton
+        onClick={() => setActiveTestimonial(prev => prev === 0 ? testimonials.length - 1 : prev - 1)}
+        sx={{
+          position: 'absolute',
+          left: { xs: -16, md: 24 },
+          top: '50%',
+          transform: 'translateY(-50%)',
+          bgcolor: 'background.paper',
+          boxShadow: 2,
+          zIndex: 2,
+          opacity: { xs: 0, md: 1 },
+          visibility: { xs: 'hidden', md: 'visible' },
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            bgcolor: 'background.paper',
+            transform: 'translateY(-50%) scale(1.1)',
+          }
+        }}
+      >
+        <NavigateBefore />
+      </IconButton>
+
+      <IconButton
+        onClick={() => setActiveTestimonial(prev => prev === testimonials.length - 1 ? 0 : prev + 1)}
+        sx={{
+          position: 'absolute',
+          right: { xs: -16, md: 24 },
+          top: '50%',
+          transform: 'translateY(-50%)',
+          bgcolor: 'background.paper',
+          boxShadow: 2,
+          zIndex: 2,
+          opacity: { xs: 0, md: 1 },
+          visibility: { xs: 'hidden', md: 'visible' },
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            bgcolor: 'background.paper',
+            transform: 'translateY(-50%) scale(1.1)',
+          }
+        }}
+      >
+        <NavigateNext />
+      </IconButton>
+
+      <MotionBox
+        sx={{
+          display: 'flex',
+          overflow: 'hidden',
+          position: 'relative',
+          minHeight: { xs: 480, md: 320 },
+          width: '100%',
+          touchAction: 'none'
+        }}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.2}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={handleDragEnd}
+      >
+        {testimonials.map((testimonial, index) => (
+          <MotionBox
+            key={index}
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ 
+              opacity: activeTestimonial === index ? 1 : 0,
+              x: activeTestimonial === index ? 0 : -100,
+              scale: activeTestimonial === index ? 1 : 0.9,
+            }}
+            transition={{
+              duration: 0.5,
+              ease: "easeInOut"
+            }}
+            sx={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: activeTestimonial === index ? 'auto' : 'none'
+            }}
+          >
+            <Paper
+              elevation={0}
+              sx={{
+                p: { xs: 3, md: 6 },
+                borderRadius: 4,
+                bgcolor: theme => alpha(theme.palette.primary.main, 0.03),
+                border: 1,
+                borderColor: theme => alpha(theme.palette.primary.main, 0.1),
+                maxWidth: 800,
+                width: '100%',
+                position: 'relative',
+                overflow: 'visible'
+              }}
+            >
+              <FormatQuote 
+                sx={{ 
+                  position: 'absolute',
+                  top: -20,
+                  left: 20,
+                  fontSize: 40,
+                  color: 'primary.main',
+                  transform: 'scaleX(-1)'
+                }} 
+              />
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography 
+                  variant="body1" 
+                  sx={{ 
+                    mb: 4, 
+                    fontSize: { xs: '1rem', md: '1.2rem' },
+                    fontStyle: 'italic',
+                    lineHeight: 1.8,
+                    color: 'text.primary'
+                  }}
+                >
+                  {testimonial.quote}
+                </Typography>
+                
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      sx={{ 
+                        color: i < testimonial.rating ? 'primary.main' : 'action.disabled',
+                        fontSize: '1.2rem'
+                      }} 
+                    />
+                  ))}
+                </Box>
+
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                  <Avatar
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    sx={{ 
+                      width: 60, 
+                      height: 60,
+                      border: 2,
+                      borderColor: 'primary.main'
+                    }}
+                  />
+                  <Box>
+                    <Typography variant="h6" fontWeight="bold" color="primary.main">
+                      {testimonial.name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {testimonial.role}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Paper>
+          </MotionBox>
+        ))}
+      </MotionBox>
+
+      <Stack 
+        direction="row" 
+        spacing={1} 
+        justifyContent="center" 
+        sx={{ mt: 4 }}
+      >
+        {testimonials.map((_, index) => (
+          <Box
+            key={index}
+            onClick={() => setActiveTestimonial(index)}
+            sx={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              bgcolor: activeTestimonial === index ? 'primary.main' : 'action.disabled',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'scale(1.2)',
+                bgcolor: activeTestimonial === index ? 'primary.main' : 'text.secondary'
+              }
+            }}
+          />
+        ))}
+      </Stack>
+    </Box>
+  );
+};
+
 function Landing() {
   const navigate = useNavigate();
   const { mode, toggleTheme } = useThemeContext();
@@ -92,28 +306,42 @@ function Landing() {
   const currentYear = new Date().getFullYear();
 
   const testimonials = [
-    {
-      quote: "Project Bazaar helped me complete my final year project with excellence. The guidance was invaluable!",
-      name: "Ananya Sharma",
-      role: "Computer Science Student",
-      rating: 5,
-      avatar: "https://randomuser.me/api/portraits/women/1.jpg"
-    },
-    {
-      quote: "The quality of projects and support is outstanding. Highly recommended for all CS students!",
-      name: "Rahul Kumar",
-      role: "Engineering Graduate",
-      rating: 5,
-      avatar: "https://randomuser.me/api/portraits/men/2.jpg"
-    },
-    {
-      quote: "Got my dream internship thanks to the project experience I gained here!",
-      name: "Priya Patel",
-      role: "Software Developer",
-      rating: 5,
-      avatar: "https://randomuser.me/api/portraits/women/3.jpg"
-    }
-  ];
+  {
+    quote: "Project Bazaar-la project vanginen. Easy-a understand panna mudichu, viva-la super mark kedaichiruku!",
+    name: "Karthik S",
+    role: "Final Year CSE Student, Coimbatore",
+    rating: 5,
+    avatar: "https://randomuser.me/api/portraits/men/11.jpg"
+  },
+  {
+    quote: "Concepts were explained clearly and I got full support until deployment. Best site for engineering projects!",
+    name: "Divya R",
+    role: "IT Student, Chennai",
+    rating: 5,
+    avatar: "https://randomuser.me/api/portraits/women/15.jpg"
+  },
+  {
+    quote: "Namma oorla irunthu project vangi top mark vanginen. Support team super!",
+    name: "Aravind M",
+    role: "ECE Student, Madurai",
+    rating: 5,
+    avatar: "https://randomuser.me/api/portraits/men/14.jpg"
+  },
+  {
+    quote: "Affordable-a irunthuchu. Unique project idea kuduthanga. Na resume-leum mention panninen.",
+    name: "Sowmya L",
+    role: "MCA Student, Trichy",
+    rating: 5,
+    avatar: "https://randomuser.me/api/portraits/women/25.jpg"
+  },
+  {
+    quote: "Naan naachathayum seyyala. Avanga kudutha guidance-la project complete pannitten. Seriously thanks!",
+    name: "Vignesh R",
+    role: "EEE Final Year, Salem",
+    rating: 5,
+    avatar: "https://randomuser.me/api/portraits/men/23.jpg"
+  }
+];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -123,6 +351,15 @@ function Landing() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Add autoplay functionality
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveTestimonial(prev => (prev === testimonials.length - 1 ? 0 : prev + 1));
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -850,14 +1087,29 @@ function Landing() {
             What Our Users Say
           </Typography>
 
+          {/* <TestimonialCarousel testimonials={testimonials} /> */}
+
           <Box sx={{ position: 'relative', px: { xs: 4, md: 8 } }}>
             {/* Testimonials Carousel */}
-            <Box
+            <MotionBox
               sx={{
                 display: 'flex',
                 overflow: 'hidden',
                 position: 'relative',
-                minHeight: { xs: 400, md: 300 }
+                minHeight: { xs: 500, md: 300 },
+                width: '100%'
+              }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(event, info) => {
+                if (info.offset.x > 100) {
+                  // Swiped right
+                  setActiveTestimonial(prev => prev === 0 ? testimonials.length - 1 : prev - 1);
+                } else if (info.offset.x < -100) {
+                  // Swiped left
+                  setActiveTestimonial(prev => prev === testimonials.length - 1 ? 0 : prev + 1);
+                }
               }}
             >
               {testimonials.map((testimonial, index) => (
@@ -957,7 +1209,7 @@ function Landing() {
                   </Paper>
                 </MotionBox>
               ))}
-            </Box>
+            </MotionBox>
 
             {/* Testimonial Indicators */}
             <Stack 
