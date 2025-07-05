@@ -236,13 +236,12 @@ const AdminChatMessages = () => {
                 opacity: 1
               }
             }}
-          >
-            <Paper 
+          >              <Paper 
               elevation={0}
               sx={{
                 p: '10px 14px',
                 borderRadius: msg.sender === 'admin' ? '20px 20px 5px 20px' : '20px 20px 20px 5px',
-                bgcolor: msg.sender === 'admin' ? 'primary.main' : 'grey.200',
+                bgcolor: msg.sender === 'admin' ? 'primary.main' : theme => theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
                 color: msg.sender === 'admin' ? 'primary.contrastText' : 'text.primary',
                 maxWidth: '70%',
                 wordBreak: 'break-word',
