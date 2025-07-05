@@ -851,55 +851,6 @@ function Landing() {
           </Typography>
 
           <Box sx={{ position: 'relative', px: { xs: 4, md: 8 } }}>
-            {/* Navigation Buttons */}
-            <IconButton
-              onClick={() => {
-                setActiveTestimonial((prev) => 
-                  prev === 0 ? testimonials.length - 1 : prev - 1
-                );
-              }}
-              sx={{
-                position: 'absolute',
-                left: { xs: 0, md: 40 },
-                top: '50%',
-                transform: 'translateY(-50%)',
-                bgcolor: 'background.paper',
-                boxShadow: 2,
-                '&:hover': {
-                  bgcolor: 'background.paper',
-                  transform: 'translateY(-50%) scale(1.1)',
-                },
-                transition: 'transform 0.2s',
-                zIndex: 2
-              }}
-            >
-              <NavigateBefore />
-            </IconButton>
-
-            <IconButton
-              onClick={() => {
-                setActiveTestimonial((prev) => 
-                  prev === testimonials.length - 1 ? 0 : prev + 1
-                );
-              }}
-              sx={{
-                position: 'absolute',
-                right: { xs: 0, md: 40 },
-                top: '50%',
-                transform: 'translateY(-50%)',
-                bgcolor: 'background.paper',
-                boxShadow: 2,
-                '&:hover': {
-                  bgcolor: 'background.paper',
-                  transform: 'translateY(-50%) scale(1.1)',
-                },
-                transition: 'transform 0.2s',
-                zIndex: 2
-              }}
-            >
-              <NavigateNext />
-            </IconButton>
-
             {/* Testimonials Carousel */}
             <Box
               sx={{
