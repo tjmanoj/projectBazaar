@@ -379,7 +379,7 @@ function Landing() {
     setFormError('');
 
     try {
-      await addDoc(collection(db, 'projectRequests'), {
+      await addDoc(collection(db, 'project_requests'), {
         ...formData,
         timestamp: serverTimestamp()
       });
@@ -1280,11 +1280,6 @@ function Landing() {
               {formError && (
                 <Typography color="error" textAlign="center">
                   {formError}
-                </Typography>
-              )}
-              {submitSuccess && (
-                <Typography color="success.main" textAlign="center">
-                  Your project request has been submitted successfully! We'll get back to you soon.
                 </Typography>
               )}
               <TextField
