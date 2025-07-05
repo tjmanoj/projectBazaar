@@ -110,9 +110,14 @@ const ChatModal = () => {
     setEditingId(msg.id);
     setEditText(msg.text);
     setNewMessage(msg.text);
+    // Use setTimeout to ensure the input is ready before focusing
     setTimeout(() => {
       if (inputRef.current) {
-        inputRef.current.focus();
+        const input = inputRef.current.querySelector('textarea');
+        if (input) {
+          input.focus();
+          input.selectionStart = input.selectionEnd = msg.text.length;
+        }
       }
     }, 100);
   };
