@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme, alpha, CssBaseline } from '@mui/material';
 
 const ThemeContext = createContext();
@@ -12,7 +12,15 @@ export function useThemeContext() {
 }
 
 export function ThemeProvider({ children }) {
-  const [mode, setMode] = useState('light');
+  const [mode, setMode] = useState(() => {
+    const savedMode = localStorage.getItem('theme-mode');
+    return savedMode || 'light';
+  });
+
+  // Save theme mode to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('theme-mode', mode);
+  }, [mode]);
 
   const theme = useMemo(
     () =>
