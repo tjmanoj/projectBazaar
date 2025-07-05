@@ -256,7 +256,25 @@ const AdminChatMessages = () => {
                     value={editText} 
                     onChange={e => setEditText(e.target.value)} 
                     disabled={saving} 
-                    sx={{ flex: 1, bgcolor: 'white', borderRadius: 1 }} 
+                    sx={{ 
+                      flex: 1,
+                      bgcolor: theme => theme.palette.mode === 'dark' ? 'grey.900' : 'white',
+                      borderRadius: 1,
+                      '& .MuiInputBase-root': {
+                        color: theme => theme.palette.mode === 'dark' ? 'common.white' : 'text.primary',
+                      },
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: theme => theme.palette.mode === 'dark' ? 'grey.700' : 'grey.300',
+                        },
+                        '&:hover fieldset': {
+                          borderColor: theme => theme.palette.mode === 'dark' ? 'grey.600' : 'grey.400',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'primary.main',
+                        },
+                      },
+                    }}
                     autoFocus
                   />
                   <IconButton 
@@ -395,27 +413,31 @@ const AdminChatMessages = () => {
             InputProps={{
               sx: {
                 borderRadius: 3,
-                bgcolor: 'white',
+                bgcolor: theme => theme.palette.mode === 'dark' ? 'grey.900' : 'white',
                 fontSize: '1rem',
                 height: 44,
                 px: 2,
                 py: 0,
                 boxShadow: 'none',
-                '& input': {
+                '& .MuiInputBase-input': {
                   p: 0,
                   height: 44,
                   display: 'flex',
                   alignItems: 'center',
+                  color: theme => theme.palette.mode === 'dark' ? 'common.white' : 'text.primary',
+                },
+                '& textarea': {
+                  color: theme => theme.palette.mode === 'dark' ? 'common.white' : 'text.primary',
                 },
                 '& fieldset': {
-                  borderColor: 'grey.300',
+                  borderColor: theme => theme.palette.mode === 'dark' ? 'grey.700' : 'grey.300',
                   borderWidth: 1,
                 },
                 '&:hover fieldset': {
-                  borderColor: 'grey.400',
+                  borderColor: theme => theme.palette.mode === 'dark' ? 'grey.600' : 'grey.400',
                 },
                 '&.Mui-focused fieldset': {
-                  borderColor: 'grey.400',
+                  borderColor: 'primary.main',
                   boxShadow: 'none',
                 },
               },
@@ -432,6 +454,9 @@ const AdminChatMessages = () => {
               flex: 1,
               mr: 1,
               minWidth: 0,
+              '& .MuiInputBase-root': {
+                color: theme => theme.palette.mode === 'dark' ? 'common.white' : 'text.primary',
+              },
             }}
           />
           <IconButton
