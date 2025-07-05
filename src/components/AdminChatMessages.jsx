@@ -254,7 +254,13 @@ const AdminChatMessages = () => {
                     size="small" 
                     value={editText} 
                     onChange={e => setEditText(e.target.value)} 
-                    disabled={saving} 
+                    disabled={saving}
+                    onKeyDown={e => {
+                      // Prevent Enter key from submitting in edit mode
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                      }
+                    }}
                     sx={{ 
                       flex: 1,
                       bgcolor: theme => theme.palette.mode === 'dark' ? 'grey.900' : 'white',
@@ -397,17 +403,24 @@ const AdminChatMessages = () => {
           <TextField
             fullWidth
             variant="outlined"
-            placeholder={sending ? "Sending..." : "Type your message..."}
+            placeholder="Type your message..."
             value={editingId ? editText : newMessage}
-            onChange={e => editingId ? setEditText(e.target.value) : setNewMessage(e.target.value)}
-            disabled={!selectedUser || adminMessages === null || sending}
-            multiline
-            maxRows={3}
+            onChange={(e) => editingId ? setEditText(e.target.value) : setNewMessage(e.target.value)}
+            disabled={sending || !selectedUser}
             onKeyDown={e => {
-              if (e.key === 'Enter' && !e.shiftKey && !sending) {
+              // Only allow Enter key submission when not in edit mode
+              if (e.key === 'Enter' && !e.shiftKey && !editingId) {
                 e.preventDefault();
                 handleSendMessage();
               }
+            }}
+            sx={{
+              flex: 1,
+              mr: 1,
+              minWidth: 0,
+              '& .MuiInputBase-root': {
+                color: theme => theme.palette.mode === 'dark' ? 'common.white' : 'text.primary',
+              },
             }}
             InputProps={{
               sx: {
@@ -447,14 +460,6 @@ const AdminChatMessages = () => {
                 height: 44,
                 display: 'flex',
                 alignItems: 'center',
-              },
-            }}
-            sx={{
-              flex: 1,
-              mr: 1,
-              minWidth: 0,
-              '& .MuiInputBase-root': {
-                color: theme => theme.palette.mode === 'dark' ? 'common.white' : 'text.primary',
               },
             }}
           />

@@ -290,7 +290,8 @@ const ChatModal = () => {
                 multiline
                 maxRows={3}
                 onKeyDown={e => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
+                  // Only allow Enter key submission when not in edit mode
+                  if (e.key === 'Enter' && !e.shiftKey && !editingId) {
                     e.preventDefault();
                     if (newMessage.trim()) handleSubmit(e);
                   }
