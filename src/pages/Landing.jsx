@@ -258,21 +258,33 @@ function Landing() {
               >
                 Contact
               </Button>
-              <IconButton 
-                onClick={toggleTheme} 
-                disableRipple
+              <Box 
                 sx={{ 
-                  color: 'text.primary',
-                  '&:hover': {
-                    backgroundColor: 'transparent'
-                  },
-                  '&:active': {
-                    backgroundColor: 'transparent'
-                  }
+                  display: 'flex', 
+                  alignItems: 'center',
+                  cursor: 'default'
                 }}
               >
-                {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
-              </IconButton>
+                <IconButton 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleTheme();
+                  }}
+                  disableRipple
+                  sx={{ 
+                    color: 'text.primary',
+                    padding: '8px',
+                    '&:hover': {
+                      backgroundColor: 'transparent'
+                    },
+                    '&:active': {
+                      backgroundColor: 'transparent'
+                    }
+                  }}
+                >
+                  {mode === 'dark' ? <Brightness7 /> : <Brightness4 />}
+                </IconButton>
+              </Box>
             </Box>
 
             <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
