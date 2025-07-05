@@ -136,23 +136,39 @@ function AdminPanel() {
     
     const loadProjectRequests = async () => {
       try {
+        console.log('Starting to load project requests...');
         setLoadingRequests(true);
         const requestsRef = collection(db, 'project_requests');
         const q = query(requestsRef, orderBy('createdAt', 'desc'));
+        console.log('Query created:', q);
+        
         const unsubscribe = onSnapshot(q, (snapshot) => {
-          const requests = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-            createdAt: doc.data().createdAt?.toDate().toLocaleString() || 'Unknown'
-          }));
+          console.log('Got snapshot, docs count:', snapshot.docs.length);
+          console.log('Snapshot empty?', snapshot.empty);
+          
+          const requests = snapshot.docs.map(doc => {
+            const data = doc.data();
+            console.log('Raw request data:', { id: doc.id, ...data });
+            return {
+              id: doc.id,
+              ...data,
+              createdAt: formatCreatedAt(data.createdAt)
+            };
+          });
+          
+          console.log('Processed requests:', requests);
           setProjectRequests(requests);
+          setLoadingRequests(false);
+        }, (error) => {
+          console.error('Error in snapshot listener:', error);
+          setRequestError('Error watching project requests: ' + error.message);
           setLoadingRequests(false);
         });
 
         return unsubscribe;
       } catch (error) {
-        console.error('Error loading project requests:', error);
-        setRequestError('Failed to load project requests');
+        console.error('Error in loadProjectRequests:', error);
+        setRequestError('Failed to load project requests: ' + error.message);
         setLoadingRequests(false);
       }
     };
@@ -325,6 +341,27 @@ function AdminPanel() {
       console.error('Error updating request status:', error);
       setRequestError('Failed to update request status');
     }
+  };
+
+  const formatCreatedAt = (timestamp) => {
+    if (!timestamp) return 'Unknown';
+    
+    // Handle Firestore Timestamp
+    if (timestamp?.toDate instanceof Function) {
+      return timestamp.toDate().toLocaleString();
+    }
+    
+    // Handle string timestamp
+    if (typeof timestamp === 'string') {
+      return new Date(timestamp).toLocaleString();
+    }
+    
+    // Handle seconds/milliseconds numbers
+    if (typeof timestamp === 'number') {
+      return new Date(timestamp * (timestamp < 1000000000000 ? 1000 : 1)).toLocaleString();
+    }
+    
+    return 'Invalid Date';
   };
 
   if (loading) {

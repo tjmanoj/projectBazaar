@@ -380,8 +380,11 @@ function Landing() {
 
     try {
       await addDoc(collection(db, 'project_requests'), {
-        ...formData,
-        timestamp: serverTimestamp()
+        name: formData.name,
+        email: formData.email,
+        requirements: formData.requirements,
+        status: 'new',
+        createdAt: serverTimestamp()
       });
       setSubmitSuccess(true);
       setFormData({ name: '', email: '', requirements: '' });
@@ -391,7 +394,8 @@ function Landing() {
         severity: 'success'
       });
     } catch (error) {
-      setFormError('Failed to submit request. Please try again.');
+      console.error('Error submitting request:', error);
+      setFormError(error.message);
       setSnackbar({
         open: true,
         message: 'Failed to submit request. Please try again.',
@@ -1290,6 +1294,7 @@ function Landing() {
                 variant="outlined"
                 fullWidth
                 required
+                autoComplete="off"
                 disabled={isSubmitting}
                 sx={{
                   '& .MuiInputBase-root': {
@@ -1328,6 +1333,7 @@ function Landing() {
                 variant="outlined"
                 fullWidth
                 required
+                autoComplete="off"
                 disabled={isSubmitting}
                 sx={{
                   '& .MuiInputBase-root': {
