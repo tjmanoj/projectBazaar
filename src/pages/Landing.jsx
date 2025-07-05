@@ -262,7 +262,8 @@ function Landing() {
                 sx={{ 
                   display: 'flex', 
                   alignItems: 'center',
-                  cursor: 'default'
+                  cursor: 'default',
+                  pr: 1 // Added right padding in desktop view
                 }}
               >
                 <IconButton 

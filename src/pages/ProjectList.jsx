@@ -329,19 +329,32 @@ function ProjectList() {
               }}
             >
               {/* Theme Toggle - Hidden on mobile */}
-              <IconButton
-                onClick={toggleTheme}
-                color="inherit"
-                size="small"
-                disableRipple
-                sx={{
-                  display: { xs: 'none', md: 'flex' },
-                  "&:hover": { backgroundColor: "transparent" },
-                  "&:active": { backgroundColor: "transparent" }
+              <Box 
+                sx={{ 
+                  display: { xs: 'none', md: 'flex' }, 
+                  alignItems: 'center',
+                  cursor: 'default',
+                  pointerEvents: 'none', // This ensures clicks won't trigger on the container
+                  pr: 1 // Added right padding in desktop view
                 }}
               >
-                {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
-              </IconButton>
+                <IconButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleTheme();
+                  }}
+                  color="inherit"
+                  size="small"
+                  disableRipple
+                  sx={{
+                    pointerEvents: 'auto', // This re-enables clicks on the icon itself
+                    "&:hover": { backgroundColor: "transparent" },
+                    "&:active": { backgroundColor: "transparent" }
+                  }}
+                >
+                  {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
+                </IconButton>
+              </Box>
 
               {/* Admin Button */}
               {isAdmin && (
