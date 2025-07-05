@@ -131,7 +131,7 @@ function Login() {
               id="email"
               label="Email Address"
               name="email"
-              autoComplete="email"
+              autoComplete="off"
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -313,6 +313,7 @@ function Login() {
             type="email"
             fullWidth
             variant="outlined"
+            autoComplete="off"
             value={resetEmail}
             onChange={(e) => setResetEmail(e.target.value)}
             sx={{ mt: 2 }}
