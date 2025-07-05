@@ -1511,11 +1511,21 @@ function Landing() {
           </Grid>
         </Grid>
         <Divider sx={{ mt: 6, mb: 4 }} />
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-          <Typography color="text.secondary" variant="body2">
+        <Box sx={{ 
+          display: 'flex', 
+          flexDirection: { xs: 'column', md: 'row' },
+          justifyContent: 'space-between', 
+          alignItems: { xs: 'center', md: 'center' }, 
+          gap: { xs: 3, md: 2 }
+        }}>
+          <Typography color="text.secondary" variant="body2" sx={{ textAlign: { xs: 'center', md: 'left' } }}>
             © {currentYear} Project Bazaar. All rights reserved.
           </Typography>
-          <Stack direction="row" spacing={2} flexWrap="wrap">
+          <Stack 
+            direction={{ xs: 'column', md: 'row' }} 
+            spacing={{ xs: 1.5, md: 2 }} 
+            alignItems="center"
+          >
             <Link
               component={RouterLink}
               to="/privacy-policy"
