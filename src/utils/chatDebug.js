@@ -9,13 +9,9 @@ import { db } from '../firebaseConfig';
  */
 export const debugUserChat = async (userId) => {
   try {
-    console.log(`[DEBUG] Checking chat data for user: ${userId}`);
-    
-    // 1. Get user data
     const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
     
-    // 2. Get chat messages
     const messagesRef = collection(db, 'chats', userId, 'messages');
     const messagesSnapshot = await getDocs(messagesRef);
     
@@ -33,7 +29,7 @@ export const debugUserChat = async (userId) => {
       messageCount: messages.length
     };
   } catch (error) {
-    console.error(`[DEBUG] Error fetching chat data for user ${userId}:`, error);
+    console.error('Error fetching chat data:', error);
     return { error: error.message };
   }
 };
@@ -44,9 +40,6 @@ export const debugUserChat = async (userId) => {
  */
 export const debugAllChats = async () => {
   try {
-    console.log(`[DEBUG] Checking all chat data`);
-    
-    // Get all chat collections
     const chatsRef = collection(db, 'chats');
     const chatsSnapshot = await getDocs(chatsRef);
     
@@ -84,7 +77,7 @@ export const debugAllChats = async () => {
       chats: chats
     };
   } catch (error) {
-    console.error(`[DEBUG] Error fetching all chat data:`, error);
+    console.error('Error fetching chat data:', error);
     return { error: error.message };
   }
 };

@@ -95,8 +95,6 @@ function Demo() {
   const isVideoAvailable = viewMode === 'desktop' ? 
     Boolean(project?.demoVideoDesktopUrl) : 
     Boolean(project?.demoVideoMobileUrl);
-    console.log("Desktop URL:", project?.demoVideoDesktopUrl);
-    console.log("Mobile URL:", project?.demoVideoMobileUrl);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, pb: 8 }}>

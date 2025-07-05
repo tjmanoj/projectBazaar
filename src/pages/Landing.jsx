@@ -292,9 +292,6 @@ function Landing() {
   const { mode, toggleTheme } = useThemeContext();
   const theme = useTheme();
 
-  // Debug logs
-  console.log('Theme mode:', mode);
-  console.log('Theme object:', theme);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -415,8 +412,6 @@ function Landing() {
     if (reason === 'clickaway') return;
     setSnackbar(prev => ({ ...prev, open: false }));
   };
-
-  console.log('Rendering Landing with mode:', mode); // Debug log
 
   return (
     <Box sx={{ 
