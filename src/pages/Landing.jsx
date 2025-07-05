@@ -325,14 +325,14 @@ function Landing() {
     name: "Aravind M",
     role: "ECE Student, Madurai",
     rating: 5,
-    avatar: "https://randomuser.me/api/portraits/men/14.jpg"
+    avatar: "https://randomuser.me/api/portraits/men/12.jpg"
   },
   {
     quote: "Affordable-a irunthuchu. Unique project idea kuduthanga. Na resume-leum mention panninen.",
     name: "Sowmya L",
     role: "MCA Student, Trichy",
     rating: 5,
-    avatar: "https://randomuser.me/api/portraits/women/25.jpg"
+    avatar: "https://randomuser.me/api/portraits/women/96.jpg"
   },
   {
     quote: "Naan naachathayum seyyala. Avanga kudutha guidance-la project complete pannitten. Seriously thanks!",
@@ -1178,8 +1178,9 @@ function Landing() {
                           <Star 
                             key={i} 
                             sx={{ 
-                              color: i < testimonial.rating ? 'primary.main' : 'action.disabled',
-                              fontSize: '1.2rem'
+                              color: i < testimonial.rating ? '#FFD700' : '#E0E0E0',
+                              fontSize: '1.2rem',
+                              filter: i < testimonial.rating ? 'drop-shadow(0 0 2px rgba(255, 215, 0, 0.4))' : 'none'
                             }} 
                           />
                         ))}
