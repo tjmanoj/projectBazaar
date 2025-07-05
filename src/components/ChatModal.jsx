@@ -298,7 +298,7 @@ const ChatModal = () => {
                 InputProps={{
                   sx: {
                     borderRadius: 3,
-                    bgcolor: 'white',
+                    bgcolor: theme => theme.palette.mode === 'dark' ? 'grey.900' : 'white',
                     fontSize: '1rem',
                     height: 44,
                     px: 2,
@@ -309,16 +309,17 @@ const ChatModal = () => {
                       height: 44,
                       display: 'flex',
                       alignItems: 'center',
+                      color: theme => theme.palette.mode === 'dark' ? 'grey.100' : 'text.primary',
                     },
                     '& fieldset': {
-                      borderColor: 'grey.300',
+                      borderColor: theme => theme.palette.mode === 'dark' ? 'grey.700' : 'grey.300',
                       borderWidth: 1,
                     },
                     '&:hover fieldset': {
-                      borderColor: 'grey.400',
+                      borderColor: theme => theme.palette.mode === 'dark' ? 'grey.600' : 'grey.400',
                     },
                     '&.Mui-focused fieldset': {
-                      borderColor: 'grey.400',
+                      borderColor: 'primary.main',
                       boxShadow: 'none',
                     },
                   },
