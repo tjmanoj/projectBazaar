@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
+import { useThemeContext } from '../context/ThemeContext';
 import { 
   AppBar, 
   Button, 
@@ -13,7 +14,6 @@ import {
   Typography, 
   Box,
   useTheme,
-  useMediaQuery,
   Toolbar,
   Stack,
   IconButton,
@@ -22,7 +22,11 @@ import {
   Divider,
   Snackbar,
   Alert,
-  Link
+  Link,
+  Avatar,
+  Paper,
+  useMediaQuery,
+  Zoom
 } from '@mui/material';
 import { 
   School, 
@@ -40,74 +44,80 @@ import {
   Twitter,
   YouTube,
   LinkedIn,
+  FormatQuote,
+  NavigateNext,
+  NavigateBefore,
+  Star,
+  KeyboardArrowUp as KeyboardArrowUpIcon
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { useThemeContext } from '../context/ThemeContext';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import Zoom from '@mui/material/Zoom';
 
-// Wrap MUI components with motion
+// Create motion components
 const MotionBox = motion(Box);
 const MotionCard = motion(Card);
 const MotionContainer = motion(Container);
 
+// Animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+};
+
+const staggerChildren = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2
+    }
+  }
+};
+
 function Landing() {
   const navigate = useNavigate();
-  const theme = useTheme();
   const { mode, toggleTheme } = useThemeContext();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const currentYear = new Date().getFullYear();
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const theme = useTheme();
+
+  // Debug logs
+  console.log('Theme mode:', mode);
+  console.log('Theme object:', theme);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    requirements: ''
-  });
-  const [formError, setFormError] = useState('');
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [formData, setFormData] = useState({ name: '', email: '', requirements: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success'
-  });
+  const [formError, setFormError] = useState('');
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const currentYear = new Date().getFullYear();
 
-  const scrollToSection = (sectionId) => {
-    const section = document.getElementById(sectionId);
-    if (section) {
-      const offset = 80; // Account for the fixed header
-      const elementPosition = section.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth"
-      });
+  const testimonials = [
+    {
+      quote: "Project Bazaar helped me complete my final year project with excellence. The guidance was invaluable!",
+      name: "Ananya Sharma",
+      role: "Computer Science Student",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/1.jpg"
+    },
+    {
+      quote: "The quality of projects and support is outstanding. Highly recommended for all CS students!",
+      name: "Rahul Kumar",
+      role: "Engineering Graduate",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    {
+      quote: "Got my dream internship thanks to the project experience I gained here!",
+      name: "Priya Patel",
+      role: "Software Developer",
+      rating: 5,
+      avatar: "https://randomuser.me/api/portraits/women/3.jpg"
     }
-    setMobileMenuOpen(false); // Close mobile menu after navigation
-  };
+  ];
 
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
-  const staggerChildren = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  // Handle scroll to top visibility
   useEffect(() => {
     const handleScroll = () => {
-      const scrollY = window.scrollY;
-      setShowScrollTop(scrollY > 400); // Show button when scrolled down 400px
+      setShowScrollTop(window.pageYOffset > 300);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -115,26 +125,15 @@ function Landing() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    setFormError('');
-  };
-
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+      setMobileMenuOpen(false);
     }
-    setSnackbar(prev => ({ ...prev, open: false }));
   };
 
   const handleProjectRequest = async (e) => {
@@ -143,39 +142,22 @@ function Landing() {
     setFormError('');
 
     try {
-      // Validate form
-      if (!formData.name.trim() || !formData.email.trim() || !formData.requirements.trim()) {
-        throw new Error('Please fill in all required fields');
-      }
-
-      if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)) {
-        throw new Error('Please enter a valid email address');
-      }
-
-      // Add to Firestore
-      await addDoc(collection(db, 'project_requests'), {
+      await addDoc(collection(db, 'projectRequests'), {
         ...formData,
-        status: 'new',
-        createdAt: serverTimestamp()
+        timestamp: serverTimestamp()
       });
-
-      // Show success message
+      setSubmitSuccess(true);
+      setFormData({ name: '', email: '', requirements: '' });
       setSnackbar({
         open: true,
-        message: 'Project request submitted successfully! We will contact you soon.',
+        message: 'Request submitted successfully!',
         severity: 'success'
       });
-
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        requirements: ''
-      });
     } catch (error) {
+      setFormError('Failed to submit request. Please try again.');
       setSnackbar({
         open: true,
-        message: error.message,
+        message: 'Failed to submit request. Please try again.',
         severity: 'error'
       });
     } finally {
@@ -183,8 +165,25 @@ function Landing() {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
+  console.log('Rendering Landing with mode:', mode); // Debug log
+
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', overflow: 'hidden' }}>
+    <Box sx={{ 
+      bgcolor: 'background.default', 
+      minHeight: '100vh', 
+      overflow: 'hidden',
+      color: 'text.primary'
+    }}>
       <CssBaseline />
       <AppBar position="fixed" elevation={0}>
         <Container maxWidth="lg">
@@ -826,422 +825,635 @@ function Landing() {
         </MotionContainer>
       </Box>
 
-
-        <Box 
-          component="section" 
-          id="contact"
-          sx={{ 
-            py: { xs: 8, md: 12 },
-            bgcolor: 'background.subtle'
-          }}
-        >
-          <MotionContainer
-            maxWidth="md"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeIn}
-          >
-            <Typography 
-          variant="h2" 
-          align="center" 
-          sx={{ mb: { xs: 1, md: -1 } }}
-            >
-          Get Started Today
-            </Typography>
-            
-            <Card
-          elevation={0}
-          sx={{
-            border: 'none',
-            boxShadow: 'none',
-            bgcolor: 'transparent'
-          }}
-            >
-          <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-            <form onSubmit={handleProjectRequest}>
-              <Stack spacing={3}>
-                {formError && (
-                  <Typography color="error" textAlign="center">
-                    {formError}
-                  </Typography>
-                )}
-                {submitSuccess && (
-                  <Typography color="success.main" textAlign="center">
-                    Your project request has been submitted successfully! We'll get back to you soon.
-                  </Typography>
-                )}
-                <TextField
-                  label="Name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  variant="outlined"
-                  fullWidth
-                  required
-                  disabled={isSubmitting}
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                    }
-                  }}
-                  InputProps={{
-                    sx: {
-                      color: mode === 'dark' ? 'grey.900' : 'text.primary',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main'
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main'
-                      }
-                    }
-                  }}
-                  InputLabelProps={{
-                    sx: { 
-                      color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-                      '&.Mui-focused': {
-                        color: 'primary.main'
-                      }
-                    }
-                  }}
-                />
-                <TextField
-                  label="Email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  variant="outlined"
-                  fullWidth
-                  required
-                  disabled={isSubmitting}
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                    }
-                  }}
-                  InputProps={{
-                    sx: {
-                      color: mode === 'dark' ? 'grey.900' : 'text.primary',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main'
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main'
-                      }
-                    }
-                  }}
-                  InputLabelProps={{
-                    sx: { 
-                      color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-                      '&.Mui-focused': {
-                        color: 'primary.main'
-                      }
-                    }
-                  }}
-                />
-                <TextField
-                  label="Project Requirements"
-                  name="requirements"
-                  value={formData.requirements}
-                  onChange={handleInputChange}
-                  multiline
-                  rows={4}
-                  variant="outlined"
-                  fullWidth
-                  required
-                  disabled={isSubmitting}
-                  sx={{
-                    '& .MuiInputBase-root': {
-                      bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
-                    }
-                  }}
-                  InputProps={{
-                    sx: {
-                      color: mode === 'dark' ? 'grey.900' : 'text.primary',
-                      '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: mode === 'dark' ? 'grey.400' : 'divider'
-                      },
-                      '&:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main'
-                      },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                        borderColor: 'primary.main'
-                      }
-                    }
-                  }}
-                  InputLabelProps={{
-                    sx: { 
-                      color: mode === 'dark' ? 'grey.700' : 'text.secondary',
-                      '&.Mui-focused': {
-                        color: 'primary.main'
-                      }
-                    }
-                  }}
-                />
-                <Button 
-                  type="submit"
-                  variant="contained"
-                  size="large"
-                  endIcon={<ArrowForward />}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Submitting...' : 'Submit Request'}
-                </Button>
-              </Stack>
-            </form>
-          </CardContent>
-            </Card>
-          </MotionContainer>
-        </Box>
-
-        {/* Footer */}
+      {/* Testimonials Section */}
       <Box 
-        component="footer" 
+        component="section" 
         sx={{ 
-          bgcolor: 'background.paper',
-          pt: 8,
-          pb: 4,
-          borderTop: 1,
-          borderColor: 'divider'
+          py: { xs: 8, md: 12 },
+          background: theme => mode === 'light'
+            ? 'linear-gradient(180deg, #f5f5f7 0%, #fff 100%)'
+            : 'linear-gradient(180deg, #1a1a1a 0%, #121212 100%)'
         }}
       >
-        <Container maxWidth="lg">
-          <Grid container spacing={6}>
-            <Grid item xs={12} md={4}>
-              <Stack spacing={3}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <img 
-                    src="/logo.png" 
-                    alt="Project Bazaar Logo" 
-                    style={{ height: '32px' }} 
-                  />
-                  <Typography variant="h6" fontWeight="bold">
-                    Project Bazaar
-                  </Typography>
-                </Box>
-                <Typography color="text.secondary" sx={{ lineHeight: 1.8 }}>
-                  Making quality projects accessible to every student. We help you turn your ideas into reality with professional guidance and support.
-                </Typography>
-                <Stack direction="row" spacing={2}>
-                  <IconButton 
-                    color="primary" 
-                    component="a" 
-                    href="https://www.instagram.com/projectbazaarofficial/" 
-                    target="_blank"
-                    sx={{ 
-                      '&:hover': { 
-                        transform: 'translateY(-3px)',
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
-                      },
-                      transition: 'transform 0.2s'
+        <MotionContainer
+          maxWidth="lg"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerChildren}
+        >
+          <Typography 
+            variant="h2" 
+            align="center"
+            sx={{ mb: { xs: 6, md: 8 } }}
+          >
+            What Our Users Say
+          </Typography>
+
+          <Box sx={{ position: 'relative', px: { xs: 4, md: 8 } }}>
+            {/* Navigation Buttons */}
+            <IconButton
+              onClick={() => {
+                setActiveTestimonial((prev) => 
+                  prev === 0 ? testimonials.length - 1 : prev - 1
+                );
+              }}
+              sx={{
+                position: 'absolute',
+                left: { xs: 0, md: 40 },
+                top: '50%',
+                transform: 'translateY(-50%)',
+                bgcolor: 'background.paper',
+                boxShadow: 2,
+                '&:hover': {
+                  bgcolor: 'background.paper',
+                  transform: 'translateY(-50%) scale(1.1)',
+                },
+                transition: 'transform 0.2s',
+                zIndex: 2
+              }}
+            >
+              <NavigateBefore />
+            </IconButton>
+
+            <IconButton
+              onClick={() => {
+                setActiveTestimonial((prev) => 
+                  prev === testimonials.length - 1 ? 0 : prev + 1
+                );
+              }}
+              sx={{
+                position: 'absolute',
+                right: { xs: 0, md: 40 },
+                top: '50%',
+                transform: 'translateY(-50%)',
+                bgcolor: 'background.paper',
+                boxShadow: 2,
+                '&:hover': {
+                  bgcolor: 'background.paper',
+                  transform: 'translateY(-50%) scale(1.1)',
+                },
+                transition: 'transform 0.2s',
+                zIndex: 2
+              }}
+            >
+              <NavigateNext />
+            </IconButton>
+
+            {/* Testimonials Carousel */}
+            <Box
+              sx={{
+                display: 'flex',
+                overflow: 'hidden',
+                position: 'relative',
+                minHeight: { xs: 400, md: 300 }
+              }}
+            >
+              {testimonials.map((testimonial, index) => (
+                <MotionBox
+                  key={index}
+                  initial={{ opacity: 0, x: 100 }}
+                  animate={{ 
+                    opacity: activeTestimonial === index ? 1 : 0,
+                    x: activeTestimonial === index ? 0 : -100,
+                    scale: activeTestimonial === index ? 1 : 0.9,
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    ease: "easeInOut"
+                  }}
+                  sx={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: activeTestimonial === index ? 'auto' : 'none'
+                  }}
+                >
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: { xs: 3, md: 6 },
+                      borderRadius: 4,
+                      bgcolor: theme => alpha(theme.palette.primary.main, 0.03),
+                      border: 1,
+                      borderColor: theme => alpha(theme.palette.primary.main, 0.1),
+                      maxWidth: 800,
+                      width: '100%',
+                      position: 'relative',
+                      overflow: 'visible'
                     }}
                   >
-                    <Instagram />
-                  </IconButton>
-                  <IconButton 
-                    color="primary" 
-                    component="a" 
-                    href="https://x.com/ProjectBazaar_" 
-                    target="_blank"
-                    sx={{ 
-                      '&:hover': { 
-                        transform: 'translateY(-3px)',
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
-                      },
-                      transition: 'transform 0.2s'
-                    }}
-                  >
-                    <Twitter />
-                  </IconButton>
-                  <IconButton 
-                    color="primary" 
-                    component="a" 
-                    href="https://www.youtube.com/@ProjectBazaarOfficial" 
-                    target="_blank"
-                    sx={{ 
-                      '&:hover': { 
-                        transform: 'translateY(-3px)',
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
-                      },
-                      transition: 'transform 0.2s'
-                    }}
-                  >
-                    <YouTube />
-                  </IconButton>
-                  <IconButton 
-                    color="primary" 
-                    component="a" 
-                    href="https://www.linkedin.com/company/projectbazaar/" 
-                    target="_blank"
-                    sx={{ 
-                      '&:hover': { 
-                        transform: 'translateY(-3px)',
-                        bgcolor: alpha(theme.palette.primary.main, 0.08),
-                      },
-                      transition: 'transform 0.2s'
-                    }}
-                  >
-                    <LinkedIn />
-                  </IconButton>
-                </Stack>
-              </Stack>
-            </Grid>
-          </Grid>
-          <Divider sx={{ mt: 6, mb: 4 }} />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
-            <Typography color="text.secondary" variant="body2">
-              © {currentYear} Project Bazaar. All rights reserved.
-            </Typography>
-            <Stack direction="row" spacing={2} flexWrap="wrap">
-              <Link
-                component={RouterLink}
-                to="/privacy-policy"
-                sx={{ 
-                  color: 'text.primary',
-                  textDecoration: 'none',
-                  px: 2,
-                  py: 1,
-                  borderRadius: 1,
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': { 
-                    color: 'primary.main',
-                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
-                  } 
-                }}
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                component={RouterLink}
-                to="/terms-of-service"
-                sx={{ 
-                  color: 'text.primary',
-                  textDecoration: 'none',
-                  px: 2,
-                  py: 1,
-                  borderRadius: 1,
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': { 
-                    color: 'primary.main',
-                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
-                  } 
-                }}
-              >
-                Terms of Service
-              </Link>
-              <Link
-                component={RouterLink}
-                to="/cancellation-refund"
-                sx={{ 
-                  color: 'text.primary',
-                  textDecoration: 'none',
-                  px: 2,
-                  py: 1,
-                  borderRadius: 1,
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': { 
-                    color: 'primary.main',
-                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
-                  } 
-                }}
-              >
-                Cancellation & Refund
-              </Link>
-              <Link
-                component={RouterLink}
-                to="/shipping-delivery"
-                sx={{ 
-                  color: 'text.primary',
-                  textDecoration: 'none',
-                  px: 2,
-                  py: 1,
-                  borderRadius: 1,
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': { 
-                    color: 'primary.main',
-                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
-                  } 
-                }}
-              >
-                Shipping & Delivery
-              </Link>
-              <Link
-                component={RouterLink}
-                onClick={() => scrollToSection('contact')}
-                sx={{ 
-                  color: 'text.primary',
-                  textDecoration: 'none',
-                  px: 2,
-                  py: 1,
-                  borderRadius: 1,
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': { 
-                    color: 'primary.main',
-                    bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
-                  } 
-                }}
-              >
-                Contact Us
-              </Link>
+                    <FormatQuote 
+                      sx={{ 
+                        position: 'absolute',
+                        top: -20,
+                        left: 20,
+                        fontSize: 40,
+                        color: 'primary.main',
+                        transform: 'scaleX(-1)'
+                      }} 
+                    />
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Typography 
+                        variant="body1" 
+                        sx={{ 
+                          mb: 4, 
+                          fontSize: { xs: '1rem', md: '1.2rem' },
+                          fontStyle: 'italic',
+                          lineHeight: 1.8,
+                          color: 'text.primary'
+                        }}
+                      >
+                        {testimonial.quote}
+                      </Typography>
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            sx={{ 
+                              color: i < testimonial.rating ? 'primary.main' : 'action.disabled',
+                              fontSize: '1.2rem'
+                            }} 
+                          />
+                        ))}
+                      </Box>
+
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+                        <Avatar
+                          src={testimonial.avatar}
+                          alt={testimonial.name}
+                          sx={{ 
+                            width: 60, 
+                            height: 60,
+                            border: 2,
+                            borderColor: 'primary.main'
+                          }}
+                        />
+                        <Box>
+                          <Typography variant="h6" fontWeight="bold" color="primary.main">
+                            {testimonial.name}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {testimonial.role}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Paper>
+                </MotionBox>
+              ))}
+            </Box>
+
+            {/* Testimonial Indicators */}
+            <Stack 
+              direction="row" 
+              spacing={1} 
+              justifyContent="center" 
+              sx={{ mt: 4 }}
+            >
+              {testimonials.map((_, index) => (
+                <Box
+                  key={index}
+                  onClick={() => setActiveTestimonial(index)}
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: activeTestimonial === index ? 'primary.main' : 'action.disabled',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'scale(1.2)',
+                      bgcolor: activeTestimonial === index ? 'primary.main' : 'text.secondary'
+                    }
+                  }}
+                />
+              ))}
             </Stack>
           </Box>
-        </Container>
+        </MotionContainer>
       </Box>
-      
-      {/* Scroll to Top Button */}
-      <Zoom in={showScrollTop}>
-        <Box
-          onClick={scrollToTop}
-          role="presentation"
+
+      {/* Contact Section */}
+      <Box 
+        component="section" 
+        id="contact"
+        sx={{ 
+          py: { xs: 8, md: 12 },
+          bgcolor: 'background.subtle'
+        }}
+      >
+        <MotionContainer
+          maxWidth="md"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeIn}
+        >
+          <Typography 
+        variant="h2" 
+        align="center" 
+        sx={{ mb: { xs: 1, md: -1 } }}
+          >
+        Get Started Today
+          </Typography>
+          
+          <Card
+        elevation={0}
+        sx={{
+          border: 'none',
+          boxShadow: 'none',
+          bgcolor: 'transparent'
+        }}
+          >
+        <CardContent sx={{ p: { xs: 3, md: 4 } }}>
+          <form onSubmit={handleProjectRequest}>
+            <Stack spacing={3}>
+              {formError && (
+                <Typography color="error" textAlign="center">
+                  {formError}
+                </Typography>
+              )}
+              {submitSuccess && (
+                <Typography color="success.main" textAlign="center">
+                  Your project request has been submitted successfully! We'll get back to you soon.
+                </Typography>
+              )}
+              <TextField
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                variant="outlined"
+                fullWidth
+                required
+                disabled={isSubmitting}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                  }
+                }}
+                InputProps={{
+                  sx: {
+                    color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    }
+                  }
+                }}
+                InputLabelProps={{
+                  sx: { 
+                    color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                    '&.Mui-focused': {
+                      color: 'primary.main'
+                    }
+                  }
+                }}
+              />
+              <TextField
+                label="Email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                variant="outlined"
+                fullWidth
+                required
+                disabled={isSubmitting}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                  }
+                }}
+                InputProps={{
+                  sx: {
+                    color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    }
+                  }
+                }}
+                InputLabelProps={{
+                  sx: { 
+                    color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                    '&.Mui-focused': {
+                      color: 'primary.main'
+                    }
+                  }
+                }}
+              />
+              <TextField
+                label="Project Requirements"
+                name="requirements"
+                value={formData.requirements}
+                onChange={handleInputChange}
+                multiline
+                rows={4}
+                variant="outlined"
+                fullWidth
+                required
+                disabled={isSubmitting}
+                sx={{
+                  '& .MuiInputBase-root': {
+                    bgcolor: mode === 'dark' ? 'grey.100' : 'background.paper',
+                  }
+                }}
+                InputProps={{
+                  sx: {
+                    color: mode === 'dark' ? 'grey.900' : 'text.primary',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: mode === 'dark' ? 'grey.400' : 'divider'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'primary.main'
+                    }
+                  }
+                }}
+                InputLabelProps={{
+                  sx: { 
+                    color: mode === 'dark' ? 'grey.700' : 'text.secondary',
+                    '&.Mui-focused': {
+                      color: 'primary.main'
+                    }
+                  }
+                }}
+              />
+              <Button 
+                type="submit"
+                variant="contained"
+                size="large"
+                endIcon={<ArrowForward />}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Request'}
+              </Button>
+            </Stack>
+          </form>
+        </CardContent>
+          </Card>
+        </MotionContainer>
+      </Box>
+
+      {/* Footer */}
+    <Box 
+      component="footer" 
+      sx={{ 
+        bgcolor: 'background.paper',
+        pt: 8,
+        pb: 4,
+        borderTop: 1,
+        borderColor: 'divider'
+      }}
+    >
+      <Container maxWidth="lg">
+        <Grid container spacing={6}>
+          <Grid item xs={12} md={4}>
+            <Stack spacing={3}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <img 
+                  src="/logo.png" 
+                  alt="Project Bazaar Logo" 
+                  style={{ height: '32px' }} 
+                />
+                <Typography variant="h6" fontWeight="bold">
+                  Project Bazaar
+                </Typography>
+              </Box>
+              <Typography color="text.secondary" sx={{ lineHeight: 1.8 }}>
+                Making quality projects accessible to every student. We help you turn your ideas into reality with professional guidance and support.
+              </Typography>
+              <Stack direction="row" spacing={2}>
+                <IconButton 
+                  color="primary" 
+                  component="a" 
+                  href="https://www.instagram.com/projectbazaarofficial/" 
+                  target="_blank"
+                  sx={{ 
+                    '&:hover': { 
+                      transform: 'translateY(-3px)',
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                    },
+                    transition: 'transform 0.2s'
+                  }}
+                >
+                  <Instagram />
+                </IconButton>
+                <IconButton 
+                  color="primary" 
+                  component="a" 
+                  href="https://x.com/ProjectBazaar_" 
+                  target="_blank"
+                  sx={{ 
+                    '&:hover': { 
+                      transform: 'translateY(-3px)',
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                    },
+                    transition: 'transform 0.2s'
+                  }}
+                >
+                  <Twitter />
+                </IconButton>
+                <IconButton 
+                  color="primary" 
+                  component="a" 
+                  href="https://www.youtube.com/@ProjectBazaarOfficial" 
+                  target="_blank"
+                  sx={{ 
+                    '&:hover': { 
+                      transform: 'translateY(-3px)',
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                    },
+                    transition: 'transform 0.2s'
+                  }}
+                >
+                  <YouTube />
+                </IconButton>
+                <IconButton 
+                  color="primary" 
+                  component="a" 
+                  href="https://www.linkedin.com/company/projectbazaar/" 
+                  target="_blank"
+                  sx={{ 
+                    '&:hover': { 
+                      transform: 'translateY(-3px)',
+                      bgcolor: alpha(theme.palette.primary.main, 0.08),
+                    },
+                    transition: 'transform 0.2s'
+                  }}
+                >
+                  <LinkedIn />
+                </IconButton>
+              </Stack>
+            </Stack>
+          </Grid>
+        </Grid>
+        <Divider sx={{ mt: 6, mb: 4 }} />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2 }}>
+          <Typography color="text.secondary" variant="body2">
+            © {currentYear} Project Bazaar. All rights reserved.
+          </Typography>
+          <Stack direction="row" spacing={2} flexWrap="wrap">
+            <Link
+              component={RouterLink}
+              to="/privacy-policy"
+              sx={{ 
+                color: 'text.primary',
+                textDecoration: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': { 
+                  color: 'primary.main',
+                  bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                } 
+              }}
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              component={RouterLink}
+              to="/terms-of-service"
+              sx={{ 
+                color: 'text.primary',
+                textDecoration: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': { 
+                  color: 'primary.main',
+                  bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                } 
+              }}
+            >
+              Terms of Service
+            </Link>
+            <Link
+              component={RouterLink}
+              to="/cancellation-refund"
+              sx={{ 
+                color: 'text.primary',
+                textDecoration: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': { 
+                  color: 'primary.main',
+                  bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                } 
+              }}
+            >
+              Cancellation & Refund
+            </Link>
+            <Link
+              component={RouterLink}
+              to="/shipping-delivery"
+              sx={{ 
+                color: 'text.primary',
+                textDecoration: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': { 
+                  color: 'primary.main',
+                  bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                } 
+              }}
+            >
+              Shipping & Delivery
+            </Link>
+            <Link
+              component={RouterLink}
+              onClick={() => scrollToSection('contact')}
+              sx={{ 
+                color: 'text.primary',
+                textDecoration: 'none',
+                px: 2,
+                py: 1,
+                borderRadius: 1,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover': { 
+                  color: 'primary.main',
+                  bgcolor: theme => alpha(theme.palette.primary.main, 0.08)
+                } 
+              }}
+            >
+              Contact Us
+            </Link>
+          </Stack>
+        </Box>
+      </Container>
+    </Box>
+    
+    {/* Scroll to Top Button */}
+    <Zoom in={showScrollTop}>
+      <Box
+        onClick={scrollToTop}
+        role="presentation"
+        sx={{
+          position: 'fixed',
+          bottom: 32,
+          right: 32,
+          zIndex: 1000
+        }}
+      >
+        <IconButton
+          color="primary"
+          aria-label="scroll to top"
           sx={{
-            position: 'fixed',
-            bottom: 32,
-            right: 32,
-            zIndex: 1000
+            bgcolor: 'background.paper',
+            boxShadow: 3,
+            '&:hover': {
+              bgcolor: 'background.paper',
+              transform: 'translateY(-4px)',
+            },
+            transition: 'transform 0.2s',
           }}
         >
-          <IconButton
-            color="primary"
-            aria-label="scroll to top"
-            sx={{
-              bgcolor: 'background.paper',
-              boxShadow: 3,
-              '&:hover': {
-                bgcolor: 'background.paper',
-                transform: 'translateY(-4px)',
-              },
-              transition: 'transform 0.2s',
-            }}
-          >
-            <KeyboardArrowUpIcon />
-          </IconButton>
-        </Box>
-      </Zoom>
+          <KeyboardArrowUpIcon />
+        </IconButton>
+      </Box>
+    </Zoom>
 
-      <Snackbar 
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    <Snackbar 
+      open={snackbar.open}
+      autoHideDuration={6000}
+      onClose={handleCloseSnackbar}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+    >
+      <Alert 
+        onClose={handleCloseSnackbar} 
+        severity={snackbar.severity}
+        variant="filled"
+        sx={{ width: '100%' }}
       >
-        <Alert 
-          onClose={handleCloseSnackbar} 
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
-  );
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
+  </Box>
+)
 }
 
 export default Landing;

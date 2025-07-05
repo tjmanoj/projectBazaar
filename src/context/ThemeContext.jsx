@@ -1,10 +1,14 @@
 import React, { createContext, useContext, useState, useMemo } from 'react';
-import { ThemeProvider as MuiThemeProvider, createTheme, alpha } from '@mui/material';
+import { ThemeProvider as MuiThemeProvider, createTheme, alpha, CssBaseline } from '@mui/material';
 
 const ThemeContext = createContext();
 
 export function useThemeContext() {
-  return useContext(ThemeContext);
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useThemeContext must be used within a ThemeProvider');
+  }
+  return context;
 }
 
 export function ThemeProvider({ children }) {
@@ -125,9 +129,20 @@ export function ThemeProvider({ children }) {
     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
+  const value = useMemo(
+    () => ({
+      mode,
+      toggleTheme,
+    }),
+    [mode]
+  );
+
   return (
-    <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
+    <ThemeContext.Provider value={value}>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </MuiThemeProvider>
     </ThemeContext.Provider>
   );
 }

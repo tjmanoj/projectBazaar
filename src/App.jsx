@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-import { ThemeProvider } from './context/ThemeContext';
+// ThemeProvider is now moved to main.jsx
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import CancellationRefund from "./pages/CancellationRefund";
@@ -37,10 +37,8 @@ function App() {
   const { currentUser } = useAuth();
 
   return (
-    <ThemeProvider>
-      <Router>
-        <div className="app">
-          <Routes>
+    <div className="app">
+      <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
             <Route path="/cancellation-refund" element={<CancellationRefund />} />
@@ -101,9 +99,7 @@ function App() {
           </Routes>
           {/* Chat Widget for authenticated users */}
           <ChatWidget />
-        </div>
-      </Router>
-    </ThemeProvider>
+      </div>
   );
 }
 
