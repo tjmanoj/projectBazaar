@@ -57,6 +57,11 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
     setImageError(true);
   };
 
+  const handleThumbnailClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate(`/project/${project.id}`);
+  };
+
   return (
     <Card 
       sx={{ 
@@ -84,13 +89,19 @@ export function ProjectCard({ project, onClick, onDemoClick }: ProjectCardProps)
           image={project.thumbnail}
           alt={`${project.title} thumbnail`}
           onError={handleImageError}
+          onClick={handleThumbnailClick}
           sx={{ 
             objectFit: 'cover',
             objectPosition: 'center top',
             borderBottom: 1,
             borderColor: 'divider',
             width: '100%',
-            height: { xs: '200px', sm: '240px' }
+            height: { xs: '200px', sm: '240px' },
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease-in-out',
+            '&:hover': {
+              transform: 'scale(1.02)'
+            }
           }}
         />
       )}

@@ -11,6 +11,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import Signup from "./pages/Signup";
 import ProjectList from "./pages/ProjectList";
+import ProjectPage from "./pages/ProjectDetails";
 import Demo from "./pages/Demo";
 import Payment from "./pages/Payment";
 import Download from "./pages/Download";
@@ -41,6 +42,7 @@ function App() {
       <Routes>
             {/* Public routes */}
             <Route path="/" element={<Landing />} />
+            <Route path="/project/:projectId" element={<ProjectPage />} />
             <Route path="/cancellation-refund" element={<CancellationRefund />} />
             <Route path="/shipping-delivery" element={<ShippingDelivery />} />
             <Route path="/contact" element={<ContactUs />} />
