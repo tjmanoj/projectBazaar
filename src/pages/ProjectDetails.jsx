@@ -337,9 +337,18 @@ export default function ProjectDetails() {
                 <Typography variant="h5" sx={{ flex: 1 }}>
                   {project.title}
                 </Typography>
-                <IconButton onClick={handleShare}>
-                  <ShareIcon />
-                </IconButton>
+                <Box 
+                  component="span"
+                  sx={{ display: 'flex', alignItems: 'center' }}
+                >
+                  <ShareIcon 
+                    sx={{ 
+                      color: 'text.secondary',
+                      cursor: 'pointer'
+                    }}
+                    onClick={handleShare}
+                  />
+                </Box>
               </Stack>
               
               <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
