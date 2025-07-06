@@ -50,16 +50,16 @@ function App() {
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route 
               path="/login" 
-              element={currentUser ? <Navigate to="/dashboard" /> : <Login />} 
+              element={currentUser ? <Navigate to="/projects" /> : <Login />} 
             />
             <Route 
               path="/signup" 
-              element={currentUser ? <Navigate to="/dashboard" /> : <Signup />} 
+              element={currentUser ? <Navigate to="/projects" /> : <Signup />} 
             />
 
             {/* Protected routes */}
             <Route 
-              path="/dashboard"
+              path="/projects"
               element={
                 <ProtectedRoute>
                   <ProjectList />

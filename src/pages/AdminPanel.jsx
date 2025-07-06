@@ -101,11 +101,11 @@ function AdminPanel() {
         setIsAdmin(isUserAdmin);
         if (!isUserAdmin) {
           // Redirect non-admin users
-          navigate('/dashboard');
+          navigate('/projects');
         }
       } catch (err) {
         console.error('Error checking admin status:', err);
-        navigate('/dashboard');
+        navigate('/projects');
       }
     };
     checkAdminStatus();

@@ -39,7 +39,7 @@ function Login() {
       setError("");
       setLoading(true);
       await login(email, password);
-      navigate("/dashboard");
+      navigate("/projects");
     } catch (err) {
       console.error(err);
       // Handle specific Firebase auth errors

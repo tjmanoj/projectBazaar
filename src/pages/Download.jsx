@@ -196,7 +196,7 @@ function Download() {
             <Button
               variant="outlined"
               startIcon={<ArrowBackIcon />}
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/projects')}
               disabled={downloading}
             >
               Back
