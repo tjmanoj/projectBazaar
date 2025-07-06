@@ -16,15 +16,21 @@ import {
   Alert,
   Stack,
   Paper,
+  IconButton,
+  Snackbar,
 } from '@mui/material';
 import {
   Code as CodeIcon,
   VideoLibrary as VideoIcon,
   ArrowBack as ArrowBackIcon,
   ShoppingCart as ShoppingCartIcon,
+  Download as DownloadIcon,
+  Share as ShareIcon,
 } from '@mui/icons-material';
 import DemoModal from '../components/DemoModal';
 import { motion } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import { checkPurchaseStatus } from '../services/projectService';
 
 const MotionBox = motion(Box);
 const fadeIn = {
@@ -35,24 +41,33 @@ const fadeIn = {
 function ProjectDetails() {
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDemoModal, setOpenDemoModal] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [shareToast, setShareToast] = useState(false);
 
   useEffect(() => {
     const fetchProject = async () => {
       try {
+        setLoading(true);
         const projectRef = doc(db, 'projects', projectId);
         const projectDoc = await getDoc(projectRef);
         
         if (!projectDoc.exists()) {
           setError('Project not found');
-          setLoading(false);
           return;
         }
 
-        setProject({ id: projectDoc.id, ...projectDoc.data() });
+        const projectData = { id: projectDoc.id, ...projectDoc.data() };
+        setProject(projectData);
+
+        if (currentUser) {
+          const purchased = await checkPurchaseStatus(projectId, currentUser.uid);
+          setHasPurchased(purchased);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -61,7 +76,27 @@ function ProjectDetails() {
     };
 
     fetchProject();
-  }, [projectId]);
+  }, [projectId, currentUser]);
+
+  const handleShare = async () => {
+    const shareUrl = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: project.title,
+          text: project.description,
+          url: shareUrl,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setShareToast(true);
+      }
+    } catch (err) {
+      // Fallback to clipboard
+      await navigator.clipboard.writeText(shareUrl);
+      setShareToast(true);
+    }
+  };
 
   if (loading) {
     return (
@@ -103,13 +138,33 @@ function ProjectDetails() {
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', pb: 8 }}>
       <Container maxWidth="lg">
         <Box sx={{ pt: 12 }}>
-          <Button 
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate(-1)}
-            sx={{ mb: 4 }}
-          >
-            Back to Projects
-          </Button>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            mb: 4 
+          }}>
+            <Button 
+              startIcon={<ArrowBackIcon />}
+              onClick={() => navigate(-1)}
+            >
+              Back to Projects
+            </Button>
+            <IconButton
+              onClick={handleShare}
+              aria-label="share project"
+              sx={{ 
+                bgcolor: 'background.paper',
+                boxShadow: 1,
+                '&:hover': { 
+                  bgcolor: 'background.paper',
+                  transform: 'scale(1.1)'
+                }
+              }}
+            >
+              <ShareIcon />
+            </IconButton>
+          </Box>
 
           <Grid container spacing={6}>
             <Grid item xs={12} md={7}>
@@ -166,15 +221,27 @@ function ProjectDetails() {
                 </Typography>
 
                 <Stack spacing={2} sx={{ mt: 4 }}>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    startIcon={<ShoppingCartIcon />}
-                    onClick={() => navigate(`/payment/${project.id}`)}
-                  >
-                    Buy Now
-                  </Button>
+                  {hasPurchased ? (
+                    <Button
+                      variant="contained"
+                      size="large"
+                      fullWidth
+                      startIcon={<DownloadIcon />}
+                      onClick={() => navigate(`/download/${project.id}`)}
+                    >
+                      Download Project
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      size="large"
+                      fullWidth
+                      startIcon={<ShoppingCartIcon />}
+                      onClick={() => navigate(`/payment/${project.id}`)}
+                    >
+                      Buy Now
+                    </Button>
+                  )}
 
                   {(project.demoVideoDesktopUrl || project.demoVideoMobileUrl) && (
                     <Button
@@ -195,25 +262,43 @@ function ProjectDetails() {
           {project.features && project.features.length > 0 && (
             <>
               <Divider sx={{ my: 8 }} />
-              <Grid container spacing={4}>
-                <Grid item xs={12}>
-                  <Typography variant="h4" gutterBottom>
-                    Features
-                  </Typography>
-                  <Paper elevation={0} sx={{ p: 3, bgcolor: 'background.paper' }}>
-                    <Grid container spacing={3}>
-                      {project.features.map((feature, index) => (
-                        <Grid item xs={12} sm={6} key={index}>
-                          <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
-                            <CodeIcon color="primary" />
-                            <Typography>{feature}</Typography>
-                          </Box>
-                        </Grid>
-                      ))}
-                    </Grid>
-                  </Paper>
-                </Grid>
-              </Grid>
+              <Box>
+                <Typography variant="h4" gutterBottom sx={{ mb: 4 }}>
+                  Key Features
+                </Typography>
+                <Paper 
+                  elevation={0} 
+                  sx={{ 
+                    p: 4,
+                    bgcolor: 'background.paper',
+                    borderRadius: 2,
+                    border: 1,
+                    borderColor: 'divider'
+                  }}
+                >
+                  <Grid container spacing={3}>
+                    {project.features.map((feature, index) => (
+                      <Grid item xs={12} md={6} key={index}>
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'flex-start', 
+                          gap: 2,
+                          p: 2,
+                          borderRadius: 1,
+                          '&:hover': {
+                            bgcolor: 'action.hover'
+                          }
+                        }}>
+                          <CodeIcon color="primary" sx={{ mt: 0.5 }} />
+                          <Typography sx={{ flex: 1 }}>
+                            {feature}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Paper>
+              </Box>
             </>
           )}
         </Box>
@@ -223,6 +308,14 @@ function ProjectDetails() {
         open={openDemoModal}
         onClose={() => setOpenDemoModal(false)}
         project={project}
+      />
+
+      <Snackbar
+        open={shareToast}
+        autoHideDuration={3000}
+        onClose={() => setShareToast(false)}
+        message="Project link copied to clipboard"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
     </Box>
   );
