@@ -175,6 +175,19 @@ function ProjectList() {
   };
 
   const handleProjectClick = (project) => {
+    if (!currentUser) {
+      // If not logged in, redirect to login with the intended payment URL
+      const returnPath = `/payment/${project.id}`;
+      navigate('/login', { 
+        state: { 
+          from: returnPath,
+          message: 'Please log in to purchase this project.'
+        },
+        replace: true  // Use replace to prevent back button issues
+      });
+      return;
+    }
+    // If logged in, go directly to payment
     navigate(`/payment/${project.id}`);
   };
 

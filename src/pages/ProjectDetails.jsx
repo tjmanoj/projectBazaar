@@ -103,15 +103,18 @@ export default function ProjectDetails() {
 
   const handlePurchase = () => {
     if (!currentUser) {
-      // Store the current project page URL to redirect back after login
+      // Store the payment page URL to redirect after login
+      const returnPath = `/payment/${projectId}`;
       navigate('/login', { 
         state: { 
-          from: `/project/${projectId}`,
+          from: returnPath,
           message: 'Please log in to purchase this project'
-        } 
+        },
+        replace: true  // Use replace to prevent back button issues
       });
       return;
     }
+    // If logged in, go directly to payment
     navigate(`/payment/${projectId}`);
   };
 

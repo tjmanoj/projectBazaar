@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
   Container,
   Paper,
@@ -26,13 +26,24 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState(location?.state?.message || "");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { login, resetPassword } = useAuth();
+  
+  // Store location state in a ref to prevent it from being lost during re-renders
+  const returnTo = React.useRef(location.state?.from || "/projects");
+  const [message, setMessage] = useState(location.state?.message || "");
   const [resetMessage, setResetMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [openResetDialog, setOpenResetDialog] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
-  const { login, resetPassword } = useAuth();
-  const navigate = useNavigate();
+  
+  // Update returnTo if location state changes
+  React.useEffect(() => {
+    if (location.state?.from) {
+      returnTo.current = location.state.from;
+    }
+  }, [location.state]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -41,9 +52,8 @@ function Login() {
       setLoading(true);
       await login(email, password);
       
-      // Get the return URL from location state, if any
-      const returnTo = location?.state?.from || "/projects";
-      navigate(returnTo);
+      // Use the stored returnTo value for navigation
+      navigate(returnTo.current, { replace: true });
     } catch (err) {
       console.error(err);
       // Handle specific Firebase auth errors
