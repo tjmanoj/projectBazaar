@@ -79,14 +79,17 @@ function ProjectList() {
 
   useEffect(() => {
     loadProjects();
-    checkAdminStatus();
-  }, [category]);
+    if (currentUser) {
+      checkAdminStatus();
+    }
+  }, [category, currentUser]);
 
   useEffect(() => {
     filterProjects(allProjects, searchQuery, category);
   }, [searchQuery, category, sortBy]);
 
   const checkAdminStatus = async () => {
+    if (!currentUser) return;
     try {
       const userDoc = await getDoc(doc(db, "users", currentUser.uid));
       setIsAdmin(userDoc.exists() && userDoc.data().isAdmin === true);

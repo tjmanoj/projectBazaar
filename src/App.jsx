@@ -60,11 +60,7 @@ function App() {
             {/* Protected routes */}
             <Route 
               path="/projects"
-              element={
-                <ProtectedRoute>
-                  <ProjectList />
-                </ProtectedRoute>
-              }
+              element={<ProjectList />}
             />
             <Route 
               path="/demo/:projectId" 

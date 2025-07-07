@@ -722,7 +722,7 @@ function Landing() {
                     <Button
                       variant="contained"
                       size="large"
-                      onClick={() => navigate('/login')}
+                      onClick={() => navigate('/projects')}
                       endIcon={<ArrowForward />}
                       sx={{
                         py: 2,

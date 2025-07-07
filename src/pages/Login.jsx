@@ -26,6 +26,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState(location?.state?.message || "");
   const [resetMessage, setResetMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [openResetDialog, setOpenResetDialog] = useState(false);
@@ -39,7 +40,10 @@ function Login() {
       setError("");
       setLoading(true);
       await login(email, password);
-      navigate("/projects");
+      
+      // Get the return URL from location state, if any
+      const returnTo = location?.state?.from || "/projects";
+      navigate(returnTo);
     } catch (err) {
       console.error(err);
       // Handle specific Firebase auth errors
@@ -85,208 +89,203 @@ function Login() {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Paper elevation={3} sx={{ p: 4, width: "100%", mt: 2 }}>
+      <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
+        {message && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            {message}
+          </Alert>
+        )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              bgcolor: "primary.main",
+              color: "white",
+              p: 2,
+              borderRadius: "50%",
+              mb: 2,
+            }}
+          >
+            <LockOutlinedIcon />
+          </Box>
+          <Typography component="h1" variant="h5">
+            Sign In
+          </Typography>
+        </Box>
+
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="off"
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            sx={{
+              "& .MuiInputBase-root": {
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "grey.100"
+                    : "background.paper",
+              },
+              "& .MuiOutlinedInput-root": {
+                "& input": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.900"
+                      : "text.primary",
+                },
+                "& fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.400"
+                      : "divider",
+                },
+                "&:hover fieldset": {
+                  borderColor: "primary.main",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "grey.700"
+                    : "text.secondary",
+                "&.Mui-focused": {
+                  color: "primary.main",
+                },
+              },
+            }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowPassword(!showPassword);
+                    }}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onMouseUp={(e) => e.preventDefault()}
+                    edge="end"
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'transparent'
+                      },
+                      color: theme => theme.palette.mode === 'dark' ? 'primary.main' : 'text.secondary'
+                    }}
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+              sx: {
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "grey.100"
+                    : "background.paper",
+                "& input": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.900"
+                      : "text.primary",
+                },
+              },
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "grey.400"
+                      : "divider",
+                },
+                "&:hover fieldset": {
+                  borderColor: "primary.main",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "primary.main",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "grey.700"
+                    : "text.secondary",
+                "&.Mui-focused": {
+                  color: "primary.main",
+                },
+              },
+            }}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+            disabled={loading}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </Button>
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              mt: 2,
+              gap: 1,
             }}
           >
-            <Box
+            <MuiLink
+              component="button"
+              variant="body2"
+              onClick={() => {
+                setOpenResetDialog(true);
+                setResetEmail(email);
+              }}
               sx={{
-                bgcolor: "primary.main",
-                color: "white",
-                p: 2,
-                borderRadius: "50%",
-                mb: 2,
+                "&:hover": {
+                  backgroundColor: "transparent",
+                  color: "primary.main",
+                },
               }}
             >
-              <LockOutlinedIcon />
-            </Box>
-            <Typography component="h1" variant="h5">
-              Sign In
-            </Typography>
+              Forgot password?
+            </MuiLink>
+            <MuiLink component={Link} to="/signup" variant="body2">
+              Don't have an account? Sign Up
+            </MuiLink>
           </Box>
-
-          {error && (
-            <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
-              {error}
-            </Alert>
-          )}
-
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="off"
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              sx={{
-                "& .MuiInputBase-root": {
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "grey.100"
-                      : "background.paper",
-                },
-                "& .MuiOutlinedInput-root": {
-                  "& input": {
-                    color: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "grey.900"
-                        : "text.primary",
-                  },
-                  "& fieldset": {
-                    borderColor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "grey.400"
-                        : "divider",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "primary.main",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "primary.main",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "grey.700"
-                      : "text.secondary",
-                  "&.Mui-focused": {
-                    color: "primary.main",
-                  },
-                },
-              }}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setShowPassword(!showPassword);
-                      }}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onMouseUp={(e) => e.preventDefault()}
-                      edge="end"
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: 'transparent'
-                        },
-                        color: theme => theme.palette.mode === 'dark' ? 'primary.main' : 'text.secondary'
-                      }}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-                sx: {
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "grey.100"
-                      : "background.paper",
-                  "& input": {
-                    color: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "grey.900"
-                        : "text.primary",
-                  },
-                },
-              }}
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  "& fieldset": {
-                    borderColor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "grey.400"
-                        : "divider",
-                  },
-                  "&:hover fieldset": {
-                    borderColor: "primary.main",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "primary.main",
-                  },
-                },
-                "& .MuiInputLabel-root": {
-                  color: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "grey.700"
-                      : "text.secondary",
-                  "&.Mui-focused": {
-                    color: "primary.main",
-                  },
-                },
-              }}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-              disabled={loading}
-            >
-              {loading ? "Signing In..." : "Sign In"}
-            </Button>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                mt: 2,
-                gap: 1,
-              }}
-            >
-              <MuiLink
-                component="button"
-                variant="body2"
-                onClick={() => {
-                  setOpenResetDialog(true);
-                  setResetEmail(email);
-                }}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "transparent",
-                    color: "primary.main",
-                  },
-                }}
-              >
-                Forgot password?
-              </MuiLink>
-              <MuiLink component={Link} to="/signup" variant="body2">
-                Don't have an account? Sign Up
-              </MuiLink>
-            </Box>
-          </Box>
-        </Paper>
-      </Box>
+        </Box>
+      </Paper>
 
       {/* Password Reset Dialog */}
       <Dialog open={openResetDialog} onClose={() => setOpenResetDialog(false)}>

@@ -78,9 +78,18 @@ export default function ProjectDetails() {
 
         setProject(projectData);
 
+        // Only check purchase status if user is logged in
         if (currentUser) {
-          const purchased = await checkPurchaseStatus(projectId, currentUser.uid);
-          setHasPurchased(purchased);
+          try {
+            const purchased = await checkPurchaseStatus(projectId, currentUser.uid);
+            setHasPurchased(purchased);
+          } catch (err) {
+            console.error('Error checking purchase status:', err);
+            // Don't set error state here, as we still want to show the project
+            setHasPurchased(false);
+          }
+        } else {
+          setHasPurchased(false);
         }
       } catch (err) {
         setError('Failed to load project');
@@ -94,7 +103,13 @@ export default function ProjectDetails() {
 
   const handlePurchase = () => {
     if (!currentUser) {
-      navigate('/login', { state: { from: `/project/${projectId}` } });
+      // Store the current project page URL to redirect back after login
+      navigate('/login', { 
+        state: { 
+          from: `/project/${projectId}`,
+          message: 'Please log in to purchase this project'
+        } 
+      });
       return;
     }
     navigate(`/payment/${projectId}`);
