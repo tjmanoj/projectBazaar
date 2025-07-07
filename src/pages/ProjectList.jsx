@@ -41,6 +41,7 @@ import {
   AccountCircle,
   AdminPanelSettings,
   Logout as LogoutIcon,
+  Login as LoginIcon,
   Menu as MenuIcon,
   Home,
   School,
@@ -55,6 +56,15 @@ function ProjectList() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  const handleAuthAction = () => {
+    if (currentUser) {
+      logout();
+      navigate('/');
+    } else {
+      navigate('/login');
+    }
+  };
   const [category, setCategory] = useState("all");
   const [isAdmin, setIsAdmin] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -323,22 +333,22 @@ function ProjectList() {
               </Box>
             </Box>
 
-            {/* Right side actions */}
+            {/* Right side controls */}
             <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap: 0.5,
+                gap: 1,
+                ml: "auto",
               }}
             >
-              {/* Theme Toggle - Hidden on mobile */}
-              <Box 
-                sx={{ 
-                  display: { xs: 'none', md: 'flex' }, 
+              {/* Theme Toggle */}
+              <Box
+                sx={{
+                  display: 'flex',
                   alignItems: 'center',
-                  cursor: 'default',
-                  pointerEvents: 'none', // This ensures clicks won't trigger on the container
-                  pr: 1 // Added right padding in desktop view
+                  pointerEvents: 'none',
+                  pr: 1
                 }}
               >
                 <IconButton
@@ -350,7 +360,7 @@ function ProjectList() {
                   size="small"
                   disableRipple
                   sx={{
-                    pointerEvents: 'auto', // This re-enables clicks on the icon itself
+                    pointerEvents: 'auto',
                     "&:hover": { backgroundColor: "transparent" },
                     "&:active": { backgroundColor: "transparent" }
                   }}
@@ -359,7 +369,7 @@ function ProjectList() {
                 </IconButton>
               </Box>
 
-              {/* Admin Button */}
+              {/* Admin Button - Only show if user is admin */}
               {isAdmin && (
                 <Button
                   variant="outlined"
@@ -376,52 +386,54 @@ function ProjectList() {
                 </Button>
               )}
 
-              {/* User Profile */}
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.5,
-                  ml: 0.5,
-                }}
-              >
-                <IconButton
-                  onClick={handleDrawerToggle}
+              {/* User Profile - Only show if logged in */}
+              {currentUser && (
+                <Box
                   sx={{
-                    p: 0.5,
-                    display: { xs: 'flex', md: 'none' },
-                    '&:hover': {
-                      backgroundColor: 'transparent'
-                    }
-                  }}
-                  disableRipple
-                >
-                  <AccountCircle 
-                    fontSize="small" 
-                    color="primary"
-                  />
-                </IconButton>
-                <Typography
-                  variant="body2"
-                  sx={{
-                    display: { xs: "none", sm: "block" },
-                    maxWidth: "120px",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                    color: "text.secondary",
-                    fontSize: "0.8rem",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                    ml: 0.5,
                   }}
                 >
-                  {currentUser?.email}
-                </Typography>
-              </Box>
+                  <IconButton
+                    onClick={handleDrawerToggle}
+                    sx={{
+                      p: 0.5,
+                      display: { xs: 'flex', md: 'none' },
+                      '&:hover': {
+                        backgroundColor: 'transparent'
+                      }
+                    }}
+                    disableRipple
+                  >
+                    <AccountCircle 
+                      fontSize="small" 
+                      color="primary"
+                    />
+                  </IconButton>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      display: { xs: "none", sm: "block" },
+                      maxWidth: "120px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      color: "text.secondary",
+                      fontSize: "0.8rem",
+                    }}
+                  >
+                    {currentUser.email}
+                  </Typography>
+                </Box>
+              )}
 
-              {/* Logout Button */}
+              {/* Auth Button */}
               <Button
                 color="inherit"
                 size="small"
-                onClick={handleLogout}
+                onClick={handleAuthAction}
                 sx={{
                   minWidth: 0,
                   p: 1,
@@ -433,7 +445,11 @@ function ProjectList() {
                   }
                 }}
               >
-                <LogoutIcon fontSize="small" color="primary" />
+                {currentUser ? (
+                  <LogoutIcon fontSize="small" color="primary" />
+                ) : (
+                  <LoginIcon fontSize="small" color="primary" />
+                )}
               </Button>
             </Box>
           </Toolbar>
@@ -548,7 +564,7 @@ function ProjectList() {
         open={mobileOpen}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better mobile performance
+          keepMounted: true,
         }}
         sx={{
           display: { xs: "block", md: "none" },
@@ -560,20 +576,40 @@ function ProjectList() {
         }}
       >
         <Box sx={{ overflow: "auto" }}>
-          <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>
-            <AccountCircle color="primary" />
-            <Typography
-              variant="subtitle2"
-              sx={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {currentUser?.email}
-            </Typography>
-          </Box>
+          {/* User Info Section - Only show if logged in */}
+          {currentUser ? (
+            <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>
+              <AccountCircle color="primary" />
+              <Typography
+                variant="subtitle2"
+                sx={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {currentUser.email}
+              </Typography>
+            </Box>
+          ) : (
+            <Box sx={{ p: 2 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  handleAuthAction();
+                  handleDrawerToggle();
+                }}
+                startIcon={<LoginIcon />}
+              >
+                Sign In
+              </Button>
+            </Box>
+          )}
           <Divider />
+
+          {/* Project Categories */}
           <List>
             <ListItem
               button
@@ -632,49 +668,41 @@ function ProjectList() {
               <ListItemText primary="Mentorship" />
             </ListItem>
           </List>
-          <Divider />
-          <List>
-            {isAdmin && (
-              <ListItem
-                button
-                onClick={() => {
-                  navigate("/admin");
-                  handleDrawerToggle();
-                }}
-              >
-                <ListItemIcon>
-                  <AdminPanelSettings color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="Admin Panel" />
-              </ListItem>
-            )}
-            <ListItem
-              button
-              onClick={() => {
-                toggleTheme();
-                handleDrawerToggle();
-              }}
-            >
-              <ListItemIcon>
-                {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
-              </ListItemIcon>
-              <ListItemText
-                primary={mode === "dark" ? "Light Mode" : "Dark Mode"}
-              />
-            </ListItem>
-            <ListItem
-              button
-              onClick={() => {
-                handleLogout();
-                handleDrawerToggle();
-              }}
-            >
-              <ListItemIcon>
-                <LogoutIcon />
-              </ListItemIcon>
-              <ListItemText primary="Logout" />
-            </ListItem>
-          </List>
+
+          {/* Show admin and logout options only if user is logged in */}
+          {currentUser && (
+            <>
+              <Divider />
+              <List>
+                {isAdmin && (
+                  <ListItem
+                    button
+                    onClick={() => {
+                      navigate("/admin");
+                      handleDrawerToggle();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <AdminPanelSettings />
+                    </ListItemIcon>
+                    <ListItemText primary="Admin Panel" />
+                  </ListItem>
+                )}
+                <ListItem
+                  button
+                  onClick={() => {
+                    handleAuthAction();
+                    handleDrawerToggle();
+                  }}
+                >
+                  <ListItemIcon>
+                    <LogoutIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Logout" />
+                </ListItem>
+              </List>
+            </>
+          )}
         </Box>
       </Drawer>
     </Box>
