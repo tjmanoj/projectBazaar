@@ -332,7 +332,7 @@ function Landing() {
     avatar: "https://randomuser.me/api/portraits/women/96.jpg"
   },
   {
-    quote: "Naan naachathayum seyyala. Avanga kudutha guidance-la project complete pannitten. Seriously thanks!",
+    quote: "Romba sikrama project senji kuduthutanga.. Seriously thanks!",
     name: "Vignesh R",
     role: "EEE Final Year, Salem",
     rating: 5,
@@ -1014,19 +1014,19 @@ function Landing() {
                 icon: <Assignment sx={{ fontSize: 48 }} />,
                 title: 'Mini Projects',
                 description: 'Perfect for semester projects and learning the latest tools and technologies.',
-                price: 'Starting at ₹499'
+                price: 'Starting at ₹999'
               },
               {
                 icon: <Engineering sx={{ fontSize: 48 }} />,
                 title: 'Final Year Projects',
                 description: 'Get complete solutions with docs, slides, and presentation-ready materials.',
-                price: 'Starting at ₹1499'
+                price: 'Starting at ₹2499'
               },
               {
                 icon: <SupervisorAccount sx={{ fontSize: 48 }} />,
                 title: 'Mentorship',
                 description: '1-on-1 guidance sessions with top industry experts to boost your project skills.',
-                price: 'Starting at ₹2499'
+                price: 'Starting at ₹3499'
               }
             ].map((service, index) => (
               <Grid item xs={12} md={4} key={index}>
